@@ -6,174 +6,204 @@
 
 <div class="product-form-page">
 
-    <!-- =========================================================
-         TOPBAR
-    ========================================================== -->
+<!-- =========================================================
+     TOPBAR
+========================================================== -->
 
-    <div class="product-page-topbar">
+<div class="topbar">
 
-        <div class="product-page-title">
+    <div class="page-title">
 
-            <div class="product-page-eyebrow">
-                Product Management
-            </div>
+        <small>
+            Product Management
+        </small>
 
-            <h1>
-                Add Product
-            </h1>
+        <h1>
+            Add Product
+        </h1>
 
-            <p>
-                Create a new product record for the BiteSync menu.
-            </p>
-
-        </div>
-
-
-        <!-- =====================================================
-             DATE
-        ====================================================== -->
-
-        <div class="product-date-box">
-
-            <span class="product-date-icon">
-                ◷
-            </span>
-
-            {{ now()->format('F d, Y') }}
-
-        </div>
+        <p>
+            Create a new product record for the BiteSync menu.
+        </p>
 
     </div>
 
 
-    <!-- =========================================================
-         BREADCRUMB
-    ========================================================== -->
+    <!-- DATE -->
 
-    <div class="product-breadcrumb">
+    <div class="date-box">
 
-        <a href="{{ route('products.index') }}">
-            Products
-        </a>
-
-        <span>
-            /
+        <span class="date-icon">
+            ◷
         </span>
 
-        <strong>
-            Add Product
-        </strong>
+        {{ now()->format('F d, Y') }}
 
     </div>
 
+</div>
 
-    <!-- =========================================================
-         VALIDATION ERRORS
-    ========================================================== -->
 
-    @if ($errors->any())
+<!-- =========================================================
+     BREADCRUMB
+========================================================== -->
 
-        <div class="product-error-alert">
+<div class="product-breadcrumb">
 
-            <div class="product-error-icon">
-                !
+    <a href="{{ route('products.index') }}">
+        Products
+    </a>
+
+    <span>
+        /
+    </span>
+
+    <strong>
+        Add Product
+    </strong>
+
+</div>
+
+
+<!-- =========================================================
+     VALIDATION ERRORS
+========================================================== -->
+
+@if ($errors->any())
+
+    <div class="product-error-alert">
+
+        <div class="product-error-icon">
+            !
+        </div>
+
+        <div>
+
+            <div class="product-error-title">
+                Please check the form.
             </div>
+
+            <ul>
+
+                @foreach ($errors->all() as $error)
+
+                    <li>
+                        {{ $error }}
+                    </li>
+
+                @endforeach
+
+            </ul>
+
+        </div>
+
+    </div>
+
+@endif
+
+
+<!-- =========================================================
+     FORM
+========================================================== -->
+
+<form
+    method="POST"
+    action="{{ route('products.store') }}"
+    enctype="multipart/form-data"
+>
+
+    @csrf
+
+
+    <!-- =====================================================
+         FORM CARD
+    ====================================================== -->
+
+    <div class="product-form-card">
+
+
+        <!-- =================================================
+             CARD HEADER
+        ================================================== -->
+
+        <div class="product-form-card-header">
 
             <div>
 
-                <div class="product-error-title">
-                    Please check the form.
-                </div>
+                <h2>
+                    Product Information
+                </h2>
 
-                <ul>
+                <p>
+                    Enter the details needed to create this menu product.
+                </p>
 
-                    @foreach ($errors->all() as $error)
+            </div>
 
-                        <li>
-                            {{ $error }}
-                        </li>
+            <div class="product-required-note">
 
-                    @endforeach
+                <span>*</span>
 
-                </ul>
+                Required fields
 
             </div>
 
         </div>
 
-    @endif
+
+        <!-- =================================================
+             CARD CONTENT
+        ================================================== -->
+
+        <div class="product-form-content">
 
 
-    <!-- =========================================================
-         FORM
-    ========================================================== -->
+            <!-- =============================================
+                 LEFT CONTENT
+            ============================================== -->
 
-    <form
-        method="POST"
-        action="{{ route('products.store') }}"
-        enctype="multipart/form-data"
-    >
-
-        @csrf
+            <div class="product-main-fields">
 
 
-        <!-- =====================================================
-             FORM CARD
-        ====================================================== -->
+                <!-- PRODUCT NAME -->
 
-        <div class="product-form-card">
+                <div class="product-field">
 
+                    <label for="name">
 
-            <!-- =================================================
-                 CARD HEADER
-            ================================================== -->
+                        Product Name
 
-            <div class="product-form-card-header">
+                        <span>
+                            *
+                        </span>
 
-                <div>
+                    </label>
 
-                    <h2>
-                        Product Information
-                    </h2>
-
-                    <p>
-                        Enter the details needed to create this menu product.
-                    </p>
-
-                </div>
-
-                <div class="product-required-note">
-
-                    <span>*</span>
-
-                    Required fields
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value="{{ old('name') }}"
+                        placeholder="e.g. Classic Burger"
+                        maxlength="255"
+                        required
+                    >
 
                 </div>
 
-            </div>
+
+                <!-- SKU + CATEGORY -->
+
+                <div class="product-two-column">
 
 
-            <!-- =================================================
-                 CARD CONTENT
-            ================================================== -->
-
-            <div class="product-form-content">
-
-
-                <!-- =============================================
-                     LEFT CONTENT
-                ============================================== -->
-
-                <div class="product-main-fields">
-
-
-                    <!-- PRODUCT NAME -->
+                    <!-- SKU -->
 
                     <div class="product-field">
 
-                        <label for="name">
+                        <label for="sku">
 
-                            Product Name
+                            SKU
 
                             <span>
                                 *
@@ -183,302 +213,275 @@
 
                         <input
                             type="text"
-                            id="name"
-                            name="name"
-                            value="{{ old('name') }}"
-                            placeholder="e.g. Classic Burger"
-                            maxlength="255"
+                            id="sku"
+                            name="sku"
+                            value="{{ old('sku') }}"
+                            placeholder="e.g. PROD-001"
+                            maxlength="100"
                             required
                         >
 
                     </div>
 
 
-                    <!-- SKU + CATEGORY -->
+                    <!-- CATEGORY -->
 
-                    <div class="product-two-column">
+                    <div class="product-field">
 
-                        <div class="product-field">
+                        <label for="category_id">
+                            Product Category
+                        </label>
 
-                            <label for="sku">
+                        <select
+                            id="category_id"
+                            name="category_id"
+                        >
 
-                                SKU
+                            <option value="">
+                                Select product category
+                            </option>
 
-                                <span>
-                                    *
-                                </span>
+                            @foreach ($categories as $category)
 
-                            </label>
-
-                            <input
-                                type="text"
-                                id="sku"
-                                name="sku"
-                                value="{{ old('sku') }}"
-                                placeholder="e.g. PROD-001"
-                                maxlength="100"
-                                required
-                            >
-
-                        </div>
-
-
-                        <div class="product-field">
-
-                            <label for="category_id">
-                                Category
-                            </label>
-
-                            <select
-                                id="category_id"
-                                name="category_id"
-                            >
-
-                                <option value="">
-                                    Select category
+                                <option
+                                    value="{{ $category->id }}"
+                                    {{ old('category_id') == $category->id ? 'selected' : '' }}
+                                >
+                                    {{ $category->name }}
                                 </option>
 
-                                @foreach ($categories as $category)
+                            @endforeach
 
-                                    <option
-                                        value="{{ $category->id }}"
-                                        {{ old('category_id') == $category->id ? 'selected' : '' }}
-                                    >
-                                        {{ $category->name }}
-                                    </option>
-
-                                @endforeach
-
-                            </select>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- SELLING PRICE -->
-
-                    <div class="product-field">
-
-                        <label for="selling_price">
-
-                            Selling Price
-
-                            <span>
-                                *
-                            </span>
-
-                        </label>
-
-                        <div class="product-price-input">
-
-                            <span>
-                                ₱
-                            </span>
-
-                            <input
-                                type="number"
-                                id="selling_price"
-                                name="selling_price"
-                                value="{{ old('selling_price') }}"
-                                placeholder="0.00"
-                                min="0"
-                                step="0.01"
-                                required
-                            >
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- DESCRIPTION -->
-
-                    <div class="product-field">
-
-                        <label for="description">
-                            Description
-                        </label>
-
-                        <textarea
-                            id="description"
-                            name="description"
-                            rows="5"
-                            placeholder="Enter a short description of the product..."
-                        >{{ old('description') }}</textarea>
+                        </select>
 
                     </div>
 
                 </div>
 
 
-                <!-- =============================================
-                     RIGHT IMAGE PANEL
-                ============================================== -->
+                <!-- SELLING PRICE -->
 
-                <div class="product-image-section">
+                <div class="product-field">
 
-                    <div class="product-section-label">
-                        Product Image
-                    </div>
+                    <label for="selling_price">
 
-                    <div class="product-section-description">
-                        Add a product photo for the Sales POS.
-                    </div>
-
-
-                    <!-- IMAGE PREVIEW -->
-
-                    <div
-                        class="product-image-preview"
-                        id="productImagePreview"
-                    >
-
-                        <div class="product-image-placeholder">
-
-                            <div class="product-placeholder-icon">
-                                ▧
-                            </div>
-
-                            <strong>
-                                No image
-                            </strong>
-
-                            <span>
-                                Preview
-                            </span>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- IMAGE INPUT -->
-
-                    <label
-                        for="image"
-                        class="product-image-button"
-                    >
+                        Selling Price
 
                         <span>
-                            +
+                            *
                         </span>
-
-                        Choose Image
 
                     </label>
 
-                    <input
-                        type="file"
-                        id="image"
-                        name="image"
-                        accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-                        hidden
-                    >
-
-
-                    <!-- FILE NAME -->
-
-                    <div
-                        class="product-image-file-name"
-                        id="productImageFileName"
-                    >
-                        No file selected
-                    </div>
-
-
-                    <!-- IMAGE HELP -->
-
-                    <div class="product-image-help">
-
-                        JPG, PNG or WEBP
+                    <div class="product-price-input">
 
                         <span>
-                            •
+                            ₱
                         </span>
 
-                        Maximum 2 MB
+                        <input
+                            type="number"
+                            id="selling_price"
+                            name="selling_price"
+                            value="{{ old('selling_price') }}"
+                            placeholder="0.00"
+                            min="0"
+                            step="0.01"
+                            required
+                        >
 
                     </div>
 
+                </div>
 
-                    <!-- IMAGE NOTE -->
 
-                    <div class="product-image-note">
+                <!-- DESCRIPTION -->
+
+                <div class="product-field">
+
+                    <label for="description">
+                        Description
+                    </label>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                        rows="5"
+                        placeholder="Enter a short description of the product..."
+                    >{{ old('description') }}</textarea>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 RIGHT IMAGE PANEL
+            ============================================== -->
+
+            <div class="product-image-section">
+
+                <div class="product-section-label">
+                    Product Image
+                </div>
+
+                <div class="product-section-description">
+                    Add a product photo for the Sales POS.
+                </div>
+
+
+                <!-- IMAGE PREVIEW -->
+
+                <div
+                    class="product-image-preview"
+                    id="productImagePreview"
+                >
+
+                    <div class="product-image-placeholder">
+
+                        <div class="product-placeholder-icon">
+                            ▧
+                        </div>
+
+                        <strong>
+                            No image
+                        </strong>
 
                         <span>
-                            i
+                            Preview
                         </span>
-
-                        <p>
-                            A product image helps staff identify items faster when creating a sale.
-                        </p>
 
                     </div>
 
                 </div>
 
-            </div>
 
-        </div>
+                <!-- IMAGE INPUT -->
+
+                <label
+                    for="image"
+                    class="product-image-button"
+                >
+
+                    <span>
+                        +
+                    </span>
+
+                    Choose Image
+
+                </label>
+
+                <input
+                    type="file"
+                    id="image"
+                    name="image"
+                    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                    hidden
+                >
 
 
-        <!-- =====================================================
-             INFORMATION NOTE
-        ====================================================== -->
+                <!-- FILE NAME -->
 
-        <div class="product-information-note">
-
-            <div class="product-note-icon">
-                i
-            </div>
-
-            <div>
-
-                <div class="product-note-title">
-                    Product and Inventory
+                <div
+                    class="product-image-file-name"
+                    id="productImageFileName"
+                >
+                    No file selected
                 </div>
 
-                <div class="product-note-text">
-                    A product represents a menu item, while inventory items
-                    represent its ingredients or stock materials. Recipe
-                    ingredients can be assigned after the product is created.
+
+                <!-- IMAGE HELP -->
+
+                <div class="product-image-help">
+
+                    JPG, PNG or WEBP
+
+                    <span>
+                        •
+                    </span>
+
+                    Maximum 2 MB
+
+                </div>
+
+
+                <!-- IMAGE NOTE -->
+
+                <div class="product-image-note">
+
+                    <span>
+                        i
+                    </span>
+
+                    <p>
+                        A product image helps staff identify items faster when creating a sale.
+                    </p>
+
                 </div>
 
             </div>
 
         </div>
 
+    </div>
 
-        <!-- =====================================================
-             ACTIONS
-        ====================================================== -->
 
-        <div class="product-form-actions">
+    <!-- =====================================================
+         INFORMATION NOTE
+    ====================================================== -->
 
-            <a
-                href="{{ route('products.index') }}"
-                class="product-cancel-button"
-            >
-                Cancel
-            </a>
+    <div class="product-information-note">
 
-            <button
-                type="submit"
-                class="product-save-button"
-            >
+        <div class="product-note-icon">
+            i
+        </div>
 
-                <span>
-                    +
-                </span>
+        <div>
 
-                Add Product
+            <div class="product-note-title">
+                Product and Inventory
+            </div>
 
-            </button>
+            <div class="product-note-text">
+                A product represents a menu item, while inventory items
+                represent its ingredients or stock materials. Recipe
+                ingredients can be assigned after the product is created.
+            </div>
 
         </div>
 
-    </form>
+    </div>
+
+
+    <!-- =====================================================
+         ACTIONS
+    ====================================================== -->
+
+    <div class="product-form-actions">
+
+        <a
+            href="{{ route('products.index') }}"
+            class="product-cancel-button"
+        >
+            Cancel
+        </a>
+
+        <button
+            type="submit"
+            class="product-save-button"
+        >
+
+            <span>
+                +
+            </span>
+
+            Add Product
+
+        </button>
+
+    </div>
+
+</form>
 
 </div>
 
@@ -506,85 +509,103 @@
    TOPBAR
 ========================================================= */
 
-.product-page-topbar {
+.product-form-page .topbar {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 20px;
-    margin-bottom: 13px;
+    gap: 25px;
+    margin-bottom: 14px;
 }
 
-.product-page-title {
+.product-form-page .page-title {
     min-width: 0;
 }
 
-.product-page-eyebrow {
+.product-form-page .page-title small {
     display: block;
-    margin-bottom: 3px;
-    color: #9a7652;
+    margin-bottom: 5px;
+
+    color: #a9825b;
+
     font-size: 10px;
-    line-height: 1.2;
     font-weight: 700;
-    letter-spacing: .08em;
+    letter-spacing: .12em;
     text-transform: uppercase;
 }
 
-.product-page-title h1 {
+.product-form-page .page-title h1 {
     margin: 0;
+
     color: #2d241d;
-    font-size: 29px;
+
+    font-size: clamp(1.6rem, 2vw, 1.9rem);
     line-height: 1.15;
+
     font-weight: 700;
-    letter-spacing: -.02em;
+    letter-spacing: -.04rem;
 }
 
-.product-page-title p {
-    margin: 5px 0 0;
+.product-form-page .page-title p {
+    margin: 6px 0 0;
+
     color: #8a8179;
+
     font-size: 12px;
     line-height: 1.5;
+
     font-weight: 400;
 }
 
 
 /* =========================================================
    DATE BOX
-   MATCH INVENTORY / SUPPLIER
 ========================================================= */
 
-.product-date-box {
-    display: flex;
+.product-form-page .date-box {
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    gap: 5px;
 
-    flex-shrink: 0;
+    gap: 9px;
 
     min-width: 145px;
 
     padding: 9px 12px;
 
     border: 1px solid #e8e0d7;
-    border-radius: 9px;
+    border-radius: 10px;
 
-    background: #fffdfb;
+    background: #ffffff;
 
-    color: #6e6258;
+    color: #8a8179;
 
     font-size: 10px;
     font-weight: 600;
 
-    text-align: center;
-
     white-space: nowrap;
+
+    box-shadow:
+        0 3px 12px rgba(43,31,23,.025);
 
     box-sizing: border-box;
 }
 
-.product-date-icon {
+.product-form-page .date-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 30px;
+    height: 30px;
+
+    flex-shrink: 0;
+
+    border-radius: 8px;
+
+    background: #fbf1e7;
+
     color: #a87542;
-    font-size: 12px;
-    line-height: 1;
+
+    font-size: 17px;
 }
 
 
@@ -595,6 +616,7 @@
 .product-breadcrumb {
     display: flex;
     align-items: center;
+
     gap: 7px;
 
     margin-bottom: 17px;
@@ -607,7 +629,9 @@
 
 .product-breadcrumb a {
     color: #9a7048;
+
     font-weight: 600;
+
     text-decoration: none;
 }
 
@@ -632,6 +656,7 @@
 .product-error-alert {
     display: flex;
     align-items: flex-start;
+
     gap: 9px;
 
     margin-bottom: 17px;
@@ -670,6 +695,7 @@
 
 .product-error-title {
     margin-bottom: 3px;
+
     font-weight: 700;
 }
 
@@ -685,7 +711,6 @@
 
 /* =========================================================
    MAIN FORM CARD
-   SAME CARD EDGE AS OTHER MODULES
 ========================================================= */
 
 .product-form-card {
@@ -810,7 +835,6 @@
 
 /* =========================================================
    LABELS
-   MATCH INVENTORY
 ========================================================= */
 
 .product-field > label,
@@ -1121,6 +1145,7 @@
 
 .product-image-help span {
     padding: 0 3px;
+
     color: #c2b7af;
 }
 
@@ -1371,12 +1396,12 @@
 
 @media (max-width: 760px) {
 
-    .product-page-topbar {
+    .product-form-page .topbar {
         flex-direction: column;
         gap: 12px;
     }
 
-    .product-date-box {
+    .product-form-page .date-box {
         min-width: 145px;
     }
 
@@ -1401,7 +1426,7 @@
 
 @media (max-width: 600px) {
 
-    .product-page-title h1 {
+    .product-form-page .page-title h1 {
         font-size: 25px;
     }
 
@@ -1451,7 +1476,7 @@
         padding: 14px;
     }
 
-    .product-date-box {
+    .product-form-page .date-box {
         width: 100%;
         justify-content: flex-start;
     }

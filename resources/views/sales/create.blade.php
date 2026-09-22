@@ -74,768 +74,723 @@ $oldSaleItemsJson = json_encode(
 
 @section('content')
 
-<div class="sales-pos-page">
+<div class="sales-create-page">
 
-```
-{{-- =========================================================
-     PAGE HEADER
-========================================================== --}}
+    {{-- =========================================================
+         PAGE HEADER
+    ========================================================== --}}
 
-<div class="sales-page-header">
+    <div class="topbar">
 
-    <div class="sales-page-header-left">
+        <div class="page-title">
 
-        <div class="sales-breadcrumb">
+            <small>
+                Sales Management
+            </small>
 
-            <a href="{{ route('sales.index') }}">
-                Sales
-            </a>
-
-            <span>
-                /
-            </span>
-
-            <strong>
+            <h1>
                 New Sale
-            </strong>
+            </h1>
+
+            <p>
+                Select products and complete the customer transaction.
+            </p>
 
         </div>
 
 
-        <div class="sales-heading-row">
+        <div class="date-box">
+
+            <span class="date-icon">
+                ◷
+            </span>
+
+            {{ now()->format('F d, Y') }}
+
+        </div>
+
+    </div>
+
+
+    {{-- =========================================================
+         BREADCRUMB
+    ========================================================== --}}
+
+    <div class="sales-breadcrumb">
+
+        <a href="{{ route('sales.index') }}">
+            Sales
+        </a>
+
+        <span>/</span>
+
+        <strong>
+            New Sale
+        </strong>
+
+    </div>
+
+
+    {{-- =========================================================
+         VALIDATION ERRORS
+    ========================================================== --}}
+
+    @if ($errors->any())
+
+        <div class="sales-alert sales-alert-error">
+
+            <div class="sales-alert-icon">
+                !
+            </div>
 
             <div>
 
-                <small class="sales-page-eyebrow">
-                    Sales
-                </small>
+                <strong>
+                    Please correct the following errors:
+                </strong>
 
-                <h1>
-                    New Sale
-                </h1>
+                <ul>
+
+                    @foreach ($errors->all() as $error)
+
+                        <li>
+                            {{ $error }}
+                        </li>
+
+                    @endforeach
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    @endif
+
+
+    {{-- =========================================================
+         NO PRODUCTS
+    ========================================================== --}}
+
+    @if ($products->isEmpty())
+
+        <div class="sales-alert sales-alert-warning">
+
+            <div class="sales-alert-icon">
+                !
+            </div>
+
+            <div>
+
+                <strong>
+                    No active products available.
+                </strong>
 
                 <p>
-                    Select products and complete the customer transaction.
+                    Please add an active product before creating a sale.
                 </p>
 
             </div>
 
         </div>
 
-    </div>
+    @endif
 
 
-    <div class="sales-today-box">
+    {{-- =========================================================
+         MAIN SALES FORM
+    ========================================================== --}}
 
-        <div class="sales-today-icon">
-            ◷
-        </div>
-
-        <div>
-
-            <span>
-                Today
-            </span>
-
-            <strong>
-                {{ now()->format('F d, Y') }}
-            </strong>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-{{-- =========================================================
-     VALIDATION ERRORS
-========================================================== --}}
-
-@if ($errors->any())
-
-    <div class="sales-alert sales-alert-error">
-
-        <div class="sales-alert-icon">
-            !
-        </div>
-
-        <div>
-
-            <strong>
-                Please correct the following errors:
-            </strong>
-
-            <ul>
-
-                @foreach ($errors->all() as $error)
-
-                    <li>
-                        {{ $error }}
-                    </li>
-
-                @endforeach
-
-            </ul>
-
-        </div>
-
-    </div>
-
-@endif
-
-
-{{-- =========================================================
-     NO PRODUCTS
-========================================================== --}}
-
-@if ($products->isEmpty())
-
-    <div class="sales-alert sales-alert-warning">
-
-        <div class="sales-alert-icon">
-            !
-        </div>
-
-        <div>
-
-            <strong>
-                No active products available.
-            </strong>
-
-            <p>
-                Please add an active product before creating a sale.
-            </p>
-
-        </div>
-
-    </div>
-
-@endif
-
-
-{{-- =========================================================
-     MAIN SALES FORM
-========================================================== --}}
-
-<form
-    action="{{ route('sales.store') }}"
-    method="POST"
-    id="salesForm"
->
-
-    @csrf
-
-    <input
-        type="hidden"
-        name="sale_date"
-        value="{{ old('sale_date', now()->format('Y-m-d')) }}"
+    <form
+        action="{{ route('sales.store') }}"
+        method="POST"
+        id="salesForm"
     >
 
+        @csrf
 
-    <div class="sales-pos-layout">
-
-
-        {{-- =================================================
-             LEFT SIDE — PRODUCT CATALOG
-        ================================================== --}}
-
-        <main class="sales-catalog-panel">
+        <input
+            type="hidden"
+            name="sale_date"
+            value="{{ old('sale_date', now()->format('Y-m-d')) }}"
+        >
 
 
-            {{-- =================================================
-                 CATALOG HEADER
-            ================================================== --}}
-
-            <div class="sales-catalog-header">
-
-                <div>
-
-                    <span class="sales-section-label">
-                        PRODUCT CATALOG
-                    </span>
-
-                    <h2>
-                        Choose Products
-                    </h2>
-
-                    <p class="sales-panel-description">
-                        Select products to add them to the current sale.
-                    </p>
-
-                </div>
-
-                <div class="sales-product-count">
-
-                    <strong id="visibleProductCount">
-                        {{ $products->count() }}
-                    </strong>
-
-                    <span>
-                        products
-                    </span>
-
-                </div>
-
-            </div>
+        <div class="sales-pos-layout">
 
 
             {{-- =================================================
-                 SEARCH / FILTER BAR
+                 LEFT SIDE — PRODUCT CATALOG
             ================================================== --}}
 
-            <div class="sales-catalog-tools">
+            <main class="sales-catalog-panel">
 
-                <div class="sales-search-box">
+                <div class="sales-catalog-header">
 
-                    <span class="sales-search-icon">
-                        ⌕
-                    </span>
+                    <div>
 
-                    <input
-                        type="text"
-                        id="productSearch"
-                        placeholder="Search product or SKU..."
-                        autocomplete="off"
-                    >
+                        <span class="sales-section-label">
+                            PRODUCT CATALOG
+                        </span>
 
-                    <button
-                        type="button"
-                        id="clearProductSearch"
-                        class="sales-clear-search"
-                        aria-label="Clear search"
-                    >
-                        ×
-                    </button>
+                        <h2>
+                            Choose Products
+                        </h2>
+
+                        <p class="sales-panel-description">
+                            Select products to add them to the current sale.
+                        </p>
+
+                    </div>
+
+                    <div class="sales-product-count">
+
+                        <strong id="visibleProductCount">
+                            {{ $products->count() }}
+                        </strong>
+
+                        <span>
+                            products
+                        </span>
+
+                    </div>
 
                 </div>
 
 
-                <div class="sales-category-filter">
+                {{-- =================================================
+                     SEARCH / FILTER BAR
+                ================================================== --}}
 
-                    <select
-                        id="categoryFilter"
-                        aria-label="Filter products by category"
-                    >
+                <div class="sales-catalog-tools">
 
-                        <option value="all">
-                            All Categories
-                        </option>
+                    <div class="sales-search-box">
 
-                        @foreach ($products->pluck('category')->filter()->unique('id')->sortBy('name') as $category)
+                        <span class="sales-search-icon">
+                            ⌕
+                        </span>
 
-                            <option value="{{ strtolower($category->name) }}">
-                                {{ $category->name }}
+                        <input
+                            type="text"
+                            id="productSearch"
+                            placeholder="Search product or SKU..."
+                            autocomplete="off"
+                        >
+
+                        <button
+                            type="button"
+                            id="clearProductSearch"
+                            class="sales-clear-search"
+                            aria-label="Clear search"
+                        >
+                            ×
+                        </button>
+
+                    </div>
+
+
+                    <div class="sales-category-filter">
+
+                        <select
+                            id="categoryFilter"
+                            aria-label="Filter products by category"
+                        >
+
+                            <option value="all">
+                                All Categories
                             </option>
 
-                        @endforeach
+                            @foreach ($products->pluck('category')->filter()->unique('id')->sortBy('name') as $category)
 
-                    </select>
+                                <option value="{{ strtolower($category->name) }}">
+                                    {{ $category->name }}
+                                </option>
+
+                            @endforeach
+
+                        </select>
+
+                    </div>
 
                 </div>
 
-            </div>
+
+                {{-- =================================================
+                     PRODUCT GRID
+                ================================================== --}}
+
+                <div
+                    class="sales-product-grid"
+                    id="productGrid"
+                >
+
+                    @foreach ($products as $product)
+
+                        <button
+                            type="button"
+                            class="sales-product-card"
+                            data-product-id="{{ $product->id }}"
+                            data-product-name="{{ strtolower($product->name) }}"
+                            data-product-sku="{{ strtolower($product->sku) }}"
+                            data-product-category="{{ strtolower(optional($product->category)->name ?? '') }}"
+                        >
+
+                            <div class="sales-product-image">
+
+                                @if ($product->image)
+
+                                    <img
+                                        src="{{ asset('storage/' . $product->image) }}"
+                                        alt="{{ $product->name }}"
+                                        loading="lazy"
+                                    >
+
+                                @else
+
+                                    <div class="sales-product-image-placeholder">
+
+                                        <span>
+                                            ◫
+                                        </span>
+
+                                    </div>
+
+                                @endif
+
+                                <span class="sales-add-overlay">
+                                    +
+                                </span>
+
+                            </div>
 
 
-            {{-- =================================================
-                 PRODUCT GRID
-            ================================================== --}}
+                            <div class="sales-product-card-info">
 
-            <div
-                class="sales-product-grid"
-                id="productGrid"
-            >
+                                <div class="sales-product-category">
+                                    {{ optional($product->category)->name ?? 'Uncategorized' }}
+                                </div>
 
-                @foreach ($products as $product)
+                                <h3>
+                                    {{ $product->name }}
+                                </h3>
 
-                    <button
-                        type="button"
-                        class="sales-product-card"
-                        data-product-id="{{ $product->id }}"
-                        data-product-name="{{ strtolower($product->name) }}"
-                        data-product-sku="{{ strtolower($product->sku) }}"
-                        data-product-category="{{ strtolower(optional($product->category)->name ?? '') }}"
-                    >
+                                <div class="sales-product-meta">
+                                    {{ $product->sku }}
+                                </div>
 
-                        <div class="sales-product-image">
+                                <div class="sales-product-card-bottom">
 
-                            @if ($product->image)
+                                    <strong>
+                                        ₱{{ number_format($product->selling_price, 2) }}
+                                    </strong>
 
-                                <img
-                                    src="{{ asset('storage/' . $product->image) }}"
-                                    alt="{{ $product->name }}"
-                                    loading="lazy"
-                                >
-
-                            @else
-
-                                <div class="sales-product-image-placeholder">
-
-                                    <span>
-                                        ◫
+                                    <span class="sales-add-small">
+                                        Add
                                     </span>
 
                                 </div>
 
-                            @endif
-
-                            <span class="sales-add-overlay">
-                                +
-                            </span>
-
-                        </div>
-
-
-                        <div class="sales-product-card-info">
-
-                            <div class="sales-product-category">
-
-                                {{ optional($product->category)->name ?? 'Uncategorized' }}
-
                             </div>
 
-                            <h3>
-                                {{ $product->name }}
-                            </h3>
+                        </button>
 
-                            <div class="sales-product-meta">
-
-                                <span>
-                                    {{ $product->sku }}
-                                </span>
-
-                            </div>
-
-                            <div class="sales-product-card-bottom">
-
-                                <strong>
-                                    ₱{{ number_format($product->selling_price, 2) }}
-                                </strong>
-
-                                <span class="sales-add-small">
-                                    Add
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    </button>
-
-                @endforeach
+                    @endforeach
 
 
-                {{-- EMPTY SEARCH RESULT --}}
-
-                <div
-                    class="sales-no-products"
-                    id="noProductsFound"
-                >
-
-                    <div class="sales-no-products-icon">
-                        ⌕
-                    </div>
-
-                    <strong>
-                        No products found
-                    </strong>
-
-                    <p>
-                        Try a different product name, SKU, or category.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            {{-- =================================================
-                 CATALOG FOOTER
-            ================================================== --}}
-
-            <div class="sales-catalog-footer">
-
-                <span class="sales-info-dot">
-                    i
-                </span>
-
-                <span>
-                    Click a product to add it to the current sale.
-                </span>
-
-            </div>
-
-        </main>
-
-
-        {{-- =================================================
-             RIGHT SIDE — CURRENT SALE
-        ================================================== --}}
-
-        <aside class="sales-order-panel">
-
-
-            {{-- =================================================
-                 ORDER HEADER
-            ================================================== --}}
-
-            <div class="sales-order-header">
-
-                <div>
-
-                    <span class="sales-section-label">
-                        CURRENT TRANSACTION
-                    </span>
-
-                    <h2>
-                        Current Sale
-                    </h2>
-
-                    <p class="sales-panel-description">
-                        Review products and payment details.
-                    </p>
-
-                </div>
-
-                <div class="sales-cart-count">
-
-                    <span id="cartItemCount">
-                        0
-                    </span>
-
-                    <small>
-                        items
-                    </small>
-
-                </div>
-
-            </div>
-
-
-            {{-- =================================================
-                 ORDER ITEMS
-            ================================================== --}}
-
-            <div
-                class="sales-order-items"
-                id="orderItems"
-            >
-
-                <div
-                    class="sales-order-empty"
-                    id="emptyOrder"
-                >
-
-                    <div class="sales-empty-cart-icon">
-                        🛒
-                    </div>
-
-                    <strong>
-                        Your sale is empty
-                    </strong>
-
-                    <p>
-                        Select a product from the catalog to start the transaction.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            {{-- =================================================
-                 SALE DETAILS
-            ================================================== --}}
-
-            <div class="sales-order-details">
-
-
-                {{-- PAYMENT METHOD --}}
-
-                <div class="sales-order-field">
-
-                    <label for="payment_method">
-                        Payment Method
-                    </label>
-
-                    <select
-                        id="payment_method"
-                        name="payment_method"
-                        class="sales-order-input @error('payment_method') is-invalid @enderror"
-                        required
+                    <div
+                        class="sales-no-products"
+                        id="noProductsFound"
                     >
 
-                        @foreach ($paymentMethods as $method)
+                        <div class="sales-no-products-icon">
+                            ⌕
+                        </div>
 
-                            <option
-                                value="{{ $method }}"
-                                @selected(old('payment_method', 'Cash') === $method)
-                            >
-                                {{ $method }}
-                            </option>
+                        <strong>
+                            No products found
+                        </strong>
 
-                        @endforeach
+                        <p>
+                            Try a different product name, SKU, or category.
+                        </p>
 
-                    </select>
+                    </div>
 
-                    <span class="sales-helper-text">
-                        Select how the customer will pay for this sale.
+                </div>
+
+
+                {{-- =================================================
+                     CATALOG FOOTER
+                ================================================== --}}
+
+                <div class="sales-catalog-footer">
+
+                    <span class="sales-info-dot">
+                        i
+                    </span>
+
+                    <span>
+                        Click a product to add it to the current sale.
                     </span>
 
                 </div>
 
-
-                {{-- DISCOUNT / TAX --}}
-
-                <div class="sales-order-two-fields">
-
-                    <div class="sales-order-field">
-
-                        <label for="discount">
-                            Discount
-                        </label>
-
-                        <div class="sales-money-input">
-
-                            <span>
-                                ₱
-                            </span>
-
-                            <input
-                                type="number"
-                                id="discount"
-                                name="discount"
-                                value="{{ old('discount', 0) }}"
-                                min="0"
-                                step="0.01"
-                                class="@error('discount') is-invalid @enderror"
-                            >
-
-                        </div>
-
-                    </div>
+            </main>
 
 
-                    <div class="sales-order-field">
+            {{-- =================================================
+                 RIGHT SIDE — CURRENT SALE
+            ================================================== --}}
 
-                        <label for="tax">
-                            Tax
-                        </label>
+            <aside class="sales-order-panel">
 
-                        <div class="sales-money-input">
-
-                            <span>
-                                ₱
-                            </span>
-
-                            <input
-                                type="number"
-                                id="tax"
-                                name="tax"
-                                value="{{ old('tax', 0) }}"
-                                min="0"
-                                step="0.01"
-                                class="@error('tax') is-invalid @enderror"
-                            >
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                {{-- =================================================
-                     TOTALS
-                ================================================== --}}
-
-                <div class="sales-total-breakdown">
-
-                    <div class="sales-total-line">
-
-                        <span>
-                            Subtotal
-                        </span>
-
-                        <strong id="summarySubtotal">
-                            ₱0.00
-                        </strong>
-
-                    </div>
-
-
-                    <div class="sales-total-line">
-
-                        <span>
-                            Discount
-                        </span>
-
-                        <strong id="summaryDiscount">
-                            -₱0.00
-                        </strong>
-
-                    </div>
-
-
-                    <div class="sales-total-line">
-
-                        <span>
-                            Tax
-                        </span>
-
-                        <strong id="summaryTax">
-                            +₱0.00
-                        </strong>
-
-                    </div>
-
-
-                    <div class="sales-total-divider"></div>
-
-
-                    <div class="sales-grand-total">
-
-                        <span>
-                            Total
-                        </span>
-
-                        <strong id="summaryTotal">
-                            ₱0.00
-                        </strong>
-
-                    </div>
-
-                </div>
-
-
-                {{-- =================================================
-                     AMOUNT RECEIVED
-                ================================================== --}}
-
-                <div class="sales-received-section">
-
-                    <label for="amount_received">
-                        Amount Received
-                    </label>
-
-                    <div class="sales-received-input">
-
-                        <span>
-                            ₱
-                        </span>
-
-                        <input
-                            type="number"
-                            id="amount_received"
-                            name="amount_received"
-                            value="{{ old('amount_received', 0) }}"
-                            min="0"
-                            step="0.01"
-                            class="@error('amount_received') is-invalid @enderror"
-                            placeholder="0.00"
-                        >
-
-                    </div>
-
-                    <span class="sales-helper-text">
-                        Enter the amount received from the customer.
-                    </span>
-
-                </div>
-
-
-                {{-- =================================================
-                     CHANGE
-                ================================================== --}}
-
-                <div class="sales-change-box">
+                <div class="sales-order-header">
 
                     <div>
 
-                        <span>
-                            Change
+                        <span class="sales-section-label">
+                            CURRENT TRANSACTION
+                        </span>
+
+                        <h2>
+                            Current Sale
+                        </h2>
+
+                        <p class="sales-panel-description">
+                            Review products and payment details.
+                        </p>
+
+                    </div>
+
+                    <div class="sales-cart-count">
+
+                        <span id="cartItemCount">
+                            0
                         </span>
 
                         <small>
-                            Amount to return
+                            items
                         </small>
 
                     </div>
 
-                    <strong id="summaryChange">
-                        ₱0.00
-                    </strong>
+                </div>
+
+
+                {{-- =================================================
+                     ORDER ITEMS
+                ================================================== --}}
+
+                <div
+                    class="sales-order-items"
+                    id="orderItems"
+                >
+
+                    <div
+                        class="sales-order-empty"
+                        id="emptyOrder"
+                    >
+
+                        <div class="sales-empty-cart-icon">
+                            🛒
+                        </div>
+
+                        <strong>
+                            Your sale is empty
+                        </strong>
+
+                        <p>
+                            Select a product from the catalog to start the transaction.
+                        </p>
+
+                    </div>
 
                 </div>
 
 
                 {{-- =================================================
-                     ACTIONS
+                     SALE DETAILS
                 ================================================== --}}
 
-                <div class="sales-order-actions">
+                <div class="sales-order-details">
 
-                    <button
-                        type="submit"
-                        class="sales-complete-button"
-                        id="completeSaleButton"
-                        @disabled($products->isEmpty())
-                    >
 
-                        <span class="sales-complete-icon">
-                            ✓
+                    {{-- PAYMENT METHOD --}}
+
+                    <div class="sales-order-field">
+
+                        <label for="payment_method">
+                            Payment Method
+                        </label>
+
+                        <select
+                            id="payment_method"
+                            name="payment_method"
+                            class="sales-order-input @error('payment_method') is-invalid @enderror"
+                            required
+                        >
+
+                            @foreach ($paymentMethods as $method)
+
+                                <option
+                                    value="{{ $method }}"
+                                    @selected(old('payment_method', 'Cash') === $method)
+                                >
+                                    {{ $method }}
+                                </option>
+
+                            @endforeach
+
+                        </select>
+
+                        <span class="sales-helper-text">
+                            Select how the customer will pay for this sale.
                         </span>
 
-                        Complete Sale
-
-                    </button>
+                    </div>
 
 
-                    <a
-                        href="{{ route('sales.index') }}"
-                        class="sales-cancel-button"
-                    >
-                        Cancel
-                    </a>
+                    {{-- DISCOUNT / TAX --}}
+
+                    <div class="sales-order-two-fields">
+
+                        <div class="sales-order-field">
+
+                            <label for="discount">
+                                Discount
+                            </label>
+
+                            <div class="sales-money-input">
+
+                                <span>
+                                    ₱
+                                </span>
+
+                                <input
+                                    type="number"
+                                    id="discount"
+                                    name="discount"
+                                    value="{{ old('discount', 0) }}"
+                                    min="0"
+                                    step="0.01"
+                                    class="@error('discount') is-invalid @enderror"
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="sales-order-field">
+
+                            <label for="tax">
+                                Tax
+                            </label>
+
+                            <div class="sales-money-input">
+
+                                <span>
+                                    ₱
+                                </span>
+
+                                <input
+                                    type="number"
+                                    id="tax"
+                                    name="tax"
+                                    value="{{ old('tax', 0) }}"
+                                    min="0"
+                                    step="0.01"
+                                    class="@error('tax') is-invalid @enderror"
+                                >
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- TOTALS --}}
+
+                    <div class="sales-total-breakdown">
+
+                        <div class="sales-total-line">
+
+                            <span>
+                                Subtotal
+                            </span>
+
+                            <strong id="summarySubtotal">
+                                ₱0.00
+                            </strong>
+
+                        </div>
+
+
+                        <div class="sales-total-line">
+
+                            <span>
+                                Discount
+                            </span>
+
+                            <strong id="summaryDiscount">
+                                -₱0.00
+                            </strong>
+
+                        </div>
+
+
+                        <div class="sales-total-line">
+
+                            <span>
+                                Tax
+                            </span>
+
+                            <strong id="summaryTax">
+                                +₱0.00
+                            </strong>
+
+                        </div>
+
+
+                        <div class="sales-total-divider"></div>
+
+
+                        <div class="sales-grand-total">
+
+                            <span>
+                                Total
+                            </span>
+
+                            <strong id="summaryTotal">
+                                ₱0.00
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- AMOUNT RECEIVED --}}
+
+                    <div class="sales-received-section">
+
+                        <label for="amount_received">
+                            Amount Received
+                        </label>
+
+                        <div class="sales-received-input">
+
+                            <span>
+                                ₱
+                            </span>
+
+                            <input
+                                type="number"
+                                id="amount_received"
+                                name="amount_received"
+                                value="{{ old('amount_received', 0) }}"
+                                min="0"
+                                step="0.01"
+                                class="@error('amount_received') is-invalid @enderror"
+                                placeholder="0.00"
+                            >
+
+                        </div>
+
+                        <span class="sales-helper-text">
+                            Enter the amount received from the customer.
+                        </span>
+
+                    </div>
+
+
+                    {{-- CHANGE --}}
+
+                    <div class="sales-change-box">
+
+                        <div>
+
+                            <span>
+                                Change
+                            </span>
+
+                            <small>
+                                Amount to return
+                            </small>
+
+                        </div>
+
+                        <strong id="summaryChange">
+                            ₱0.00
+                        </strong>
+
+                    </div>
+
+
+                    {{-- ACTIONS --}}
+
+                    <div class="sales-order-actions">
+
+                        <button
+                            type="submit"
+                            class="sales-complete-button"
+                            id="completeSaleButton"
+                            @disabled($products->isEmpty())
+                        >
+
+                            <span class="sales-complete-icon">
+                                ✓
+                            </span>
+
+                            Complete Sale
+
+                        </button>
+
+
+                        <a
+                            href="{{ route('sales.index') }}"
+                            class="sales-cancel-button"
+                        >
+                            Cancel
+                        </a>
+
+                    </div>
+
+
+                    {{-- NOTE --}}
+
+                    <div class="sales-order-note">
+
+                        <span>
+                            i
+                        </span>
+
+                        <p>
+                            Completing this sale will record the transaction and deduct the required inventory based on each product's recipe.
+                        </p>
+
+                    </div>
 
                 </div>
 
+            </aside>
 
-                {{-- =================================================
-                     NOTE
-                ================================================== --}}
-
-                <div class="sales-order-note">
-
-                    <span>
-                        i
-                    </span>
-
-                    <p>
-                        Completing this sale will record the transaction and deduct the required inventory based on each product's recipe.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </aside>
-
-    </div>
+        </div>
 
 
-    {{-- =========================================================
-         HIDDEN SALE ITEMS
-    ========================================================== --}}
+        {{-- =========================================================
+             HIDDEN SALE ITEMS
+        ========================================================== --}}
 
-    <div id="hiddenSaleItems"></div>
+        <div id="hiddenSaleItems"></div>
 
-</form>
-```
+    </form>
 
 </div>
 
 @endsection
+
 
 @push('styles')
 
@@ -845,9 +800,9 @@ $oldSaleItemsJson = json_encode(
    PAGE
 ============================================================ */
 
-.sales-pos-page {
+.sales-create-page {
     width: 100%;
-    max-width: 1500px;
+    max-width: 1120px;
     margin: 0 auto;
     padding-bottom: 30px;
     color: #342820;
@@ -855,32 +810,92 @@ $oldSaleItemsJson = json_encode(
 
 
 /* ============================================================
-   PAGE HEADER
+   HEADER
+   MATCHES INVENTORY / PRODUCTS / PURCHASES
 ============================================================ */
 
-.sales-page-header {
+.sales-create-page .topbar {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 30px;
-    margin-bottom: 18px;
+    gap: 25px;
+    margin-bottom: 14px;
 }
 
-.sales-page-header-left {
-    min-width: 0;
+.sales-create-page .page-title small {
+    display: block;
+    margin-bottom: 5px;
+    color: #a9825b;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: .12em;
+    text-transform: uppercase;
 }
+
+.sales-create-page .page-title h1 {
+    margin: 0;
+    color: #2b1f17;
+    font-size: 29px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -.045rem;
+}
+
+.sales-create-page .page-title p {
+    margin: 6px 0 0;
+    color: #84776d;
+    font-size: 12px;
+    line-height: 1.5;
+    font-weight: 400;
+}
+
+.sales-create-page .date-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 145px;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #ffffff;
+    color: #84776d;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: 0 3px 12px rgba(43, 31, 23, .025);
+}
+
+.sales-create-page .date-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: var(--orange-light);
+    color: var(--orange);
+    font-size: 17px;
+}
+
+
+/* ============================================================
+   BREADCRUMB
+============================================================ */
 
 .sales-breadcrumb {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
+    gap: 7px;
+    margin-bottom: 17px;
     color: #95887e;
-    font-size: 12px;
+    font-size: 10px;
+    line-height: 1.3;
 }
 
 .sales-breadcrumb a {
-    color: var(--orange);
+    color: #a16e42;
     text-decoration: none;
     font-weight: 600;
 }
@@ -889,81 +904,13 @@ $oldSaleItemsJson = json_encode(
     text-decoration: underline;
 }
 
+.sales-breadcrumb span {
+    color: #c2b5aa;
+}
+
 .sales-breadcrumb strong {
-    color: #5f5148;
+    color: #6f6259;
     font-weight: 600;
-}
-
-.sales-page-eyebrow {
-    display: block;
-    margin-bottom: 5px;
-    color: var(--orange);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1.1px;
-    text-transform: uppercase;
-}
-
-.sales-heading-row h1 {
-    margin: 0;
-    color: #2b1f17;
-    font-size: 29px;
-    line-height: 1.15;
-    font-weight: 700;
-    letter-spacing: 0;
-}
-
-.sales-heading-row p {
-    margin: 7px 0 0;
-    color: #84776d;
-    font-size: 13px;
-    line-height: 1.5;
-}
-
-
-/* ============================================================
-   TODAY BOX
-============================================================ */
-
-.sales-today-box {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    flex: 0 0 auto;
-    min-width: 165px;
-    padding: 11px 14px;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    background: #ffffff;
-    box-shadow: 0 4px 15px rgba(43, 31, 23, .035);
-}
-
-.sales-today-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 9px;
-    background: var(--orange-light);
-    color: var(--orange);
-    font-size: 20px;
-}
-
-.sales-today-box span {
-    display: block;
-    margin-bottom: 2px;
-    color: #978a80;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: .7px;
-}
-
-.sales-today-box strong {
-    display: block;
-    color: #3a2c23;
-    font-size: 12px;
-    font-weight: 700;
 }
 
 
@@ -974,11 +921,12 @@ $oldSaleItemsJson = json_encode(
 .sales-alert {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 20px;
-    padding: 13px 15px;
-    border-radius: 11px;
-    font-size: 12px;
+    gap: 10px;
+    margin-bottom: 17px;
+    padding: 11px 13px;
+    border-radius: 10px;
+    font-size: 11px;
+    line-height: 1.45;
 }
 
 .sales-alert-error {
@@ -998,12 +946,12 @@ $oldSaleItemsJson = json_encode(
     align-items: center;
     justify-content: center;
     flex: 0 0 auto;
-    width: 23px;
-    height: 23px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     background: #d9534f;
     color: #ffffff;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
 }
 
@@ -1013,7 +961,7 @@ $oldSaleItemsJson = json_encode(
 
 .sales-alert strong {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
 }
 
 .sales-alert p {
@@ -1022,7 +970,7 @@ $oldSaleItemsJson = json_encode(
 
 .sales-alert ul {
     margin: 0;
-    padding-left: 17px;
+    padding-left: 16px;
 }
 
 
@@ -1032,41 +980,39 @@ $oldSaleItemsJson = json_encode(
 
 .sales-pos-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 390px;
-    gap: 18px;
+    grid-template-columns: minmax(0, 1fr) 350px;
+    gap: 17px;
     align-items: start;
 }
 
 
 /* ============================================================
-   SHARED PANEL BASE
+   PANEL BASE
 ============================================================ */
 
 .sales-catalog-panel,
 .sales-order-panel {
+    min-width: 0;
     overflow: hidden;
     border: 1px solid var(--border);
-    border-radius: 17px;
+    border-radius: 15px;
     background: #ffffff;
-    box-shadow: 0 5px 18px rgba(43, 31, 23, .035);
+    box-shadow: 0 4px 16px rgba(43, 31, 23, .035);
 }
 
 
 /* ============================================================
-   CATALOG PANEL
+   PANEL HEADERS
 ============================================================ */
 
-.sales-catalog-panel {
-    min-width: 0;
-}
-
-.sales-catalog-header {
+.sales-catalog-header,
+.sales-order-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
-    min-height: 68px;
-    padding: 15px 18px;
+    gap: 15px;
+    min-height: 65px;
+    padding: 14px 19px;
     border-bottom: 1px solid #eee7e1;
 }
 
@@ -1074,9 +1020,10 @@ $oldSaleItemsJson = json_encode(
     display: block;
     margin-bottom: 4px;
     color: var(--orange);
-    font-size: 11px;
+    font-size: 10px;
+    line-height: 1.2;
     font-weight: 700;
-    letter-spacing: 1.1px;
+    letter-spacing: .12em;
     text-transform: uppercase;
 }
 
@@ -1084,7 +1031,7 @@ $oldSaleItemsJson = json_encode(
 .sales-order-header h2 {
     margin: 0;
     color: #35281f;
-    font-size: 19px;
+    font-size: 17px;
     line-height: 1.2;
     font-weight: 700;
 }
@@ -1092,27 +1039,40 @@ $oldSaleItemsJson = json_encode(
 .sales-panel-description {
     margin: 3px 0 0;
     color: #93877d;
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1.4;
 }
 
-.sales-product-count {
+.sales-product-count,
+.sales-cart-count {
     display: flex;
     align-items: baseline;
     gap: 4px;
-    padding: 7px 10px;
-    border-radius: 9px;
+    padding: 6px 9px;
+    border-radius: 8px;
     background: #fcf9f5;
 }
 
 .sales-product-count strong {
     color: #60452f;
-    font-size: 13px;
+    font-size: 12px;
+    font-weight: 700;
 }
 
 .sales-product-count span {
     color: #978a80;
-    font-size: 10px;
+    font-size: 9px;
+}
+
+.sales-cart-count span {
+    color: var(--orange);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.sales-cart-count small {
+    color: #978a80;
+    font-size: 9px;
 }
 
 
@@ -1122,9 +1082,9 @@ $oldSaleItemsJson = json_encode(
 
 .sales-catalog-tools {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 190px;
-    gap: 10px;
-    padding: 14px 18px;
+    grid-template-columns: minmax(0, 1fr) 180px;
+    gap: 9px;
+    padding: 13px 18px;
     border-bottom: 1px solid #f0ebe7;
     background: #fdfcfb;
 }
@@ -1137,80 +1097,67 @@ $oldSaleItemsJson = json_encode(
 
 .sales-search-icon {
     position: absolute;
-    left: 12px;
+    left: 11px;
     z-index: 2;
     color: #9b8e84;
-    font-size: 18px;
+    font-size: 17px;
     pointer-events: none;
 }
 
-.sales-search-box input {
+.sales-search-box input,
+.sales-category-filter select {
     display: block;
     width: 100%;
-    height: 41px;
+    height: 39px;
     box-sizing: border-box;
-    padding: 0 38px 0 37px;
     border: 1px solid #ded4cb;
-    border-radius: 9px;
+    border-radius: 8px;
     outline: none;
     background: #ffffff;
     color: #3b2e26;
     font-family: inherit;
-    font-size: 13px;
-    transition:
-        border-color .18s ease,
-        box-shadow .18s ease;
+    font-size: 12px;
+}
+
+.sales-search-box input {
+    padding: 0 36px 0 34px;
 }
 
 .sales-search-box input::placeholder {
     color: #b0a59d;
 }
 
-.sales-search-box input:focus {
+.sales-search-box input:focus,
+.sales-category-filter select:focus {
     border-color: #d2a47b;
-    box-shadow: 0 0 0 3px rgba(210, 164, 123, .12);
+    box-shadow: 0 0 0 3px rgba(196, 122, 58, .075);
+}
+
+.sales-category-filter select {
+    padding: 0 10px;
+    cursor: pointer;
 }
 
 .sales-clear-search {
     position: absolute;
-    right: 8px;
+    right: 7px;
     display: none;
     align-items: center;
     justify-content: center;
-    width: 25px;
-    height: 25px;
+    width: 24px;
+    height: 24px;
     padding: 0;
     border: 0;
     border-radius: 6px;
     background: #f3eee9;
     color: #78695f;
-    font-size: 17px;
+    font-size: 16px;
     line-height: 1;
     cursor: pointer;
 }
 
 .sales-clear-search:hover {
     background: #ebe3dc;
-}
-
-.sales-category-filter select {
-    display: block;
-    width: 100%;
-    height: 41px;
-    padding: 0 11px;
-    border: 1px solid #ded4cb;
-    border-radius: 9px;
-    outline: none;
-    background: #ffffff;
-    color: #3b2e26;
-    font-family: inherit;
-    font-size: 13px;
-    cursor: pointer;
-}
-
-.sales-category-filter select:focus {
-    border-color: #d2a47b;
-    box-shadow: 0 0 0 3px rgba(210, 164, 123, .12);
 }
 
 
@@ -1220,10 +1167,10 @@ $oldSaleItemsJson = json_encode(
 
 .sales-product-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(150px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 11px;
     min-height: 300px;
-    padding: 18px;
+    padding: 17px 18px;
 }
 
 .sales-product-card {
@@ -1233,7 +1180,7 @@ $oldSaleItemsJson = json_encode(
     padding: 0;
     overflow: hidden;
     border: 1px solid #e8e0d9;
-    border-radius: 13px;
+    border-radius: 11px;
     background: #ffffff;
     color: inherit;
     font-family: inherit;
@@ -1259,7 +1206,7 @@ $oldSaleItemsJson = json_encode(
 .sales-product-image {
     position: relative;
     width: 100%;
-    height: 145px;
+    height: 125px;
     overflow: hidden;
     background: #f5f1ed;
 }
@@ -1282,40 +1229,39 @@ $oldSaleItemsJson = json_encode(
     justify-content: center;
     width: 100%;
     height: 100%;
-    background:
-        linear-gradient(
-            135deg,
-            #f7f3ef,
-            #eee7e0
-        );
+    background: linear-gradient(
+        135deg,
+        #f7f3ef,
+        #eee7e0
+    );
 }
 
 .sales-product-image-placeholder span {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 13px;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
     background: #ffffff;
     color: #b69a82;
-    font-size: 24px;
+    font-size: 21px;
     box-shadow: 0 3px 10px rgba(60, 43, 31, .06);
 }
 
 .sales-add-overlay {
     position: absolute;
-    right: 9px;
-    bottom: 9px;
+    right: 8px;
+    bottom: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 29px;
-    height: 29px;
+    width: 27px;
+    height: 27px;
     border-radius: 50%;
     background: #ffffff;
     color: var(--orange);
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 500;
     line-height: 1;
     box-shadow: 0 3px 10px rgba(35, 25, 18, .13);
@@ -1326,16 +1272,17 @@ $oldSaleItemsJson = json_encode(
     flex: 1;
     flex-direction: column;
     min-width: 0;
-    padding: 11px 12px 12px;
+    padding: 10px 11px 11px;
 }
 
 .sales-product-category {
     overflow: hidden;
     margin-bottom: 4px;
     color: var(--orange);
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
-    letter-spacing: .5px;
+    letter-spacing: .05em;
+    line-height: 1.25;
     text-overflow: ellipsis;
     text-transform: uppercase;
     white-space: nowrap;
@@ -1345,7 +1292,7 @@ $oldSaleItemsJson = json_encode(
     overflow: hidden;
     margin: 0;
     color: #3a2d25;
-    font-size: 13px;
+    font-size: 12px;
     line-height: 1.3;
     font-weight: 700;
     text-overflow: ellipsis;
@@ -1356,7 +1303,8 @@ $oldSaleItemsJson = json_encode(
     overflow: hidden;
     margin-top: 3px;
     color: #a0958c;
-    font-size: 10px;
+    font-size: 9px;
+    line-height: 1.3;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -1365,14 +1313,14 @@ $oldSaleItemsJson = json_encode(
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: 7px;
     margin-top: auto;
-    padding-top: 10px;
+    padding-top: 9px;
 }
 
 .sales-product-card-bottom strong {
     color: #4e3b2e;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 800;
 }
 
@@ -1380,12 +1328,12 @@ $oldSaleItemsJson = json_encode(
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 27px;
-    padding: 0 9px;
+    min-height: 25px;
+    padding: 0 8px;
     border-radius: 7px;
     background: var(--orange-light);
     color: var(--orange);
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 800;
 }
 
@@ -1408,24 +1356,24 @@ $oldSaleItemsJson = json_encode(
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 46px;
-    height: 46px;
-    margin-bottom: 10px;
-    border-radius: 12px;
+    width: 44px;
+    height: 44px;
+    margin-bottom: 9px;
+    border-radius: 11px;
     background: #f5f0eb;
     color: #a89586;
-    font-size: 22px;
+    font-size: 21px;
 }
 
 .sales-no-products strong {
     color: #514239;
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .sales-no-products p {
     margin: 5px 0 0;
     color: #9a8d84;
-    font-size: 11px;
+    font-size: 10px;
 }
 
 
@@ -1436,12 +1384,13 @@ $oldSaleItemsJson = json_encode(
 .sales-catalog-footer {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
     padding: 10px 18px;
     border-top: 1px solid #eee7e1;
     background: #fcfaf8;
     color: #968980;
-    font-size: 11px;
+    font-size: 10px;
+    line-height: 1.4;
 }
 
 .sales-info-dot {
@@ -1454,7 +1403,7 @@ $oldSaleItemsJson = json_encode(
     border-radius: 50%;
     background: var(--orange-light);
     color: var(--orange);
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
 }
 
@@ -1466,37 +1415,6 @@ $oldSaleItemsJson = json_encode(
 .sales-order-panel {
     position: sticky;
     top: 18px;
-    min-width: 0;
-}
-
-.sales-order-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-    min-height: 68px;
-    padding: 15px 18px;
-    border-bottom: 1px solid #eee7e1;
-}
-
-.sales-cart-count {
-    display: flex;
-    align-items: baseline;
-    gap: 4px;
-    padding: 7px 10px;
-    border-radius: 9px;
-    background: #fcf9f5;
-}
-
-.sales-cart-count span {
-    color: var(--orange);
-    font-size: 14px;
-    font-weight: 800;
-}
-
-.sales-cart-count small {
-    color: #978a80;
-    font-size: 10px;
 }
 
 
@@ -1505,7 +1423,7 @@ $oldSaleItemsJson = json_encode(
 ============================================================ */
 
 .sales-order-items {
-    max-height: 315px;
+    max-height: 300px;
     overflow-y: auto;
     padding: 4px 16px;
 }
@@ -1528,7 +1446,7 @@ $oldSaleItemsJson = json_encode(
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    min-height: 190px;
+    min-height: 185px;
     padding: 20px 18px;
     text-align: center;
 }
@@ -1537,25 +1455,25 @@ $oldSaleItemsJson = json_encode(
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 52px;
-    height: 52px;
-    margin-bottom: 10px;
-    border-radius: 15px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 9px;
+    border-radius: 13px;
     background: #f7f2ed;
-    font-size: 23px;
+    font-size: 21px;
 }
 
 .sales-order-empty strong {
     color: #4a3a30;
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .sales-order-empty p {
-    max-width: 230px;
+    max-width: 225px;
     margin: 6px 0 0;
     color: #9a8d83;
-    font-size: 11px;
-    line-height: 1.55;
+    font-size: 10px;
+    line-height: 1.5;
 }
 
 
@@ -1565,9 +1483,9 @@ $oldSaleItemsJson = json_encode(
 
 .sales-cart-item {
     display: grid;
-    grid-template-columns: 48px minmax(0, 1fr);
-    gap: 10px;
-    padding: 12px 0;
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 9px;
+    padding: 10px 0;
     border-bottom: 1px solid #eee8e2;
 }
 
@@ -1576,10 +1494,10 @@ $oldSaleItemsJson = json_encode(
 }
 
 .sales-cart-item-image {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     overflow: hidden;
-    border-radius: 9px;
+    border-radius: 8px;
     background: #f4efeb;
 }
 
@@ -1597,7 +1515,7 @@ $oldSaleItemsJson = json_encode(
     width: 100%;
     height: 100%;
     color: #ae9987;
-    font-size: 18px;
+    font-size: 17px;
 }
 
 .sales-cart-item-main {
@@ -1608,13 +1526,13 @@ $oldSaleItemsJson = json_encode(
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 8px;
+    gap: 7px;
 }
 
 .sales-cart-item-name {
     overflow: hidden;
     color: #44352c;
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1.3;
     font-weight: 700;
     text-overflow: ellipsis;
@@ -1626,14 +1544,14 @@ $oldSaleItemsJson = json_encode(
     align-items: center;
     justify-content: center;
     flex: 0 0 auto;
-    width: 23px;
-    height: 23px;
+    width: 22px;
+    height: 22px;
     padding: 0;
     border: 0;
     border-radius: 6px;
     background: transparent;
     color: #b29f91;
-    font-size: 17px;
+    font-size: 16px;
     line-height: 1;
     cursor: pointer;
 }
@@ -1646,24 +1564,25 @@ $oldSaleItemsJson = json_encode(
 .sales-cart-item-sku {
     margin-top: 2px;
     color: #a0968d;
-    font-size: 9px;
+    font-size: 8px;
+    line-height: 1.3;
 }
 
 .sales-cart-item-bottom {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    margin-top: 8px;
+    gap: 7px;
+    margin-top: 7px;
 }
 
 .sales-quantity-control {
     display: flex;
     align-items: center;
-    height: 29px;
+    height: 27px;
     overflow: hidden;
     border: 1px solid #ded5ce;
-    border-radius: 8px;
+    border-radius: 7px;
     background: #ffffff;
 }
 
@@ -1671,14 +1590,14 @@ $oldSaleItemsJson = json_encode(
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 27px;
-    height: 29px;
+    width: 25px;
+    height: 27px;
     padding: 0;
     border: 0;
     background: #ffffff;
     color: #725c4d;
     font-family: inherit;
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1;
     cursor: pointer;
 }
@@ -1691,18 +1610,18 @@ $oldSaleItemsJson = json_encode(
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 27px;
-    height: 29px;
+    min-width: 25px;
+    height: 27px;
     border-right: 1px solid #e5ddd6;
     border-left: 1px solid #e5ddd6;
     color: #49392f;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
 }
 
 .sales-cart-item-price {
     color: #4c392c;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
 }
 
@@ -1718,36 +1637,37 @@ $oldSaleItemsJson = json_encode(
 }
 
 .sales-order-field {
-    margin-bottom: 16px;
+    margin-bottom: 15px;
 }
 
 .sales-order-field label,
 .sales-received-section label {
     display: block;
-    margin-bottom: 7px;
+    margin-bottom: 6px;
     color: #4a3b31;
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.3;
 }
 
 .sales-order-input {
     display: block;
     width: 100%;
-    height: 41px;
+    height: 39px;
     box-sizing: border-box;
     padding: 0 11px;
     border: 1px solid #ded4cb;
-    border-radius: 9px;
+    border-radius: 8px;
     outline: none;
     background: #ffffff;
     color: #3b2e26;
     font-family: inherit;
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .sales-order-input:focus {
     border-color: #d2a47b;
-    box-shadow: 0 0 0 3px rgba(210, 164, 123, .12);
+    box-shadow: 0 0 0 3px rgba(196, 122, 58, .075);
 }
 
 .sales-order-input.is-invalid,
@@ -1758,9 +1678,9 @@ $oldSaleItemsJson = json_encode(
 
 .sales-helper-text {
     display: block;
-    margin-top: 6px;
+    margin-top: 5px;
     color: #988b82;
-    font-size: 11px;
+    font-size: 9px;
     line-height: 1.45;
 }
 
@@ -1775,41 +1695,43 @@ $oldSaleItemsJson = json_encode(
     gap: 9px;
 }
 
-.sales-money-input {
+.sales-money-input,
+.sales-received-input {
     position: relative;
 }
 
-.sales-money-input > span {
+.sales-money-input > span,
+.sales-received-input > span {
     position: absolute;
     top: 0;
-    left: 11px;
+    left: 10px;
     z-index: 2;
     display: flex;
     align-items: center;
-    height: 41px;
+    height: 39px;
     color: #8a7b70;
-    font-size: 13px;
+    font-size: 12px;
     pointer-events: none;
 }
 
 .sales-money-input input {
     display: block;
     width: 100%;
-    height: 41px;
+    height: 39px;
     box-sizing: border-box;
-    padding: 0 10px 0 28px;
+    padding: 0 10px 0 27px;
     border: 1px solid #ded4cb;
-    border-radius: 9px;
+    border-radius: 8px;
     outline: none;
     background: #ffffff;
     color: #3b2e26;
     font-family: inherit;
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .sales-money-input input:focus {
     border-color: #d2a47b;
-    box-shadow: 0 0 0 3px rgba(210, 164, 123, .12);
+    box-shadow: 0 0 0 3px rgba(196, 122, 58, .075);
 }
 
 
@@ -1818,8 +1740,8 @@ $oldSaleItemsJson = json_encode(
 ============================================================ */
 
 .sales-total-breakdown {
-    margin-top: 16px;
-    padding: 15px 0;
+    margin-top: 15px;
+    padding: 14px 0;
     border-top: 1px solid #eee7e1;
     border-bottom: 1px solid #eee7e1;
 }
@@ -1829,7 +1751,7 @@ $oldSaleItemsJson = json_encode(
     align-items: center;
     justify-content: space-between;
     gap: 15px;
-    margin-bottom: 10px;
+    margin-bottom: 9px;
 }
 
 .sales-total-line:last-child {
@@ -1838,18 +1760,18 @@ $oldSaleItemsJson = json_encode(
 
 .sales-total-line span {
     color: #75665d;
-    font-size: 11px;
+    font-size: 10px;
 }
 
 .sales-total-line strong {
     color: #4f3e32;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
 }
 
 .sales-total-divider {
     height: 1px;
-    margin: 12px 0;
+    margin: 11px 0;
     background: #eee7e1;
 }
 
@@ -1862,13 +1784,13 @@ $oldSaleItemsJson = json_encode(
 
 .sales-grand-total span {
     color: #403229;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 800;
 }
 
 .sales-grand-total strong {
     color: var(--orange);
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 800;
 }
 
@@ -1878,46 +1800,28 @@ $oldSaleItemsJson = json_encode(
 ============================================================ */
 
 .sales-received-section {
-    margin-top: 16px;
-}
-
-.sales-received-input {
-    position: relative;
-}
-
-.sales-received-input > span {
-    position: absolute;
-    top: 0;
-    left: 11px;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    height: 41px;
-    color: #8a7b70;
-    font-size: 13px;
-    font-weight: 600;
-    pointer-events: none;
+    margin-top: 15px;
 }
 
 .sales-received-input input {
     display: block;
     width: 100%;
-    height: 41px;
+    height: 39px;
     box-sizing: border-box;
-    padding: 0 11px 0 30px;
+    padding: 0 11px 0 29px;
     border: 1px solid #ded4cb;
-    border-radius: 9px;
+    border-radius: 8px;
     outline: none;
     background: #ffffff;
     color: #3e3027;
     font-family: inherit;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
 }
 
 .sales-received-input input:focus {
     border-color: #d2a47b;
-    box-shadow: 0 0 0 3px rgba(210, 164, 123, .12);
+    box-shadow: 0 0 0 3px rgba(196, 122, 58, .075);
 }
 
 
@@ -1930,30 +1834,30 @@ $oldSaleItemsJson = json_encode(
     align-items: center;
     justify-content: space-between;
     gap: 15px;
-    margin-top: 12px;
-    padding: 10px 11px;
+    margin-top: 11px;
+    padding: 10px;
     border: 1px solid #dfe9df;
-    border-radius: 9px;
+    border-radius: 8px;
     background: #f7fbf7;
 }
 
 .sales-change-box span {
     display: block;
     color: #4f674f;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
 }
 
 .sales-change-box small {
     display: block;
-    margin-top: 3px;
+    margin-top: 2px;
     color: #849584;
-    font-size: 10px;
+    font-size: 9px;
 }
 
 .sales-change-box strong {
     color: #4c895d;
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 800;
 }
 
@@ -1965,8 +1869,8 @@ $oldSaleItemsJson = json_encode(
 .sales-order-actions {
     display: flex;
     flex-direction: column;
-    gap: 9px;
-    margin-top: 16px;
+    gap: 8px;
+    margin-top: 15px;
 }
 
 .sales-complete-button {
@@ -1975,10 +1879,10 @@ $oldSaleItemsJson = json_encode(
     justify-content: center;
     gap: 7px;
     width: 100%;
-    min-height: 41px;
-    padding: 0 16px;
+    min-height: 37px;
+    padding: 0 15px;
     border: 0;
-    border-radius: 9px;
+    border-radius: 8px;
     background: linear-gradient(
         135deg,
         var(--orange),
@@ -1986,7 +1890,7 @@ $oldSaleItemsJson = json_encode(
     );
     color: #ffffff;
     font-family: inherit;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
     cursor: pointer;
     box-shadow: 0 5px 12px rgba(180, 125, 75, .18);
@@ -2010,11 +1914,11 @@ $oldSaleItemsJson = json_encode(
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 20px;
-    height: 20px;
+    width: 19px;
+    height: 19px;
     border-radius: 50%;
     background: rgba(255,255,255,.18);
-    font-size: 11px;
+    font-size: 10px;
 }
 
 .sales-cancel-button {
@@ -2022,15 +1926,15 @@ $oldSaleItemsJson = json_encode(
     align-items: center;
     justify-content: center;
     width: 100%;
-    min-height: 41px;
+    min-height: 37px;
     box-sizing: border-box;
-    padding: 0 16px;
+    padding: 0 15px;
     border: 1px solid #ded4cb;
-    border-radius: 9px;
+    border-radius: 8px;
     background: #ffffff;
     color: #66584f;
     text-decoration: none;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     transition:
         background .18s ease,
@@ -2050,10 +1954,10 @@ $oldSaleItemsJson = json_encode(
 .sales-order-note {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
-    margin-top: 12px;
-    padding: 10px 11px;
-    border-radius: 9px;
+    gap: 7px;
+    margin-top: 11px;
+    padding: 9px 10px;
+    border-radius: 8px;
     background: #fcf9f5;
 }
 
@@ -2062,37 +1966,20 @@ $oldSaleItemsJson = json_encode(
     align-items: center;
     justify-content: center;
     flex: 0 0 auto;
-    width: 18px;
-    height: 18px;
+    width: 17px;
+    height: 17px;
     border-radius: 50%;
     background: var(--orange-light);
     color: var(--orange);
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
 }
 
 .sales-order-note p {
     margin: 0;
     color: #8e8076;
-    font-size: 10px;
+    font-size: 9px;
     line-height: 1.5;
-}
-
-
-/* ============================================================
-   RESPONSIVE — 1250
-============================================================ */
-
-@media (max-width: 1250px) {
-
-    .sales-pos-layout {
-        grid-template-columns: minmax(0, 1fr) 360px;
-    }
-
-    .sales-product-grid {
-        grid-template-columns: repeat(3, minmax(150px, 1fr));
-    }
-
 }
 
 
@@ -2111,7 +1998,7 @@ $oldSaleItemsJson = json_encode(
     }
 
     .sales-product-grid {
-        grid-template-columns: repeat(4, minmax(150px, 1fr));
+        grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 
 }
@@ -2124,7 +2011,7 @@ $oldSaleItemsJson = json_encode(
 @media (max-width: 850px) {
 
     .sales-product-grid {
-        grid-template-columns: repeat(3, minmax(145px, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
 }
@@ -2136,12 +2023,16 @@ $oldSaleItemsJson = json_encode(
 
 @media (max-width: 700px) {
 
-    .sales-page-header {
-        flex-direction: column;
-        gap: 15px;
+    .sales-create-page {
+        max-width: 100%;
     }
 
-    .sales-today-box {
+    .sales-create-page .topbar {
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .sales-create-page .date-box {
         width: 100%;
         box-sizing: border-box;
     }
@@ -2151,22 +2042,23 @@ $oldSaleItemsJson = json_encode(
     }
 
     .sales-product-grid {
-        grid-template-columns: repeat(2, minmax(135px, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         padding: 14px;
     }
 
-    .sales-catalog-header {
-        padding-left: 14px;
-        padding-right: 14px;
+    .sales-catalog-header,
+    .sales-order-header {
+        padding-left: 15px;
+        padding-right: 15px;
     }
 
     .sales-catalog-footer {
-        padding-left: 14px;
-        padding-right: 14px;
+        padding-left: 15px;
+        padding-right: 15px;
     }
 
     .sales-order-details {
-        padding: 14px;
+        padding: 15px;
     }
 
 }
@@ -2178,11 +2070,12 @@ $oldSaleItemsJson = json_encode(
 
 @media (max-width: 480px) {
 
-    .sales-heading-row h1 {
-        font-size: 25px;
+    .sales-create-page .page-title h1 {
+        font-size: 23px;
     }
 
-    .sales-catalog-header {
+    .sales-catalog-header,
+    .sales-order-header {
         align-items: flex-start;
     }
 
@@ -2192,7 +2085,7 @@ $oldSaleItemsJson = json_encode(
     }
 
     .sales-product-image {
-        height: 115px;
+        height: 110px;
     }
 
     .sales-product-card-info {
@@ -2200,7 +2093,7 @@ $oldSaleItemsJson = json_encode(
     }
 
     .sales-product-card h3 {
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .sales-product-card-bottom strong {
@@ -2216,6 +2109,7 @@ $oldSaleItemsJson = json_encode(
 </style>
 
 @endpush
+
 
 @push('scripts')
 
@@ -2260,9 +2154,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const orderItems =
         document.getElementById('orderItems');
 
-    const emptyOrder =
-        document.getElementById('emptyOrder');
-
     const hiddenSaleItems =
         document.getElementById('hiddenSaleItems');
 
@@ -2302,8 +2193,6 @@ document.addEventListener('DOMContentLoaded', function () {
     ============================================================ */
 
     let cart = [];
-
-    let rowIndex = 0;
 
 
     /* ============================================================
@@ -2434,19 +2323,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
             if (visible) {
-
                 visibleCount++;
-
             }
 
         });
 
 
         if (visibleProductCount) {
-
             visibleProductCount.textContent =
                 visibleCount;
-
         }
 
 
@@ -2473,14 +2358,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     /* ============================================================
-       ADD PRODUCT TO CART
+       ADD PRODUCT
     ============================================================ */
 
     function addToCart(productId, quantity = 1) {
 
         const product =
             getProduct(productId);
-
 
         if (!product) {
             return;
@@ -2511,7 +2395,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         renderCart();
-
         updateSummary();
 
     }
@@ -2525,7 +2408,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const item =
             getCartItem(productId);
-
 
         if (!item) {
             return;
@@ -2541,40 +2423,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         renderCart();
-
-        updateSummary();
-
-    }
-
-
-    /* ============================================================
-       SET QUANTITY
-    ============================================================ */
-
-    function setQuantity(productId, quantity) {
-
-        const item =
-            getCartItem(productId);
-
-
-        if (!item) {
-            return;
-        }
-
-
-        const newQuantity =
-            Math.max(
-                1,
-                parseInt(quantity, 10) || 1
-            );
-
-
-        item.quantity =
-            newQuantity;
-
-
-        renderCart();
-
         updateSummary();
 
     }
@@ -2596,7 +2444,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         renderCart();
-
         updateSummary();
 
     }
@@ -2620,10 +2467,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             orderItems.innerHTML = `
 
-                <div
-                    class="sales-order-empty"
-                    id="emptyOrder"
-                >
+                <div class="sales-order-empty">
 
                     <div class="sales-empty-cart-icon">
                         🛒
@@ -2643,7 +2487,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
             updateCartCount();
-
             updateHiddenInputs();
 
             return;
@@ -2705,11 +2548,8 @@ document.addEventListener('DOMContentLoaded', function () {
             itemElement.innerHTML = `
 
                 <div class="sales-cart-item-image">
-
                     ${imageHtml}
-
                 </div>
-
 
                 <div class="sales-cart-item-main">
 
@@ -2735,9 +2575,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
                     <div class="sales-cart-item-sku">
-
                         ${escapeHtml(product.sku)}
-
                     </div>
 
 
@@ -2771,9 +2609,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
                         <span class="sales-cart-item-price">
-
                             ${formatMoney(itemTotal)}
-
                         </span>
 
                     </div>
@@ -2789,7 +2625,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         updateCartCount();
-
         updateHiddenInputs();
 
     }
@@ -2814,17 +2649,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         if (cartItemCount) {
-
-            cartItemCount.textContent =
-                count;
-
+            cartItemCount.textContent = count;
         }
 
     }
 
 
     /* ============================================================
-       HIDDEN FORM INPUTS
+       HIDDEN INPUTS
     ============================================================ */
 
     function updateHiddenInputs() {
@@ -2842,12 +2674,9 @@ document.addEventListener('DOMContentLoaded', function () {
             const productInput =
                 document.createElement('input');
 
-            productInput.type =
-                'hidden';
-
+            productInput.type = 'hidden';
             productInput.name =
                 `items[${index}][product_id]`;
-
             productInput.value =
                 item.product_id;
 
@@ -2855,23 +2684,15 @@ document.addEventListener('DOMContentLoaded', function () {
             const quantityInput =
                 document.createElement('input');
 
-            quantityInput.type =
-                'hidden';
-
+            quantityInput.type = 'hidden';
             quantityInput.name =
                 `items[${index}][quantity]`;
-
             quantityInput.value =
                 item.quantity;
 
 
-            hiddenSaleItems.appendChild(
-                productInput
-            );
-
-            hiddenSaleItems.appendChild(
-                quantityInput
-            );
+            hiddenSaleItems.appendChild(productInput);
+            hiddenSaleItems.appendChild(quantityInput);
 
         });
 
@@ -2941,42 +2762,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         if (summarySubtotal) {
-
             summarySubtotal.textContent =
                 formatMoney(subtotal);
-
         }
-
 
         if (summaryDiscount) {
-
             summaryDiscount.textContent =
                 '-' + formatMoney(discount);
-
         }
-
 
         if (summaryTax) {
-
             summaryTax.textContent =
                 '+' + formatMoney(tax);
-
         }
-
 
         if (summaryTotal) {
-
             summaryTotal.textContent =
                 formatMoney(total);
-
         }
 
-
         if (summaryChange) {
-
             summaryChange.textContent =
                 formatMoney(change);
-
         }
 
     }
@@ -3012,10 +2819,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
 
-                addToCart(
-                    productId,
-                    1
-                );
+                addToCart(productId, 1);
 
             }
         );
@@ -3089,9 +2893,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         Number(item.quantity) <= 1
                     ) {
 
-                        removeFromCart(
-                            productId
-                        );
+                        removeFromCart(productId);
 
                     } else {
 
@@ -3136,9 +2938,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (productSearch) {
 
-                    productSearch.value =
-                        '';
-
+                    productSearch.value = '';
                     productSearch.focus();
 
                 }
@@ -3240,8 +3040,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (existing) {
 
-                existing.quantity +=
-                    quantity;
+                existing.quantity += quantity;
 
             } else {
 
@@ -3267,12 +3066,6 @@ document.addEventListener('DOMContentLoaded', function () {
             'submit',
             function (event) {
 
-                /*
-                |----------------------------------------------------
-                | CHECK CART
-                |----------------------------------------------------
-                */
-
                 if (cart.length === 0) {
 
                     event.preventDefault();
@@ -3286,14 +3079,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
 
-                /*
-                |----------------------------------------------------
-                | CHECK QUANTITIES
-                |----------------------------------------------------
-                */
-
-                let hasInvalidQuantity =
-                    false;
+                let hasInvalidQuantity = false;
 
 
                 cart.forEach(function (item) {
@@ -3303,8 +3089,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         Number(item.quantity) <= 0
                     ) {
 
-                        hasInvalidQuantity =
-                            true;
+                        hasInvalidQuantity = true;
 
                     }
 
@@ -3323,12 +3108,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 }
 
-
-                /*
-                |----------------------------------------------------
-                | CALCULATE TOTAL
-                |----------------------------------------------------
-                */
 
                 let subtotal = 0;
 
@@ -3379,12 +3158,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     );
 
 
-                /*
-                |----------------------------------------------------
-                | CHECK PAYMENT
-                |----------------------------------------------------
-                */
-
                 if (received < total) {
 
                     event.preventDefault();
@@ -3394,9 +3167,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     );
 
                     if (amountReceivedInput) {
-
                         amountReceivedInput.focus();
-
                     }
 
                     return;
@@ -3404,25 +3175,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
 
-                /*
-                |----------------------------------------------------
-                | UPDATE HIDDEN INPUTS
-                |----------------------------------------------------
-                */
-
                 updateHiddenInputs();
 
 
-                /*
-                |----------------------------------------------------
-                | PROCESSING STATE
-                |----------------------------------------------------
-                */
-
                 if (completeSaleButton) {
 
-                    completeSaleButton.disabled =
-                        true;
+                    completeSaleButton.disabled = true;
 
                     completeSaleButton.innerHTML = `
 

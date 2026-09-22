@@ -91,9 +91,7 @@
 ========================================================= */
 
 html {
-
     min-height: 100%;
-
     font-size: 16px;
 }
 
@@ -129,7 +127,6 @@ body {
 ========================================================= */
 
 .app {
-
     min-height: 100vh;
 }
 
@@ -179,7 +176,7 @@ body {
 
 
 /* =========================================================
-   LOGO
+   BRAND
 ========================================================= */
 
 .logo {
@@ -188,51 +185,12 @@ body {
 
     align-items: center;
 
-    gap: 11px;
-
     padding:
         3px
-        9px;
+        8px;
 
     margin-bottom:
-        clamp(15px, 2.8vh, 30px);
-
-    flex-shrink: 0;
-}
-
-
-.logo-icon {
-
-    width:
-        clamp(38px, 5vh, 45px);
-
-    height:
-        clamp(38px, 5vh, 45px);
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    border-radius: 13px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #d79555,
-            #a85f28
-        );
-
-    color: white;
-
-    font-size: 1.1875rem;
-
-    font-weight: 800;
-
-    box-shadow:
-        0 8px 20px
-        rgba(0, 0, 0, 0.22);
+        clamp(14px, 2.5vh, 27px);
 
     flex-shrink: 0;
 }
@@ -240,26 +198,28 @@ body {
 
 .logo-name {
 
-    font-size: 1.25rem;
+    font-size: 1.125rem;
 
     font-weight: 800;
 
-    letter-spacing: -0.025rem;
+    letter-spacing: -0.02rem;
+
+    color: white;
 }
 
 
 .logo-subtitle {
 
-    margin-top: 2px;
+    margin-top: 1px;
 
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
 
     color:
         rgba(255, 255, 255, 0.55);
 
     text-transform: uppercase;
 
-    letter-spacing: 0.055rem;
+    letter-spacing: 0.05rem;
 }
 
 
@@ -269,19 +229,19 @@ body {
 
 .nav-title {
 
-    padding: 0 11px;
+    padding: 0 10px;
 
     margin-bottom:
-        clamp(5px, 1vh, 9px);
+        clamp(5px, 0.9vh, 8px);
 
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
 
     color:
         rgba(255, 255, 255, 0.48);
 
     text-transform: uppercase;
 
-    letter-spacing: 0.075rem;
+    letter-spacing: 0.07rem;
 
     font-weight: 800;
 
@@ -300,31 +260,35 @@ body {
     flex-direction: column;
 
     gap:
-        clamp(2px, 0.5vh, 5px);
+        clamp(2px, 0.45vh, 4px);
 
     flex-shrink: 0;
 }
 
+
+/* =========================================================
+   NAV ITEM
+========================================================= */
 
 .nav-item {
 
     width: 100%;
 
     min-height:
-        clamp(36px, 5vh, 45px);
+        clamp(35px, 4.7vh, 42px);
 
     display: flex;
 
     align-items: center;
 
     gap:
-        clamp(8px, 1.3vh, 12px);
+        clamp(8px, 1.2vh, 11px);
 
     padding:
-        clamp(6px, 0.9vh, 9px)
-        11px;
+        clamp(5px, 0.8vh, 8px)
+        10px;
 
-    border-radius: 10px;
+    border-radius: 9px;
 
     border: none;
 
@@ -335,7 +299,7 @@ body {
 
     text-decoration: none;
 
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
 
     line-height: 1.3;
 
@@ -349,6 +313,10 @@ body {
 }
 
 
+/* =========================================================
+   NAV HOVER
+========================================================= */
+
 .nav-item:hover {
 
     background:
@@ -357,6 +325,10 @@ body {
     color: white;
 }
 
+
+/* =========================================================
+   ACTIVE NAVIGATION
+========================================================= */
 
 .nav-item.active {
 
@@ -370,7 +342,7 @@ body {
     color: white;
 
     box-shadow:
-        0 6px 16px
+        0 5px 13px
         rgba(0, 0, 0, 0.16);
 }
 
@@ -395,10 +367,10 @@ body {
 .nav-icon {
 
     width:
-        clamp(26px, 3.4vh, 30px);
+        clamp(25px, 3.2vh, 28px);
 
     height:
-        clamp(26px, 3.4vh, 30px);
+        clamp(25px, 3.2vh, 28px);
 
     display: flex;
 
@@ -406,7 +378,7 @@ body {
 
     justify-content: center;
 
-    border-radius: 8px;
+    border-radius: 7px;
 
     background:
         rgba(255, 255, 255, 0.055);
@@ -414,7 +386,7 @@ body {
     color:
         rgba(255, 255, 255, 0.82);
 
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
 
     flex-shrink: 0;
 }
@@ -436,7 +408,7 @@ body {
 .admin-section {
 
     margin-top:
-        clamp(12px, 2vh, 23px);
+        clamp(11px, 1.8vh, 20px);
 }
 
 
@@ -449,14 +421,14 @@ body {
     margin-top: auto;
 
     padding-top:
-        clamp(8px, 1.4vh, 15px);
+        clamp(7px, 1.2vh, 13px);
 
     flex-shrink: 0;
 }
 
 
 /* =========================================================
-   USER MINI
+   MINI USER
 ========================================================= */
 
 .user-mini {
@@ -465,14 +437,14 @@ body {
 
     align-items: center;
 
-    gap: 9px;
+    gap: 8px;
 
     padding:
-        clamp(8px, 1.2vh, 11px);
+        clamp(7px, 1.1vh, 10px);
 
-    margin-bottom: 6px;
+    margin-bottom: 5px;
 
-    border-radius: 11px;
+    border-radius: 10px;
 
     background:
         rgba(255, 255, 255, 0.055);
@@ -483,13 +455,17 @@ body {
 }
 
 
+/* =========================================================
+   USER AVATAR
+========================================================= */
+
 .avatar {
 
     width:
-        clamp(34px, 4.5vh, 39px);
+        clamp(32px, 4.2vh, 37px);
 
     height:
-        clamp(34px, 4.5vh, 39px);
+        clamp(32px, 4.2vh, 37px);
 
     display: flex;
 
@@ -497,7 +473,7 @@ body {
 
     justify-content: center;
 
-    border-radius: 10px;
+    border-radius: 9px;
 
     background:
         linear-gradient(
@@ -508,13 +484,17 @@ body {
 
     color: #382519;
 
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
 
     font-weight: 800;
 
     flex-shrink: 0;
 }
 
+
+/* =========================================================
+   USER INFORMATION
+========================================================= */
 
 .user-info {
 
@@ -524,7 +504,7 @@ body {
 
 .user-name {
 
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
 
     font-weight: 700;
 
@@ -542,9 +522,9 @@ body {
 
 .user-role {
 
-    margin-top: 2px;
+    margin-top: 1px;
 
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
 
     line-height: 1.3;
 
@@ -558,7 +538,6 @@ body {
 ========================================================= */
 
 .logout-form {
-
     width: 100%;
 }
 
@@ -568,22 +547,23 @@ body {
     width: 100%;
 
     min-height:
-        clamp(36px, 4.5vh, 42px);
+        clamp(35px, 4.2vh, 40px);
 
     display: flex;
 
     align-items: center;
 
-    gap: 10px;
+    gap: 9px;
 
     padding:
-        6px 11px;
+        5px
+        10px;
 
     border:
         1px solid
         rgba(255, 255, 255, 0.06);
 
-    border-radius: 9px;
+    border-radius: 8px;
 
     background:
         rgba(255, 255, 255, 0.025);
@@ -593,7 +573,7 @@ body {
 
     font-family: inherit;
 
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
 
     cursor: pointer;
 
@@ -617,8 +597,7 @@ body {
 
 
 /* =========================================================
-   MAIN CONTENT
-   MASTER DASHBOARD POSITION
+   MAIN
 ========================================================= */
 
 .main {
@@ -653,12 +632,9 @@ body {
 
 /* =========================================================
    SHARED TOPBAR
-   SAME AS ADMIN DASHBOARD
 ========================================================= */
 
 .topbar {
-
-    width: 100%;
 
     display: flex;
 
@@ -668,55 +644,41 @@ body {
 
     gap: 20px;
 
-    margin: 0 0 clamp(20px, 3vh, 28px);
-
-    padding: 0;
+    margin-bottom:
+        clamp(18px, 2.6vh, 25px);
 }
 
 
 /* =========================================================
    PAGE TITLE
-   SAME AS ADMIN DASHBOARD
 ========================================================= */
-
-.page-title {
-
-    margin: 0;
-
-    padding: 0;
-}
-
 
 .page-title small {
 
     display: block;
 
-    margin-bottom: 5px;
+    margin-bottom: 4px;
 
     color: var(--orange);
 
-    font-size: 0.8125rem;
+    font-size: 0.6875rem;
 
     font-weight: 800;
 
     text-transform: uppercase;
 
-    letter-spacing: 0.075rem;
+    letter-spacing: 0.07rem;
 }
 
 
 .page-title h1 {
 
-    margin: 0;
-
-    padding: 0;
-
     font-size:
-        clamp(1.75rem, 2.4vw, 2.125rem);
+        clamp(1.6rem, 2.2vw, 1.9rem);
 
     line-height: 1.15;
 
-    letter-spacing: -0.055rem;
+    letter-spacing: -0.045rem;
 
     color: var(--dark);
 }
@@ -724,14 +686,11 @@ body {
 
 .page-title p {
 
-    margin:
-        7px 0 0;
-
-    padding: 0;
+    margin-top: 5px;
 
     color: var(--muted);
 
-    font-size: 0.9375rem;
+    font-size: 0.75rem;
 
     line-height: 1.5;
 }
@@ -739,44 +698,15 @@ body {
 
 /* =========================================================
    DATE BOX
-   SAME AS ADMIN DASHBOARD
 ========================================================= */
 
 .date-box {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
-
-    padding:
-        11px 15px;
-
-    border:
-        1px solid var(--border);
-
-    border-radius: 12px;
-
-    background: white;
-
-    color: #756b63;
-
-    font-size: 0.875rem;
-
-    box-shadow:
-        0 3px 12px
-        rgba(43, 31, 23, 0.03);
-
-    flex-shrink: 0;
+    display: none;
 }
 
 
 .date-icon {
-
-    color: var(--orange);
-
-    font-size: 1rem;
+    display: none;
 }
 
 
@@ -791,13 +721,13 @@ textarea {
 
     font-family: inherit;
 
-    font-size: 1rem;
+    font-size: 0.875rem;
 }
 
 
 label {
 
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
 
     line-height: 1.4;
 
@@ -818,7 +748,8 @@ label {
         width: 72px;
 
         padding:
-            15px 8px;
+            15px
+            8px;
     }
 
 
@@ -832,7 +763,13 @@ label {
     }
 
 
-    .logo > div:not(.logo-icon) {
+    .logo-name {
+
+        display: none;
+    }
+
+
+    .logo-subtitle {
 
         display: none;
     }
@@ -849,7 +786,8 @@ label {
         justify-content: center;
 
         padding:
-            6px 3px;
+            6px
+            3px;
     }
 
 
@@ -878,7 +816,8 @@ label {
         justify-content: center;
 
         padding:
-            6px 3px;
+            6px
+            3px;
     }
 
 
@@ -893,7 +832,8 @@ label {
         justify-content: center;
 
         padding:
-            5px 3px;
+            5px
+            3px;
     }
 
 
@@ -911,8 +851,11 @@ label {
         margin-left: 72px;
 
         padding:
-            24px 18px 35px;
+            24px
+            18px
+            35px;
     }
+
 }
 
 
@@ -939,7 +882,9 @@ label {
     .main {
 
         padding:
-            20px 14px 30px;
+            20px
+            14px
+            30px;
     }
 
 
@@ -951,12 +896,12 @@ label {
 
     .page-title p {
 
-        font-size: 0.875rem;
+        font-size: 0.75rem;
     }
+
 }
 
 </style>
-
 
 @stack('styles')
 
@@ -968,155 +913,339 @@ label {
 <div class="app">
 
 
-    <!-- =====================================================
-         SIDEBAR
-    ====================================================== -->
+<!-- =========================================================
+     SIDEBAR
+========================================================== -->
 
-    <aside class="sidebar">
+<aside class="sidebar">
 
 
-        <!-- LOGO -->
+<!-- =====================================================
+     BRAND
+====================================================== -->
 
-        <div class="logo">
+<div class="logo">
 
-            <div class="logo-icon">
-                B
-            </div>
+    <div>
 
-            <div>
-
-                <div class="logo-name">
-                    BiteSync
-                </div>
-
-                <div class="logo-subtitle">
-                    Management System
-                </div>
-
-            </div>
-
+        <div class="logo-name">
+            BiteSync
         </div>
 
+        <div class="logo-subtitle">
+            Management System
+        </div>
 
-        <!-- MAIN MENU -->
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     CURRENT USER ROLE
+====================================================== -->
+
+@php
+
+    $currentUser = auth()->user();
+
+    $currentRole = $currentUser?->role;
+
+    /*
+    |--------------------------------------------------------------------------
+    | Role permissions used ONLY for navigation visibility.
+    |--------------------------------------------------------------------------
+    | Actual route middleware/controller authorization should still protect
+    | the pages themselves.
+    |
+    */
+
+    $isAdmin = $currentRole === 'CEO/Admin';
+
+    $isFinance = $currentRole === 'Finance';
+
+    $isProcurement = $currentRole === 'Procurement';
+
+@endphp
+
+
+<!-- =====================================================
+     MAIN MENU
+====================================================== -->
+
+<div class="nav-title">
+    Main Menu
+</div>
+
+
+<nav class="nav">
+
+
+    <!-- =================================================
+         DASHBOARD
+    ================================================== -->
+
+    @if ($isAdmin)
+
+        <a
+            href="{{ route('admin.dashboard') }}"
+            class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
+        >
+
+            <span class="nav-icon">
+                ⌂
+            </span>
+
+            <span>
+                Dashboard
+            </span>
+
+        </a>
+
+    @elseif ($isFinance)
+
+        <a
+            href="{{ route('finance.dashboard') }}"
+            class="nav-item {{ request()->routeIs('finance.dashboard') ? 'active' : '' }}"
+        >
+
+            <span class="nav-icon">
+                ⌂
+            </span>
+
+            <span>
+                Dashboard
+            </span>
+
+        </a>
+
+    @elseif ($isProcurement)
+
+        <a
+            href="{{ route('procurement.dashboard') }}"
+            class="nav-item {{ request()->routeIs('procurement.dashboard') ? 'active' : '' }}"
+        >
+
+            <span class="nav-icon">
+                ⌂
+            </span>
+
+            <span>
+                Dashboard
+            </span>
+
+        </a>
+
+    @endif
+
+
+    <!-- =================================================
+         INVENTORY
+         CEO/Admin = manage
+         Finance = view
+         Procurement = manage
+    ================================================== -->
+
+    @if ($isAdmin || $isFinance || $isProcurement)
+
+        <a
+            href="{{ route('inventory.index') }}"
+            class="nav-item {{ request()->routeIs('inventory.*') ? 'active' : '' }}"
+        >
+
+            <span class="nav-icon">
+                ▦
+            </span>
+
+            <span>
+                Inventory
+            </span>
+
+        </a>
+
+    @endif
+
+
+    <!-- =================================================
+         PRODUCTS
+         CEO/Admin ONLY
+    ================================================== -->
+
+    @if ($isAdmin)
+
+        <a
+            href="{{ route('products.index') }}"
+            class="nav-item {{ request()->routeIs('products.*') || request()->routeIs('recipes.*') ? 'active' : '' }}"
+        >
+
+            <span class="nav-icon">
+                ◈
+            </span>
+
+            <span>
+                Products
+            </span>
+
+        </a>
+
+    @endif
+
+
+    <!-- =================================================
+         SUPPLIERS
+         CEO/Admin = manage
+         Finance = view
+         Procurement = manage
+    ================================================== -->
+
+    @if ($isAdmin || $isFinance || $isProcurement)
+
+        <a
+            href="{{ route('suppliers.index') }}"
+            class="nav-item {{ request()->routeIs('suppliers.*') ? 'active' : '' }}"
+        >
+
+            <span class="nav-icon">
+                ♧
+            </span>
+
+            <span>
+                Suppliers
+            </span>
+
+        </a>
+
+    @endif
+
+
+    <!-- =================================================
+         PURCHASES
+         CEO/Admin = manage
+         Finance = view
+         Procurement = manage
+    ================================================== -->
+
+    @if ($isAdmin || $isFinance || $isProcurement)
+
+        <a
+            href="{{ route('purchases.index') }}"
+            class="nav-item {{ request()->routeIs('purchases.*') ? 'active' : '' }}"
+        >
+
+            <span class="nav-icon">
+                ▤
+            </span>
+
+            <span>
+                Purchases
+            </span>
+
+        </a>
+
+    @endif
+
+
+    <!-- =================================================
+         SALES
+         CEO/Admin = manage
+         Finance = view
+         Procurement = NO ACCESS
+    ================================================== -->
+
+    @if ($isAdmin || $isFinance)
+
+        <a
+            href="{{ route('sales.index') }}"
+            class="nav-item {{ request()->routeIs('sales.*') ? 'active' : '' }}"
+        >
+
+            <span class="nav-icon">
+                ₱
+            </span>
+
+            <span>
+                Sales
+            </span>
+
+        </a>
+
+    @endif
+
+
+    <!-- =================================================
+         EXPENSES
+         CEO/Admin = manage
+         Finance = manage
+         Procurement = NO ACCESS
+    ================================================== -->
+
+    @if ($isAdmin || $isFinance)
+
+        <a
+            href="{{ route('expenses.index') }}"
+            class="nav-item {{ request()->routeIs('expenses.*') ? 'active' : '' }}"
+        >
+
+            <span class="nav-icon">
+                ▣
+            </span>
+
+            <span>
+                Expenses
+            </span>
+
+        </a>
+
+    @endif
+
+
+    <!-- =================================================
+         REPORTS
+         ALL THREE ROLES
+    ================================================== -->
+
+    @if ($isAdmin || $isFinance || $isProcurement)
+
+        <a
+            href="{{ route('reports.index') }}"
+            class="nav-item {{ request()->routeIs('reports.*') ? 'active' : '' }}"
+        >
+
+            <span class="nav-icon">
+                ▥
+            </span>
+
+            <span>
+                Reports
+            </span>
+
+        </a>
+
+    @endif
+
+</nav>
+
+
+<!-- =====================================================
+     ADMINISTRATION
+     CEO/Admin ONLY
+====================================================== -->
+
+@if ($isAdmin)
+
+    <div class="admin-section">
 
         <div class="nav-title">
-            Main Menu
+            Administration
         </div>
 
 
         <nav class="nav">
 
 
-            <!-- DASHBOARD -->
-
-            <a
-                href="{{ route('admin.dashboard') }}"
-                class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
-            >
-
-                <span class="nav-icon">
-                    ⌂
-                </span>
-
-                <span>
-                    Dashboard
-                </span>
-
-            </a>
-
-
-            <!-- INVENTORY -->
-
-            <a
-                href="{{ route('inventory.index') }}"
-                class="nav-item {{ request()->routeIs('inventory.*') ? 'active' : '' }}"
-            >
-
-                <span class="nav-icon">
-                    ▦
-                </span>
-
-                <span>
-                    Inventory
-                </span>
-
-            </a>
-
-
-            <!-- PRODUCTS -->
-
-            <a
-                href="{{ route('products.index') }}"
-                class="nav-item {{ request()->routeIs('products.*') || request()->routeIs('recipes.*') ? 'active' : '' }}"
-            >
-
-                <span class="nav-icon">
-                    ◈
-                </span>
-
-                <span>
-                    Products
-                </span>
-
-            </a>
-
-
-            <!-- SUPPLIERS -->
-
-            <a
-                href="{{ route('suppliers.index') }}"
-                class="nav-item {{ request()->routeIs('suppliers.*') ? 'active' : '' }}"
-            >
-
-                <span class="nav-icon">
-                    ♧
-                </span>
-
-                <span>
-                    Suppliers
-                </span>
-
-            </a>
-
-
-            <!-- PURCHASES -->
-
-            <a
-                href="{{ route('purchases.index') }}"
-                class="nav-item {{ request()->routeIs('purchases.*') ? 'active' : '' }}"
-            >
-
-                <span class="nav-icon">
-                    ▤
-                </span>
-
-                <span>
-                    Purchases
-                </span>
-
-            </a>
-
-
-            <!-- SALES -->
-
-            <a
-                href="{{ route('sales.index') }}"
-                class="nav-item {{ request()->routeIs('sales.*') ? 'active' : '' }}"
-            >
-
-                <span class="nav-icon">
-                    ₱
-                </span>
-
-                <span>
-                    Sales
-                </span>
-
-            </a>
-
-
-            <!-- EXPENSES -->
+            <!-- =================================================
+                 USER MANAGEMENT
+            ================================================== -->
 
             <a
                 href="#"
@@ -1124,17 +1253,19 @@ label {
             >
 
                 <span class="nav-icon">
-                    ▣
+                    ♙
                 </span>
 
                 <span>
-                    Expenses
+                    User Management
                 </span>
 
             </a>
 
 
-            <!-- REPORTS -->
+            <!-- =================================================
+                 SYSTEM SETTINGS
+            ================================================== -->
 
             <a
                 href="#"
@@ -1142,157 +1273,155 @@ label {
             >
 
                 <span class="nav-icon">
-                    ▥
+                    ⚙
                 </span>
 
                 <span>
-                    Reports
+                    System Settings
+                </span>
+
+            </a>
+
+
+            <!-- =================================================
+                 AUDIT LOGS
+            ================================================== -->
+
+            <a
+                href="#"
+                class="nav-item"
+            >
+
+                <span class="nav-icon">
+                    ◷
+                </span>
+
+                <span>
+                    Audit Logs
                 </span>
 
             </a>
 
         </nav>
 
+    </div>
 
-        <!-- ADMINISTRATION -->
-
-        <div class="admin-section">
-
-            <div class="nav-title">
-                Administration
-            </div>
+@endif
 
 
-            <nav class="nav">
+<!-- =====================================================
+     USER + LOGOUT
+====================================================== -->
 
-                <a
-                    href="#"
-                    class="nav-item"
-                >
-
-                    <span class="nav-icon">
-                        ♙
-                    </span>
-
-                    <span>
-                        User Management
-                    </span>
-
-                </a>
+<div class="sidebar-bottom">
 
 
-                <a
-                    href="#"
-                    class="nav-item"
-                >
+    <!-- =================================================
+         USER
+    ================================================== -->
 
-                    <span class="nav-icon">
-                        ⚙
-                    </span>
+    <div class="user-mini">
 
-                    <span>
-                        System Settings
-                    </span>
+        <div class="avatar">
 
-                </a>
+            @if(auth()->check())
 
+                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
 
-                <a
-                    href="#"
-                    class="nav-item"
-                >
+            @else
 
-                    <span class="nav-icon">
-                        ◷
-                    </span>
+                U
 
-                    <span>
-                        Audit Logs
-                    </span>
-
-                </a>
-
-            </nav>
+            @endif
 
         </div>
 
 
-        <!-- USER + LOGOUT -->
+        <div class="user-info">
 
-        <div class="sidebar-bottom">
+            <div class="user-name">
 
-            <div class="user-mini">
+                @if(auth()->check())
 
-                <div class="avatar">
+                    {{ auth()->user()->name }}
 
-                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                @else
 
-                </div>
+                    User
 
-
-                <div class="user-info">
-
-                    <div class="user-name">
-
-                        {{ auth()->user()->name }}
-
-                    </div>
-
-
-                    <div class="user-role">
-
-                        {{ auth()->user()->role }}
-
-                    </div>
-
-                </div>
+                @endif
 
             </div>
 
 
-            <form
-                method="POST"
-                action="{{ route('logout') }}"
-                class="logout-form"
-            >
+            <div class="user-role">
 
-                @csrf
+                @if(auth()->check())
 
-                <button
-                    type="submit"
-                    class="logout-button"
-                >
+                    {{ auth()->user()->role }}
 
-                    <span class="nav-icon">
-                        ↪
-                    </span>
+                @else
 
-                    <span>
-                        Sign Out
-                    </span>
+                    Guest
 
-                </button>
+                @endif
 
-            </form>
+            </div>
 
         </div>
 
-    </aside>
+    </div>
 
 
-    <!-- =====================================================
-         MAIN CONTENT
-    ====================================================== -->
+    <!-- =================================================
+         LOGOUT
+    ================================================== -->
 
-    <main class="main">
+    <form
+        method="POST"
+        action="{{ route('logout') }}"
+        class="logout-form"
+    >
 
-        <div class="page-content">
+        @csrf
 
-            @yield('content')
+        <button
+            type="submit"
+            class="logout-button"
+        >
 
-        </div>
+            <span class="nav-icon">
+                ↪
+            </span>
 
-    </main>
+            <span>
+                Sign Out
+            </span>
+
+        </button>
+
+    </form>
+
+</div>
+
+
+</aside>
+
+
+<!-- =========================================================
+     MAIN CONTENT
+========================================================== -->
+
+<main class="main">
+
+    <div class="page-content">
+
+        @yield('content')
+
+    </div>
+
+</main>
+
 
 </div>
 

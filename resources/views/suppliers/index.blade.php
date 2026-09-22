@@ -6,622 +6,689 @@
 
 <div class="suppliers-page">
 
-    <!-- =========================================================
-         SUPPLIERS TOPBAR
-    ========================================================== -->
+<!-- =========================================================
+     SUPPLIERS TOPBAR
+========================================================== -->
 
-    <div class="topbar">
+<div class="topbar">
 
-        <div class="page-title">
+    <div class="page-title">
 
-            <small>
-                Supplier Management
-            </small>
+        <small>
+            Supplier Management
+        </small>
 
-            <h1>
-                Suppliers
-            </h1>
+        <h1>
+            Suppliers
+        </h1>
 
-            <p>
-                Manage your BiteSync supplier and purchasing records.
-            </p>
+        <p>
+            Manage your BiteSync supplier records and supplier information.
+        </p>
+
+    </div>
+
+
+    <div class="date-box">
+
+        <span class="date-icon">
+            ◷
+        </span>
+
+        {{ now()->format('F d, Y') }}
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     SUMMARY CARDS
+========================================================== -->
+
+<section class="suppliers-stats">
+
+    <!-- TOTAL SUPPLIERS -->
+
+    <div class="suppliers-stat">
+
+        <div class="suppliers-stat-left">
+
+            <div class="suppliers-stat-label">
+                TOTAL SUPPLIERS
+            </div>
+
+            <div class="suppliers-stat-note">
+                All supplier records
+            </div>
 
         </div>
 
-        <div class="date-box">
 
-            <span class="date-icon">
-                ◷
-            </span>
+        <div class="suppliers-stat-right">
 
-            {{ now()->format('F d, Y') }}
+            <div class="suppliers-stat-icon">
+                ▦
+            </div>
+
+            <div class="suppliers-stat-value">
+                {{ $totalSuppliers }}
+            </div>
 
         </div>
 
     </div>
 
 
-    <!-- =========================================================
+    <!-- ACTIVE SUPPLIERS -->
+
+    <div class="suppliers-stat">
+
+        <div class="suppliers-stat-left">
+
+            <div class="suppliers-stat-label">
+                ACTIVE SUPPLIERS
+            </div>
+
+            <div class="suppliers-stat-note">
+                Currently available
+            </div>
+
+        </div>
+
+
+        <div class="suppliers-stat-right">
+
+            <div class="suppliers-stat-icon">
+                ✓
+            </div>
+
+            <div class="suppliers-stat-value">
+                {{ $activeSuppliers }}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- INACTIVE SUPPLIERS -->
+
+    <div class="suppliers-stat">
+
+        <div class="suppliers-stat-left">
+
+            <div class="suppliers-stat-label">
+                INACTIVE SUPPLIERS
+            </div>
+
+            <div class="suppliers-stat-note">
+                Not currently available
+            </div>
+
+        </div>
+
+
+        <div class="suppliers-stat-right">
+
+            <div class="suppliers-stat-icon">
+                ×
+            </div>
+
+            <div class="suppliers-stat-value">
+                {{ $inactiveSuppliers }}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ACTIVE SUPPLIER RATE -->
+
+    <div class="suppliers-stat">
+
+        <div class="suppliers-stat-left">
+
+            <div class="suppliers-stat-label">
+                ACTIVE SUPPLIER RATE
+            </div>
+
+            <div class="suppliers-stat-note">
+                Currently active suppliers
+            </div>
+
+        </div>
+
+
+        <div class="suppliers-stat-right">
+
+            <div class="suppliers-stat-icon">
+                %
+            </div>
+
+            <div class="suppliers-stat-value">
+
+                @if ($totalSuppliers > 0)
+
+                    {{ number_format(($activeSuppliers / $totalSuppliers) * 100, 1) }}%
+
+                @else
+
+                    0.0%
+
+                @endif
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     SUPPLIER RECORDS PANEL
+========================================================== -->
+
+<div class="suppliers-panel">
+
+    <!-- =====================================================
+         PANEL HEADER
+    ====================================================== -->
+
+    <div class="suppliers-panel-header">
+
+        <div>
+
+            <div class="suppliers-panel-title">
+                Supplier Records
+            </div>
+
+            <div class="suppliers-panel-subtitle">
+                Search and manage your café supplier records.
+            </div>
+
+        </div>
+
+
+        @if ($user->role === 'CEO/Admin' || $user->role === 'Procurement')
+
+            <a
+                href="{{ route('suppliers.create') }}"
+                class="suppliers-add-button"
+            >
+
+                <span>
+                    +
+                </span>
+
+                Add Supplier
+
+            </a>
+
+        @endif
+
+    </div>
+
+
+    <!-- =====================================================
+         SEARCH / FILTER
+    ====================================================== -->
+
+    <form
+        method="GET"
+        action="{{ route('suppliers.index') }}"
+        class="suppliers-filters"
+    >
+
+        <div class="suppliers-search-wrapper">
+
+            <span class="suppliers-search-icon">
+                ⌕
+            </span>
+
+            <input
+                type="text"
+                name="search"
+                value="{{ $search }}"
+                placeholder="Search suppliers..."
+            >
+
+        </div>
+
+
+        <select name="status">
+
+            <option value="">
+                All Status
+            </option>
+
+            <option
+                value="active"
+                {{ $status === 'active' ? 'selected' : '' }}
+            >
+                Active
+            </option>
+
+            <option
+                value="on_hold"
+                {{ $status === 'on_hold' ? 'selected' : '' }}
+            >
+                On Hold
+            </option>
+
+            <option
+                value="inactive"
+                {{ $status === 'inactive' ? 'selected' : '' }}
+            >
+                Inactive
+            </option>
+
+            <option
+                value="blacklisted"
+                {{ $status === 'blacklisted' ? 'selected' : '' }}
+            >
+                Blacklisted
+            </option>
+
+        </select>
+
+
+        <button
+            type="submit"
+            class="suppliers-filter-button"
+        >
+            Filter
+        </button>
+
+
+        @if ($search || $status)
+
+            <a
+                href="{{ route('suppliers.index') }}"
+                class="suppliers-clear-button"
+            >
+                Clear
+            </a>
+
+        @endif
+
+    </form>
+
+
+    <!-- =====================================================
          SUCCESS MESSAGE
-    ========================================================== -->
+    ====================================================== -->
 
     @if (session('success'))
 
         <div class="supplier-alert supplier-alert-success">
 
-            <span class="supplier-alert-icon">
-                ✓
-            </span>
-
-            <span>
-                {{ session('success') }}
-            </span>
+            {{ session('success') }}
 
         </div>
 
     @endif
 
 
-    <!-- =========================================================
+    <!-- =====================================================
          ERROR MESSAGE
-    ========================================================== -->
+    ====================================================== -->
 
     @if ($errors->any())
 
         <div class="supplier-alert supplier-alert-error">
 
-            <span class="supplier-alert-icon">
-                !
-            </span>
-
-            <span>
-                Please check the form and correct the highlighted information.
-            </span>
+            {{ $errors->first() }}
 
         </div>
 
     @endif
 
 
-    <!-- =========================================================
-         SUMMARY CARDS
-    ========================================================== -->
+    <!-- =====================================================
+         SUPPLIER TABLE
+    ====================================================== -->
 
-    <section class="supplier-stats">
+    <div class="suppliers-table-wrapper">
 
-        <!-- TOTAL SUPPLIERS -->
+        <table class="suppliers-table">
 
-        <div class="supplier-stat">
+            <thead>
 
-            <div>
+                <tr>
 
-                <div class="supplier-stat-label">
-                    TOTAL SUPPLIERS
-                </div>
+                    <th>
+                        Supplier
+                    </th>
 
-                <div class="supplier-stat-value">
-                    {{ $totalSuppliers }}
-                </div>
+                    <th>
+                        Contact
+                    </th>
 
-                <div class="supplier-stat-note">
-                    All supplier records
-                </div>
+                    <th>
+                        Email
+                    </th>
 
-            </div>
+                    <th>
+                        Address
+                    </th>
 
-            <div class="supplier-stat-icon">
-                ♧
-            </div>
+                    <th>
+                        Status
+                    </th>
 
-        </div>
+                    @if ($user->role === 'CEO/Admin' || $user->role === 'Procurement')
 
-
-        <!-- ACTIVE SUPPLIERS -->
-
-        <div class="supplier-stat">
-
-            <div>
-
-                <div class="supplier-stat-label">
-                    ACTIVE SUPPLIERS
-                </div>
-
-                <div class="supplier-stat-value">
-                    {{ $activeSuppliers }}
-                </div>
-
-                <div class="supplier-stat-note">
-                    Currently available
-                </div>
-
-            </div>
-
-            <div class="supplier-stat-icon">
-                ✓
-            </div>
-
-        </div>
-
-
-        <!-- INACTIVE SUPPLIERS -->
-
-        <div class="supplier-stat">
-
-            <div>
-
-                <div class="supplier-stat-label">
-                    INACTIVE SUPPLIERS
-                </div>
-
-                <div class="supplier-stat-value">
-                    {{ $inactiveSuppliers }}
-                </div>
-
-                <div class="supplier-stat-note">
-                    Not currently available
-                </div>
-
-            </div>
-
-            <div class="supplier-stat-icon">
-                —
-            </div>
-
-        </div>
-
-
-        <!-- ACTIVE SUPPLIER RATE -->
-
-        <div class="supplier-stat">
-
-            <div>
-
-                <div class="supplier-stat-label">
-                    ACTIVE SUPPLIER RATE
-                </div>
-
-                <div class="supplier-stat-value supplier-rate">
-
-                    @if ($totalSuppliers > 0)
-
-                        {{ number_format(
-                            ($activeSuppliers / $totalSuppliers) * 100,
-                            1
-                        ) }}%
-
-                    @else
-
-                        0%
-
-                    @endif
-
-                </div>
-
-                <div class="supplier-stat-note">
-                    Suppliers currently active
-                </div>
-
-            </div>
-
-            <div class="supplier-stat-icon">
-                %
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================================================
-         SUPPLIER RECORDS PANEL
-    ========================================================== -->
-
-    <div class="suppliers-panel">
-
-
-        <!-- =====================================================
-             PANEL HEADER
-        ====================================================== -->
-
-        <div class="suppliers-panel-header">
-
-            <div>
-
-                <div class="suppliers-panel-title">
-                    Supplier Records
-                </div>
-
-                <div class="suppliers-panel-subtitle">
-                    Search and manage your café supplier records.
-                </div>
-
-            </div>
-
-
-            <!-- ADD SUPPLIER -->
-
-            @if (
-                in_array(
-                    $user->role,
-                    ['CEO/Admin', 'Procurement'],
-                    true
-                )
-            )
-
-                <a
-                    href="{{ route('suppliers.create') }}"
-                    class="supplier-add-button"
-                >
-
-                    <span>
-                        +
-                    </span>
-
-                    Add Supplier
-
-                </a>
-
-            @endif
-
-        </div>
-
-
-        <!-- =====================================================
-             SEARCH / FILTER
-        ====================================================== -->
-
-        <form
-            method="GET"
-            action="{{ route('suppliers.index') }}"
-            class="supplier-filters"
-        >
-
-            <!-- SEARCH -->
-
-            <div class="supplier-search-wrapper">
-
-                <span class="supplier-search-icon">
-                    ⌕
-                </span>
-
-                <input
-                    type="text"
-                    name="search"
-                    value="{{ $search }}"
-                    placeholder="Search suppliers..."
-                >
-
-            </div>
-
-
-            <!-- STATUS -->
-
-            <select name="status">
-
-                <option value="">
-                    All Status
-                </option>
-
-                <option
-                    value="active"
-                    {{ $status === 'active' ? 'selected' : '' }}
-                >
-                    Active
-                </option>
-
-                <option
-                    value="inactive"
-                    {{ $status === 'inactive' ? 'selected' : '' }}
-                >
-                    Inactive
-                </option>
-
-            </select>
-
-
-            <!-- FILTER -->
-
-            <button
-                type="submit"
-                class="supplier-filter-button"
-            >
-                Filter
-            </button>
-
-
-            <!-- CLEAR -->
-
-            @if ($search || $status)
-
-                <a
-                    href="{{ route('suppliers.index') }}"
-                    class="supplier-clear-button"
-                >
-                    Clear
-                </a>
-
-            @endif
-
-        </form>
-
-
-        <!-- =====================================================
-             SUPPLIER TABLE
-        ====================================================== -->
-
-        <div class="supplier-table-wrapper">
-
-            <table class="suppliers-table">
-
-                <thead>
-
-                    <tr>
-
-                        <th>
-                            Supplier
-                        </th>
-
-                        <th>
-                            Contact Person
-                        </th>
-
-                        <th>
-                            Phone
-                        </th>
-
-                        <th>
-                            Email
-                        </th>
-
-                        <th>
-                            Address
-                        </th>
-
-                        <th>
-                            Status
-                        </th>
-
-                        <th class="supplier-actions-header">
+                        <th class="suppliers-actions-header">
                             Actions
                         </th>
 
-                    </tr>
+                    @endif
 
-                </thead>
+                </tr>
+
+            </thead>
 
 
-                <tbody>
+            <tbody>
 
-                    @forelse ($suppliers as $supplier)
+                @forelse ($suppliers as $supplier)
 
-                        <tr>
+                    @php
 
-                            <!-- SUPPLIER -->
+                        $supplierStatus =
+                            $supplier->status ?? 'Active';
 
-                            <td>
+                        $statusClass = match ($supplierStatus) {
 
-                                <div class="supplier-name">
-                                    {{ $supplier->name }}
+                            'Active' =>
+                                'suppliers-status-active',
+
+                            'On Hold' =>
+                                'suppliers-status-hold',
+
+                            'Inactive' =>
+                                'suppliers-status-inactive',
+
+                            'Blacklisted' =>
+                                'suppliers-status-blacklisted',
+
+                            default =>
+                                'suppliers-status-inactive',
+
+                        };
+
+                    @endphp
+
+
+                    <tr>
+
+                        <!-- =================================================
+                             SUPPLIER
+                        ================================================== -->
+
+                        <td>
+
+                            <div class="suppliers-item-cell">
+
+                                <div class="suppliers-item-avatar">
+
+                                    {{ strtoupper(substr($supplier->name ?? 'S', 0, 1)) }}
+
                                 </div>
 
-                            </td>
 
+                                <div class="suppliers-item-info">
 
-                            <!-- CONTACT PERSON -->
+                                    <div class="suppliers-name">
 
-                            <td>
+                                        {{ $supplier->name }}
 
-                                @if ($supplier->contact_person)
-
-                                    <div class="supplier-contact">
-                                        {{ $supplier->contact_person }}
                                     </div>
 
-                                @else
 
-                                    <span class="supplier-muted">
-                                        —
-                                    </span>
+                                    <div class="suppliers-code">
 
-                                @endif
+                                        SUP-{{ str_pad($supplier->id, 4, '0', STR_PAD_LEFT) }}
 
-                            </td>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
 
 
-                            <!-- PHONE -->
+                        <!-- =================================================
+                             CONTACT
+                        ================================================== -->
 
-                            <td>
+                        <td>
+
+                            <div class="suppliers-contact">
+
+                                <div class="suppliers-contact-name">
+
+                                    {{ $supplier->contact_person ?: 'No contact person' }}
+
+                                </div>
+
 
                                 @if ($supplier->phone)
 
-                                    <span class="supplier-phone">
+                                    <div class="suppliers-contact-phone">
+
                                         {{ $supplier->phone }}
-                                    </span>
 
-                                @else
-
-                                    <span class="supplier-muted">
-                                        —
-                                    </span>
-
-                                @endif
-
-                            </td>
-
-
-                            <!-- EMAIL -->
-
-                            <td>
-
-                                @if ($supplier->email)
-
-                                    <span class="supplier-email">
-                                        {{ $supplier->email }}
-                                    </span>
-
-                                @else
-
-                                    <span class="supplier-muted">
-                                        —
-                                    </span>
-
-                                @endif
-
-                            </td>
-
-
-                            <!-- ADDRESS -->
-
-                            <td>
-
-                                @if ($supplier->address)
-
-                                    <div class="supplier-address">
-                                        {{ $supplier->address }}
                                     </div>
 
                                 @else
 
-                                    <span class="supplier-muted">
-                                        —
-                                    </span>
+                                    <div class="suppliers-muted-small">
+                                        No phone number
+                                    </div>
 
                                 @endif
 
-                            </td>
+                            </div>
+
+                        </td>
 
 
-                            <!-- STATUS -->
+                        <!-- =================================================
+                             EMAIL
+                        ================================================== -->
+
+                        <td>
+
+                            @if ($supplier->email)
+
+                                <span
+                                    class="suppliers-email"
+                                    title="{{ $supplier->email }}"
+                                >
+
+                                    {{ $supplier->email }}
+
+                                </span>
+
+                            @else
+
+                                <span class="suppliers-muted">
+                                    —
+                                </span>
+
+                            @endif
+
+                        </td>
+
+
+                        <!-- =================================================
+                             ADDRESS
+                        ================================================== -->
+
+                        <td>
+
+                            @if ($supplier->address)
+
+                                <span
+                                    class="suppliers-address"
+                                    title="{{ $supplier->address }}"
+                                >
+
+                                    {{ $supplier->address }}
+
+                                </span>
+
+                            @else
+
+                                <span class="suppliers-muted">
+                                    —
+                                </span>
+
+                            @endif
+
+                        </td>
+
+
+                        <!-- =================================================
+                             STATUS
+                        ================================================== -->
+
+                        <td>
+
+                            <span
+                                class="suppliers-status {{ $statusClass }}"
+                            >
+
+                                {{ strtoupper($supplierStatus) }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- =================================================
+                             ACTIONS
+                        ================================================== -->
+
+                        @if ($user->role === 'CEO/Admin' || $user->role === 'Procurement')
 
                             <td>
 
-                                @if ($supplier->status === 'Active')
-
-                                    <span class="supplier-status supplier-status-active">
-                                        ACTIVE
-                                    </span>
-
-                                @else
-
-                                    <span class="supplier-status supplier-status-inactive">
-                                        INACTIVE
-                                    </span>
-
-                                @endif
-
-                            </td>
-
-
-                            <!-- ACTIONS -->
-
-                            <td>
-
-                                <div class="supplier-table-actions">
+                                <div class="suppliers-table-actions">
 
                                     <!-- VIEW -->
 
                                     <a
                                         href="{{ route('suppliers.show', $supplier) }}"
-                                        class="supplier-view-button"
+                                        class="supplier-icon-action supplier-view-action"
+                                        title="View Supplier"
+                                        aria-label="View Supplier"
                                     >
-
-                                        <span>
-                                            ◉
-                                        </span>
-
-                                        View
-
+                                        ⌕
                                     </a>
 
 
-                                    <!-- CEO / PROCUREMENT -->
+                                    <!-- EDIT -->
 
-                                    @if (
-                                        in_array(
-                                            $user->role,
-                                            ['CEO/Admin', 'Procurement'],
-                                            true
-                                        )
-                                    )
+                                    <a
+                                        href="{{ route('suppliers.edit', $supplier) }}"
+                                        class="supplier-icon-action supplier-edit-action"
+                                        title="Edit Supplier"
+                                        aria-label="Edit Supplier"
+                                    >
+                                        ✎
+                                    </a>
 
-                                        <!-- EDIT -->
 
-                                        <a
-                                            href="{{ route('suppliers.edit', $supplier) }}"
-                                            class="supplier-edit-button"
+                                    <!-- ON HOLD -->
+
+                                    @if ($supplierStatus === 'Active')
+
+                                        <form
+                                            method="POST"
+                                            action="{{ route('suppliers.hold', $supplier) }}"
+                                            onsubmit="return confirm('Place this supplier on hold?');"
                                         >
 
-                                            <span>
-                                                ✎
-                                            </span>
+                                            @csrf
 
-                                            Edit
+                                            @method('PATCH')
 
-                                        </a>
-
-
-                                        <!-- DEACTIVATE -->
-
-                                        @if ($supplier->status === 'Active')
-
-                                            <form
-                                                method="POST"
-                                                action="{{ route('suppliers.destroy', $supplier) }}"
-                                                class="supplier-inline-form"
-                                                onsubmit="return confirm('Are you sure you want to deactivate this supplier?');"
+                                            <button
+                                                type="submit"
+                                                class="supplier-icon-action supplier-hold-action"
+                                                title="Place On Hold"
+                                                aria-label="Place On Hold"
                                             >
+                                                ⏸
+                                            </button>
 
-                                                @csrf
+                                        </form>
 
-                                                @method('DELETE')
-
-                                                <button
-                                                    type="submit"
-                                                    class="supplier-deactivate-button"
-                                                >
-
-                                                    <span>
-                                                        −
-                                                    </span>
-
-                                                    Deactivate
-
-                                                </button>
-
-                                            </form>
+                                    @endif
 
 
-                                        <!-- ACTIVATE -->
+                                    <!-- ACTIVATE -->
 
-                                        @else
+                                    @if (
+                                        $supplierStatus === 'On Hold' ||
+                                        $supplierStatus === 'Inactive'
+                                    )
 
-                                            <form
-                                                method="POST"
-                                                action="{{ route('suppliers.activate', $supplier) }}"
-                                                class="supplier-inline-form"
-                                                onsubmit="return confirm('Do you want to reactivate this supplier?');"
+                                        <form
+                                            method="POST"
+                                            action="{{ route('suppliers.activate', $supplier) }}"
+                                            onsubmit="return confirm('Activate this supplier?');"
+                                        >
+
+                                            @csrf
+
+                                            @method('PATCH')
+
+                                            <button
+                                                type="submit"
+                                                class="supplier-icon-action supplier-activate-action"
+                                                title="Activate Supplier"
+                                                aria-label="Activate Supplier"
                                             >
+                                                ▶
+                                            </button>
 
-                                                @csrf
+                                        </form>
 
-                                                @method('PATCH')
+                                    @endif
 
-                                                <button
-                                                    type="submit"
-                                                    class="supplier-activate-button"
-                                                >
 
-                                                    <span>
-                                                        ✓
-                                                    </span>
+                                    <!-- BLACKLIST -->
 
-                                                    Activate
+                                    @if ($supplierStatus !== 'Blacklisted')
 
-                                                </button>
+                                        <form
+                                            method="POST"
+                                            action="{{ route('suppliers.blacklist', $supplier) }}"
+                                            onsubmit="return confirm('Blacklist this supplier?');"
+                                        >
 
-                                            </form>
+                                            @csrf
 
-                                        @endif
+                                            @method('PATCH')
+
+                                            <button
+                                                type="submit"
+                                                class="supplier-icon-action supplier-blacklist-action"
+                                                title="Blacklist Supplier"
+                                                aria-label="Blacklist Supplier"
+                                            >
+                                                ⊘
+                                            </button>
+
+                                        </form>
 
                                     @endif
 
@@ -629,72 +696,72 @@
 
                             </td>
 
-                        </tr>
+                        @endif
+
+                    </tr>
 
 
-                    @empty
+                @empty
 
-                        <!-- EMPTY STATE -->
+                    <tr>
 
-                        <tr>
+                        <td
+                            colspan="{{ ($user->role === 'CEO/Admin' || $user->role === 'Procurement') ? 6 : 5 }}"
+                            class="suppliers-empty-state"
+                        >
 
-                            <td
-                                colspan="7"
-                                class="supplier-empty-state"
-                            >
+                            <div class="suppliers-empty-icon">
+                                ▦
+                            </div>
 
-                                <div class="supplier-empty-icon">
-                                    ♧
-                                </div>
 
-                                <div class="supplier-empty-title">
-                                    No supplier records found
-                                </div>
+                            <div class="suppliers-empty-title">
+                                No supplier records found
+                            </div>
 
-                                <div class="supplier-empty-description">
 
-                                    @if ($search || $status)
+                            <div class="suppliers-empty-description">
 
-                                        Try changing your search
-                                        or filter.
+                                @if ($search || $status)
 
-                                    @else
+                                    Try changing your search or filter.
 
-                                        Your supplier records
-                                        will appear here.
+                                @else
 
-                                    @endif
+                                    Your supplier records will appear here.
 
-                                </div>
+                                @endif
 
-                            </td>
+                            </div>
 
-                        </tr>
+                        </td>
 
-                    @endforelse
+                    </tr>
 
-                </tbody>
+                @endforelse
 
-            </table>
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- =====================================================
+         PAGINATION
+    ====================================================== -->
+
+    @if ($suppliers->hasPages())
+
+        <div class="suppliers-pagination-wrapper">
+
+            {{ $suppliers->links() }}
 
         </div>
 
+    @endif
 
-        <!-- =====================================================
-             PAGINATION
-        ====================================================== -->
-
-        @if ($suppliers->hasPages())
-
-            <div class="supplier-pagination-wrapper">
-
-                {{ $suppliers->links() }}
-
-            </div>
-
-        @endif
-
-    </div>
+</div>
 
 </div>
 
@@ -712,103 +779,21 @@
 .suppliers-page {
 
     width: 100%;
-
 }
 
 
 /* =========================================================
-   SUPPLIER PAGE TITLE
-   Matches Products and Inventory
+   PAGE TITLE
 ========================================================= */
 
 .suppliers-page .page-title h1 {
 
-    font-size: clamp(
-        1.75rem,
-        2.2vw,
-        2rem
-    );
+    font-size:
+        clamp(1.6rem, 2vw, 1.9rem);
 
     line-height: 1.15;
 
-    letter-spacing: -0.045rem;
-
-}
-
-
-/* =========================================================
-   ALERTS
-========================================================= */
-
-.supplier-alert {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    margin-bottom: 18px;
-
-    padding: 12px 15px;
-
-    border: 1px solid var(--border);
-
-    border-radius: 10px;
-
-    font-size: 0.875rem;
-
-    line-height: 1.4;
-
-    font-weight: 600;
-
-}
-
-
-.supplier-alert-success {
-
-    background: var(--green-light);
-
-    border-color: #d5e7d8;
-
-    color: #397548;
-
-}
-
-
-.supplier-alert-error {
-
-    background: var(--red-light);
-
-    border-color: #ecd0cc;
-
-    color: #a45348;
-
-}
-
-
-.supplier-alert-icon {
-
-    width: 24px;
-
-    height: 24px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    flex-shrink: 0;
-
-    border-radius: 7px;
-
-    background: rgba(255,255,255,0.65);
-
-    font-size: 0.8125rem;
-
-    font-weight: 800;
-
+    letter-spacing: -0.04rem;
 }
 
 
@@ -816,7 +801,7 @@
    SUMMARY CARDS
 ========================================================= */
 
-.supplier-stats {
+.suppliers-stats {
 
     display: grid;
 
@@ -825,14 +810,13 @@
 
     gap: 17px;
 
-    margin-bottom: 22px;
-
+    margin-bottom: 17px;
 }
 
 
-.supplier-stat {
+.suppliers-stat {
 
-    min-height: 135px;
+    min-height: 125px;
 
     display: flex;
 
@@ -842,38 +826,43 @@
 
     gap: 15px;
 
-    padding: 20px;
+    padding:
+        16px
+        17px
+        15px;
 
-    border: 1px solid var(--border);
+    border:
+        1px solid var(--border);
 
-    border-radius: 17px;
+    border-radius: 15px;
 
     background: white;
 
     box-shadow:
-        0 7px 22px
-        rgba(43, 31, 23, 0.055);
+        0 5px 18px
+        rgba(43, 31, 23, 0.045);
 
     position: relative;
 
     overflow: hidden;
-
 }
 
 
-.supplier-stat::before {
+/* =========================================================
+   LEFT ACCENT
+========================================================= */
+
+.suppliers-stat::before {
 
     content: "";
 
     position: absolute;
 
     top: 0;
-
     left: 0;
-
     bottom: 0;
 
-    width: 4px;
+    width: 3px;
 
     background:
         linear-gradient(
@@ -881,74 +870,104 @@
             var(--orange),
             #e2a16c
         );
-
 }
 
 
-.supplier-stat-label {
+/* =========================================================
+   LEFT SIDE
+========================================================= */
+
+.suppliers-stat-left {
+
+    min-width: 0;
+
+    flex: 1;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    justify-content: flex-start;
+
+    align-self: stretch;
+
+    padding-left: 1px;
+
+    padding-top: 2px;
+}
+
+
+/* =========================================================
+   LABEL
+========================================================= */
+
+.suppliers-stat-label {
 
     color: var(--muted);
 
-    font-size: 0.8125rem;
+    font-size: 0.6875rem;
 
     line-height: 1.3;
 
     font-weight: 800;
 
-    letter-spacing: 0.05rem;
+    letter-spacing: 0.045rem;
 
+    white-space: nowrap;
 }
 
 
 /* =========================================================
-   KPI VALUE
-   Matches Products / Inventory = 30px
+   NOTE
 ========================================================= */
 
-.supplier-stat-value {
+.suppliers-stat-note {
 
-    margin-top: 14px;
-
-    color: var(--dark);
-
-    font-size: 1.875rem;
-
-    line-height: 1;
-
-    font-weight: 800;
-
-}
-
-
-/* =========================================================
-   ACTIVE SUPPLIER RATE
-========================================================= */
-
-.supplier-rate {
-
-    font-size: 1.875rem;
-
-}
-
-
-.supplier-stat-note {
-
-    margin-top: 8px;
+    margin-top: 58px;
 
     color: #9d958f;
 
-    font-size: 0.8125rem;
+    font-size: 0.6875rem;
 
     line-height: 1.4;
 
+    max-width: 155px;
 }
 
 
-.supplier-stat-icon {
+/* =========================================================
+   RIGHT SIDE
+========================================================= */
 
-    width: 40px;
+.suppliers-stat-right {
 
-    height: 40px;
+    min-width: 82px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-end;
+
+    justify-content: flex-start;
+
+    padding-top: 3px;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   ICON
+========================================================= */
+
+.suppliers-stat-icon {
+
+    width: 34px;
+
+    height: 34px;
 
     display: flex;
 
@@ -958,7 +977,7 @@
 
     flex-shrink: 0;
 
-    border-radius: 11px;
+    border-radius: 9px;
 
     background:
         linear-gradient(
@@ -969,10 +988,32 @@
 
     color: var(--orange);
 
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
+
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   VALUE
+========================================================= */
+
+.suppliers-stat-value {
+
+    margin-top: 13px;
+
+    color: var(--dark);
+
+    font-size:
+        clamp(1.45rem, 1.8vw, 1.75rem);
+
+    line-height: 1;
 
     font-weight: 800;
 
+    text-align: right;
+
+    white-space: nowrap;
 }
 
 
@@ -984,16 +1025,16 @@
 
     background: white;
 
-    border: 1px solid var(--border);
+    border:
+        1px solid var(--border);
 
-    border-radius: 17px;
+    border-radius: 15px;
 
     overflow: hidden;
 
     box-shadow:
-        0 5px 18px
+        0 4px 16px
         rgba(43, 31, 23, 0.035);
-
 }
 
 
@@ -1003,7 +1044,7 @@
 
 .suppliers-panel-header {
 
-    min-height: 75px;
+    min-height: 65px;
 
     display: flex;
 
@@ -1011,12 +1052,14 @@
 
     justify-content: space-between;
 
-    gap: 20px;
+    gap: 17px;
 
-    padding: 17px 21px;
+    padding:
+        14px
+        18px;
 
-    border-bottom: 1px solid var(--border);
-
+    border-bottom:
+        1px solid var(--border);
 }
 
 
@@ -1024,25 +1067,23 @@
 
     color: var(--dark);
 
-    font-size: 1rem;
+    font-size: 0.875rem;
 
     line-height: 1.3;
 
     font-weight: 700;
-
 }
 
 
 .suppliers-panel-subtitle {
 
-    margin-top: 4px;
+    margin-top: 3px;
 
     color: var(--muted);
 
-    font-size: 0.8125rem;
+    font-size: 0.6875rem;
 
     line-height: 1.4;
-
 }
 
 
@@ -1050,7 +1091,7 @@
    ADD SUPPLIER
 ========================================================= */
 
-.supplier-add-button {
+.suppliers-add-button {
 
     display: inline-flex;
 
@@ -1058,9 +1099,13 @@
 
     justify-content: center;
 
-    gap: 6px;
+    gap: 5px;
 
-    padding: 8px 12px;
+    min-height: 32px;
+
+    padding:
+        0
+        10px;
 
     border-radius: 8px;
 
@@ -1075,24 +1120,23 @@
 
     text-decoration: none;
 
-    font-size: 0.8125rem;
+    font-size: 0.6875rem;
 
     line-height: 1.2;
 
     font-weight: 700;
 
     box-shadow:
-        0 4px 11px
-        rgba(168, 95, 40, 0.14);
+        0 3px 9px
+        rgba(168, 95, 40, 0.12);
 
     transition:
         background 0.18s ease,
         box-shadow 0.18s ease;
-
 }
 
 
-.supplier-add-button:hover {
+.suppliers-add-button:hover {
 
     color: white;
 
@@ -1104,18 +1148,16 @@
         );
 
     box-shadow:
-        0 5px 12px
-        rgba(168, 95, 40, 0.16);
-
+        0 4px 10px
+        rgba(168, 95, 40, 0.15);
 }
 
 
-.supplier-add-button span {
+.suppliers-add-button span {
 
-    font-size: 0.9375rem;
+    font-size: 0.8125rem;
 
     line-height: 1;
-
 }
 
 
@@ -1123,43 +1165,49 @@
    FILTERS
 ========================================================= */
 
-.supplier-filters {
+.suppliers-filters {
 
     display: flex;
 
     align-items: center;
 
-    gap: 10px;
+    gap: 8px;
 
-    padding: 15px 21px;
+    padding:
+        12px
+        18px;
 
     background: var(--card-soft);
 
-    border-bottom: 1px solid var(--border);
-
+    border-bottom:
+        1px solid var(--border);
 }
 
 
-.supplier-search-wrapper {
+.suppliers-search-wrapper {
 
     flex: 1;
 
     position: relative;
 
     min-width: 180px;
-
 }
 
 
-.supplier-search-wrapper input {
+.suppliers-search-wrapper input {
 
     width: 100%;
 
-    height: 37px;
+    height: 35px;
 
-    padding: 0 13px 0 37px;
+    padding:
+        0
+        11px
+        0
+        34px;
 
-    border: 1px solid var(--border);
+    border:
+        1px solid var(--border);
 
     border-radius: 8px;
 
@@ -1169,63 +1217,67 @@
 
     font-family: inherit;
 
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
 
     outline: none;
 
     transition:
         border-color 0.18s ease,
         box-shadow 0.18s ease;
-
 }
 
 
-.supplier-search-wrapper input:focus {
+.suppliers-search-wrapper input:focus {
 
     border-color: #d5a77d;
 
     box-shadow:
         0 0 0 3px
-        rgba(196, 122, 58, 0.08);
-
+        rgba(196, 122, 58, 0.07);
 }
 
 
-.supplier-search-wrapper input::placeholder {
+.suppliers-search-wrapper input::placeholder {
 
     color: #aaa19a;
-
 }
 
 
-.supplier-search-icon {
+.suppliers-search-icon {
 
     position: absolute;
 
-    left: 13px;
+    left: 11px;
 
     top: 50%;
 
-    transform: translateY(-50%);
+    transform:
+        translateY(-50%);
 
     color: var(--muted);
 
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
 
     pointer-events: none;
-
 }
 
 
-.supplier-filters select {
+/* =========================================================
+   FILTER SELECT
+========================================================= */
 
-    height: 37px;
+.suppliers-filters select {
 
-    min-width: 135px;
+    height: 35px;
 
-    padding: 0 11px;
+    min-width: 125px;
 
-    border: 1px solid var(--border);
+    padding:
+        0
+        10px;
+
+    border:
+        1px solid var(--border);
 
     border-radius: 8px;
 
@@ -1235,19 +1287,22 @@
 
     font-family: inherit;
 
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
 
     outline: none;
 
     cursor: pointer;
-
 }
 
 
-.supplier-filter-button,
-.supplier-clear-button {
+/* =========================================================
+   FILTER BUTTON
+========================================================= */
 
-    height: 37px;
+.suppliers-filter-button,
+.suppliers-clear-button {
+
+    height: 35px;
 
     display: inline-flex;
 
@@ -1255,13 +1310,15 @@
 
     justify-content: center;
 
-    padding: 0 13px;
+    padding:
+        0
+        11px;
 
     border-radius: 8px;
 
     font-family: inherit;
 
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
 
     font-weight: 700;
 
@@ -1270,11 +1327,10 @@
     text-decoration: none;
 
     cursor: pointer;
-
 }
 
 
-.supplier-filter-button {
+.suppliers-filter-button {
 
     border: none;
 
@@ -1282,21 +1338,21 @@
 
     color: white;
 
-    transition: background-color 0.18s ease;
-
+    transition:
+        background-color 0.18s ease;
 }
 
 
-.supplier-filter-button:hover {
+.suppliers-filter-button:hover {
 
     background: var(--dark-soft);
-
 }
 
 
-.supplier-clear-button {
+.suppliers-clear-button {
 
-    border: 1px solid var(--border);
+    border:
+        1px solid var(--border);
 
     background: white;
 
@@ -1305,16 +1361,59 @@
     transition:
         background-color 0.18s ease,
         color 0.18s ease;
-
 }
 
 
-.supplier-clear-button:hover {
+.suppliers-clear-button:hover {
 
     background: #faf7f3;
 
     color: var(--dark);
+}
 
+
+/* =========================================================
+   ALERTS
+========================================================= */
+
+.supplier-alert {
+
+    margin:
+        12px
+        18px
+        0;
+
+    padding:
+        9px
+        12px;
+
+    border-radius: 8px;
+
+    font-size: 0.6875rem;
+
+    font-weight: 650;
+}
+
+
+.supplier-alert-success {
+
+    background: #edf8f0;
+
+    border:
+        1px solid #cfe5d5;
+
+    color: #39704d;
+}
+
+
+.supplier-alert-error {
+
+    background: #fff0ee;
+
+    border:
+        1px solid #eccfcb;
+
+    color: #9e4942;
 }
 
 
@@ -1322,12 +1421,11 @@
    TABLE
 ========================================================= */
 
-.supplier-table-wrapper {
+.suppliers-table-wrapper {
 
     width: 100%;
 
     overflow-x: auto;
-
 }
 
 
@@ -1335,26 +1433,28 @@
 
     width: 100%;
 
-    min-width: 1050px;
+    min-width: 950px;
 
     border-collapse: collapse;
-
 }
 
 
 .suppliers-table th {
 
-    padding: 12px 15px;
+    padding:
+        10px
+        12px;
 
     background: #fbf9f6;
 
     color: var(--muted);
 
-    border-bottom: 1px solid var(--border);
+    border-bottom:
+        1px solid var(--border);
 
     text-align: left;
 
-    font-size: 0.6875rem;
+    font-size: 0.625rem;
 
     line-height: 1.3;
 
@@ -1362,27 +1462,28 @@
 
     text-transform: uppercase;
 
-    letter-spacing: 0.045rem;
+    letter-spacing: 0.04rem;
 
     white-space: nowrap;
-
 }
 
 
 .suppliers-table td {
 
-    padding: 13px 15px;
+    padding:
+        11px
+        12px;
 
     color: #625951;
 
-    border-bottom: 1px solid #f0ebe6;
+    border-bottom:
+        1px solid #f0ebe6;
 
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
 
     line-height: 1.4;
 
     vertical-align: middle;
-
 }
 
 
@@ -1390,143 +1491,40 @@
 
     background: white;
 
+    transition:
+        background-color 0.15s ease;
 }
 
 
 .suppliers-table tbody tr:hover {
 
     background: #fdfaf7;
-
 }
 
 
 /* =========================================================
-   SUPPLIER INFORMATION
+   SUPPLIER ITEM
 ========================================================= */
 
-.supplier-name {
+.suppliers-item-cell {
 
-    color: var(--dark);
-
-    font-size: 0.8125rem;
-
-    line-height: 1.4;
-
-    font-weight: 700;
-
-}
-
-
-.supplier-contact {
-
-    color: #625951;
-
-    font-size: 0.8125rem;
-
-}
-
-
-.supplier-phone {
-
-    color: #625951;
-
-    font-size: 0.8125rem;
-
-    white-space: nowrap;
-
-}
-
-
-.supplier-email {
-
-    color: #625951;
-
-    font-size: 0.8125rem;
-
-}
-
-
-.supplier-address {
-
-    max-width: 220px;
-
-    color: #625951;
-
-    font-size: 0.8125rem;
-
-    line-height: 1.4;
-
-}
-
-
-.supplier-muted {
-
-    color: #a39b95;
-
-    font-size: 0.8125rem;
-
-}
-
-
-/* =========================================================
-   STATUS
-========================================================= */
-
-.supplier-status {
-
-    display: inline-flex;
+    display: flex;
 
     align-items: center;
 
-    justify-content: center;
+    gap: 10px;
 
-    padding: 5px 8px;
-
-    border-radius: 7px;
-
-    font-size: 0.6875rem;
-
-    line-height: 1.2;
-
-    font-weight: 800;
-
-    white-space: nowrap;
-
-    letter-spacing: 0.02rem;
-
+    min-width: 190px;
 }
 
 
-.supplier-status-active {
+.suppliers-item-avatar {
 
-    color: var(--green);
+    width: 38px;
 
-    background: var(--green-light);
+    height: 38px;
 
-}
-
-
-.supplier-status-inactive {
-
-    color: var(--muted);
-
-    background: #f1eeeb;
-
-}
-
-
-/* =========================================================
-   ACTIONS
-========================================================= */
-
-.supplier-actions-header {
-
-    text-align: center !important;
-
-}
-
-
-.supplier-table-actions {
+    flex-shrink: 0;
 
     display: flex;
 
@@ -1534,34 +1532,179 @@
 
     justify-content: center;
 
-    gap: 5px;
+    border-radius: 50%;
 
-    white-space: nowrap;
+    background:
+        linear-gradient(
+            135deg,
+            #fbf1e7,
+            #f1dfce
+        );
 
+    border:
+        1px solid #f0e6db;
+
+    color: var(--orange-dark);
+
+    font-size: 0.8125rem;
+
+    line-height: 1;
+
+    font-weight: 800;
 }
 
 
-.supplier-inline-form {
+.suppliers-item-info {
 
-    display: inline;
+    min-width: 0;
+}
 
-    margin: 0;
 
+.suppliers-name {
+
+    color: var(--dark);
+
+    font-size: 0.75rem;
+
+    line-height: 1.4;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    max-width: 220px;
+}
+
+
+.suppliers-code {
+
+    margin-top: 2px;
+
+    color: var(--muted);
+
+    font-family: monospace;
+
+    font-size: 0.625rem;
+
+    line-height: 1.3;
 }
 
 
 /* =========================================================
-   ACTION BUTTONS
+   CONTACT
 ========================================================= */
 
-.supplier-view-button,
-.supplier-edit-button,
-.supplier-deactivate-button,
-.supplier-activate-button {
+.suppliers-contact {
 
-    min-width: 52px;
+    min-width: 145px;
+}
 
-    height: 28px;
+
+.suppliers-contact-name {
+
+    color: var(--dark);
+
+    font-size: 0.6875rem;
+
+    line-height: 1.35;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    max-width: 175px;
+}
+
+
+.suppliers-contact-phone {
+
+    margin-top: 3px;
+
+    color: var(--muted);
+
+    font-size: 0.625rem;
+
+    line-height: 1.35;
+}
+
+
+.suppliers-muted-small {
+
+    margin-top: 3px;
+
+    color: #aaa19a;
+
+    font-size: 0.625rem;
+}
+
+
+/* =========================================================
+   EMAIL
+========================================================= */
+
+.suppliers-email {
+
+    display: inline-block;
+
+    max-width: 210px;
+
+    color: #625951;
+
+    font-size: 0.6875rem;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   ADDRESS
+========================================================= */
+
+.suppliers-address {
+
+    display: inline-block;
+
+    max-width: 220px;
+
+    color: #756b64;
+
+    font-size: 0.6875rem;
+
+    line-height: 1.4;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+.suppliers-muted {
+
+    color: #a39b95;
+
+    font-size: 0.75rem;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.suppliers-status {
 
     display: inline-flex;
 
@@ -1571,166 +1714,83 @@
 
     gap: 4px;
 
-    padding: 0 8px;
+    padding:
+        4px
+        7px;
 
     border-radius: 7px;
 
-    font-family: inherit;
-
-    font-size: 0.6875rem;
+    font-size: 0.625rem;
 
     line-height: 1.2;
 
-    font-weight: 700;
+    font-weight: 800;
 
-    text-decoration: none;
+    white-space: nowrap;
 
-    cursor: pointer;
-
-    transition:
-        background-color 0.18s ease,
-        border-color 0.18s ease,
-        color 0.18s ease;
-
+    letter-spacing: 0.015rem;
 }
 
 
-.supplier-view-button span,
-.supplier-edit-button span,
-.supplier-deactivate-button span,
-.supplier-activate-button span {
+.suppliers-status::before {
 
-    font-size: 0.6875rem;
+    content: "";
 
-    line-height: 1;
+    width: 5px;
 
+    height: 5px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: currentColor;
 }
 
 
-/* =========================================================
-   VIEW
-========================================================= */
+.suppliers-status-active {
 
-.supplier-view-button {
+    color: var(--green);
 
-    border: 1px solid #dfd0c3;
-
-    background: #faf7f3;
-
-    color: #79583f;
-
+    background: var(--green-light);
 }
 
 
-.supplier-view-button:hover {
+.suppliers-status-hold {
 
-    background: #f5eee7;
+    color: #a36a12;
 
-    border-color: #cdb49f;
-
-    color: #68482f;
-
+    background: #fff5df;
 }
 
 
-/* =========================================================
-   EDIT
-========================================================= */
+.suppliers-status-inactive {
 
-.supplier-edit-button {
+    color: var(--muted);
 
-    border: 1px solid #e1d4c8;
-
-    background: white;
-
-    color: #7d5b42;
-
+    background: #f1eeeb;
 }
 
 
-.supplier-edit-button:hover {
+.suppliers-status-blacklisted {
 
-    background: #faf5ef;
+    color: #9b3d3d;
 
-    border-color: #cdb49f;
-
-    color: #68482f;
-
+    background: #fbeeee;
 }
 
 
 /* =========================================================
-   DEACTIVATE
+   ACTIONS
 ========================================================= */
 
-.supplier-deactivate-button {
-
-    border: 1px solid #e4c9c4;
-
-    background: white;
-
-    color: #a45348;
-
-}
-
-
-.supplier-deactivate-button:hover {
-
-    background: #fff3f1;
-
-    border-color: #dcb4ae;
-
-    color: #8d3e35;
-
-}
-
-
-/* =========================================================
-   ACTIVATE
-========================================================= */
-
-.supplier-activate-button {
-
-    border: 1px solid #c9dfce;
-
-    background: white;
-
-    color: #397548;
-
-}
-
-
-.supplier-activate-button:hover {
-
-    background: #edf7ef;
-
-    border-color: #afd0b7;
-
-    color: #2f653c;
-
-}
-
-
-/* =========================================================
-   EMPTY STATE
-========================================================= */
-
-.supplier-empty-state {
-
-    padding: 65px 20px !important;
+.suppliers-actions-header {
 
     text-align: center !important;
-
 }
 
 
-.supplier-empty-icon {
-
-    width: 52px;
-
-    height: 52px;
-
-    margin: 0 auto 13px;
+.suppliers-table-actions {
 
     display: flex;
 
@@ -1738,69 +1798,370 @@
 
     justify-content: center;
 
-    border-radius: 14px;
+    gap: 2px;
+
+    white-space: nowrap;
+}
+
+
+.suppliers-table-actions form {
+
+    display: inline-flex;
+
+    margin: 0;
+
+    padding: 0;
+}
+
+
+/* =========================================================
+   ICON-ONLY ACTIONS
+========================================================= */
+
+.supplier-icon-action {
+
+    width: 27px;
+
+    height: 27px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 0;
+
+    margin: 0;
+
+    border: none;
+
+    background: transparent;
+
+    border-radius: 6px;
+
+    font-family: inherit;
+
+    font-size: 0.75rem;
+
+    line-height: 1;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.18s ease,
+        color 0.18s ease,
+        transform 0.18s ease;
+}
+
+
+.supplier-icon-action:hover {
+
+    transform:
+        translateY(-1px);
+}
+
+
+/* =========================================================
+   VIEW
+========================================================= */
+
+.supplier-view-action {
+
+    color: #756b63;
+}
+
+
+.supplier-view-action:hover {
+
+    background: #f3f0ed;
+
+    color: var(--dark);
+}
+
+
+/* =========================================================
+   EDIT
+========================================================= */
+
+.supplier-edit-action {
+
+    color: #806247;
+}
+
+
+.supplier-edit-action:hover {
+
+    background: #faf2e9;
+
+    color: #68482f;
+}
+
+
+/* =========================================================
+   HOLD
+========================================================= */
+
+.supplier-hold-action {
+
+    color: #a36a12;
+}
+
+
+.supplier-hold-action:hover {
+
+    background: #fff5df;
+
+    color: #85530a;
+}
+
+
+/* =========================================================
+   ACTIVATE
+========================================================= */
+
+.supplier-activate-action {
+
+    color: var(--green);
+}
+
+
+.supplier-activate-action:hover {
+
+    background: var(--green-light);
+
+    color: #2e6c46;
+}
+
+
+/* =========================================================
+   BLACKLIST
+========================================================= */
+
+.supplier-blacklist-action {
+
+    color: #a34b4b;
+}
+
+
+.supplier-blacklist-action:hover {
+
+    background: #fbeeee;
+
+    color: #843535;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.suppliers-empty-state {
+
+    padding:
+        55px
+        20px !important;
+
+    text-align: center !important;
+}
+
+
+.suppliers-empty-icon {
+
+    width: 46px;
+
+    height: 46px;
+
+    margin:
+        0
+        auto
+        11px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 12px;
 
     background: var(--orange-light);
 
     color: var(--orange);
 
-    font-size: 1.1875rem;
-
+    font-size: 1.05rem;
 }
 
 
-.supplier-empty-title {
+.suppliers-empty-title {
 
     color: var(--dark);
 
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
 
     font-weight: 700;
-
 }
 
 
-.supplier-empty-description {
+.suppliers-empty-description {
 
-    margin-top: 5px;
+    margin-top: 4px;
 
     color: var(--muted);
 
-    font-size: 0.8125rem;
+    font-size: 0.6875rem;
 
     line-height: 1.4;
-
 }
 
 
 /* =========================================================
    PAGINATION
+   MATCHES INVENTORY / PRODUCTS / SALES
 ========================================================= */
 
-.supplier-pagination-wrapper {
+.suppliers-pagination-wrapper {
 
-    padding: 15px 21px;
+    padding:
+        13px
+        18px;
 
-    border-top: 1px solid var(--border);
-
+    border-top:
+        1px solid var(--border);
 }
 
 
-.supplier-pagination-wrapper nav {
+.suppliers-pagination-wrapper nav {
 
     display: flex;
 
+    align-items: center;
+
     justify-content: center;
 
+    width: 100%;
 }
 
 
-.supplier-pagination-wrapper svg {
+.suppliers-pagination-wrapper nav > div {
 
-    width: 15px;
+    display: flex;
 
-    height: 15px;
+    align-items: center;
 
+    justify-content: space-between;
+
+    gap: 12px;
+
+    width: 100%;
+}
+
+
+.suppliers-pagination-wrapper nav > div > div {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 4px;
+}
+
+
+.suppliers-pagination-wrapper nav a,
+.suppliers-pagination-wrapper nav button,
+.suppliers-pagination-wrapper nav span[aria-current="page"],
+.suppliers-pagination-wrapper nav span[aria-disabled="true"] {
+
+    min-width: 30px;
+
+    height: 30px;
+
+    padding:
+        0
+        9px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 7px;
+
+    background: white;
+
+    color: var(--muted);
+
+    font-family: inherit;
+
+    font-size: 0.6875rem;
+
+    font-weight: 700;
+
+    line-height: 1;
+
+    text-decoration: none;
+}
+
+
+.suppliers-pagination-wrapper nav a:hover {
+
+    border-color: #d5a77d;
+
+    background: #faf7f3;
+
+    color: var(--orange);
+}
+
+
+.suppliers-pagination-wrapper nav span[aria-current="page"] {
+
+    border-color: var(--orange);
+
+    background: var(--orange);
+
+    color: white;
+}
+
+
+.suppliers-pagination-wrapper nav span[aria-current="page"] > span {
+
+    color: white;
+}
+
+
+.suppliers-pagination-wrapper nav span[aria-disabled="true"] {
+
+    color: #b8b0aa;
+
+    background: #faf9f7;
+
+    cursor: default;
+}
+
+
+.suppliers-pagination-wrapper nav svg {
+
+    width: 13px;
+
+    height: 13px;
+}
+
+
+.suppliers-pagination-wrapper nav p {
+
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 0.6875rem;
+
+    line-height: 1.4;
 }
 
 
@@ -1810,11 +2171,10 @@
 
 @media (max-width: 1200px) {
 
-    .supplier-stats {
+    .suppliers-stats {
 
         grid-template-columns:
             repeat(2, minmax(0, 1fr));
-
     }
 
 }
@@ -1822,10 +2182,41 @@
 
 @media (max-width: 700px) {
 
-    .supplier-stats {
+    .suppliers-stats {
 
         grid-template-columns: 1fr;
+    }
 
+
+    .suppliers-stat {
+
+        min-height: 115px;
+    }
+
+
+    .suppliers-stat-left {
+
+        padding-top: 1px;
+    }
+
+
+    .suppliers-stat-right {
+
+        min-width: 72px;
+
+        padding-top: 3px;
+    }
+
+
+    .suppliers-stat-value {
+
+        font-size: 1.45rem;
+    }
+
+
+    .suppliers-stat-note {
+
+        margin-top: 55px;
     }
 
 
@@ -1834,46 +2225,55 @@
         align-items: flex-start;
 
         flex-direction: column;
-
     }
 
 
-    .supplier-add-button {
+    .suppliers-add-button {
 
         width: 100%;
-
     }
 
 
-    .supplier-filters {
+    .suppliers-filters {
 
         align-items: stretch;
 
         flex-direction: column;
-
     }
 
 
-    .supplier-search-wrapper {
+    .suppliers-search-wrapper {
 
         width: 100%;
-
     }
 
 
-    .supplier-filters select,
-    .supplier-filter-button,
-    .supplier-clear-button {
+    .suppliers-filters select,
+    .suppliers-filter-button,
+    .suppliers-clear-button {
 
         width: 100%;
-
     }
 
 
-    .supplier-table-actions {
+    .suppliers-table-actions {
 
         justify-content: flex-start;
+    }
 
+
+    .suppliers-pagination-wrapper {
+
+        padding:
+            12px;
+    }
+
+
+    .suppliers-pagination-wrapper nav > div {
+
+        flex-direction: column;
+
+        align-items: center;
     }
 
 }

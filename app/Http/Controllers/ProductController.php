@@ -119,6 +119,12 @@ class ProductController extends Controller
     {
         $user = $request->user();
 
+        /*
+        |--------------------------------------------------------------------------
+        | Authorization
+        |--------------------------------------------------------------------------
+        */
+
         if (!in_array(
             $user->role,
             ['CEO/Admin'],
@@ -130,10 +136,34 @@ class ProductController extends Controller
             );
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Product Categories Only
+        |--------------------------------------------------------------------------
+        |
+        | Do NOT load inventory categories here.
+        |
+        | Product categories:
+        | - Burgers
+        | - Chicken Meals
+        | - Rice Meals
+        | - Pasta
+        | - Sides
+        | - Snacks
+        | - Beverages
+        | - Desserts
+        | - Combos
+        |
+        */
+
         $categories = Category::where(
-            'is_active',
-            true
+            'type',
+            Category::TYPE_PRODUCT
         )
+            ->where(
+                'is_active',
+                true
+            )
             ->orderBy('name')
             ->get();
 
@@ -149,6 +179,12 @@ class ProductController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $user = $request->user();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Authorization
+        |--------------------------------------------------------------------------
+        */
 
         if (!in_array(
             $user->role,
@@ -168,9 +204,24 @@ class ProductController extends Controller
         */
 
         $validated = $request->validate([
+            /*
+            | Only an active PRODUCT category can be selected.
+            */
+
             'category_id' => [
                 'nullable',
-                'exists:categories,id',
+                Rule::exists('categories', 'id')
+                    ->where(function ($query) {
+                        $query
+                            ->where(
+                                'type',
+                                Category::TYPE_PRODUCT
+                            )
+                            ->where(
+                                'is_active',
+                                true
+                            );
+                    }),
             ],
 
             'name' => [
@@ -238,6 +289,12 @@ class ProductController extends Controller
             'is_active' => true,
         ]);
 
+        /*
+        |--------------------------------------------------------------------------
+        | Redirect
+        |--------------------------------------------------------------------------
+        */
+
         return redirect()
             ->route('products.index')
             ->with(
@@ -255,6 +312,12 @@ class ProductController extends Controller
     ): View {
         $user = $request->user();
 
+        /*
+        |--------------------------------------------------------------------------
+        | Authorization
+        |--------------------------------------------------------------------------
+        */
+
         if (!in_array(
             $user->role,
             ['CEO/Admin'],
@@ -266,10 +329,20 @@ class ProductController extends Controller
             );
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Product Categories Only
+        |--------------------------------------------------------------------------
+        */
+
         $categories = Category::where(
-            'is_active',
-            true
+            'type',
+            Category::TYPE_PRODUCT
         )
+            ->where(
+                'is_active',
+                true
+            )
             ->orderBy('name')
             ->get();
 
@@ -289,6 +362,12 @@ class ProductController extends Controller
     ): RedirectResponse {
         $user = $request->user();
 
+        /*
+        |--------------------------------------------------------------------------
+        | Authorization
+        |--------------------------------------------------------------------------
+        */
+
         if (!in_array(
             $user->role,
             ['CEO/Admin'],
@@ -307,9 +386,24 @@ class ProductController extends Controller
         */
 
         $validated = $request->validate([
+            /*
+            | Only an active PRODUCT category can be selected.
+            */
+
             'category_id' => [
                 'nullable',
-                'exists:categories,id',
+                Rule::exists('categories', 'id')
+                    ->where(function ($query) {
+                        $query
+                            ->where(
+                                'type',
+                                Category::TYPE_PRODUCT
+                            )
+                            ->where(
+                                'is_active',
+                                true
+                            );
+                    }),
             ],
 
             'name' => [
@@ -376,7 +470,7 @@ class ProductController extends Controller
         if ($request->hasFile('image')) {
 
             /*
-            | Delete the previous image first.
+            | Delete previous image.
             */
 
             if (!empty($product->image)) {
@@ -386,7 +480,7 @@ class ProductController extends Controller
             }
 
             /*
-            | Store the new image.
+            | Store new image.
             */
 
             $productData['image'] = $request
@@ -404,6 +498,12 @@ class ProductController extends Controller
         */
 
         $product->update($productData);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Redirect
+        |--------------------------------------------------------------------------
+        */
 
         return redirect()
             ->route('products.index')

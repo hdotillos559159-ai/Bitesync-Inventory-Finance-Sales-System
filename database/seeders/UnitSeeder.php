@@ -13,43 +13,56 @@ class UnitSeeder extends Seeder
             [
                 'name' => 'Kilogram',
                 'abbreviation' => 'kg',
+                'is_active' => true,
             ],
             [
                 'name' => 'Gram',
                 'abbreviation' => 'g',
+                'is_active' => true,
             ],
             [
                 'name' => 'Liter',
                 'abbreviation' => 'L',
+                'is_active' => true,
             ],
             [
                 'name' => 'Milliliter',
-                'abbreviation' => 'ml',
+                'abbreviation' => 'mL',
+                'is_active' => true,
             ],
             [
                 'name' => 'Piece',
-                'abbreviation' => 'pc',
-            ],
-            [
-                'name' => 'Bottle',
-                'abbreviation' => 'bt',
+                'abbreviation' => 'pcs',
+                'is_active' => true,
             ],
             [
                 'name' => 'Pack',
-                'abbreviation' => 'pk',
+                'abbreviation' => 'pack',
+                'is_active' => true,
             ],
             [
                 'name' => 'Box',
                 'abbreviation' => 'box',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Bottle',
+                'abbreviation' => 'btl',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Can',
+                'abbreviation' => 'can',
+                'is_active' => true,
             ],
         ];
 
         foreach ($units as $unit) {
-            Unit::firstOrCreate(
-                ['abbreviation' => $unit['abbreviation']],
+            Unit::updateOrCreate(
+                ['name' => $unit['name']],
                 [
-                    'name' => $unit['name'],
-                    'is_active' => true,
+                    'abbreviation' => $unit['abbreviation'],
+                    'is_active' => $unit['is_active'],
                 ]
             );
         }

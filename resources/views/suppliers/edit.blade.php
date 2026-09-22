@@ -51,17 +51,13 @@
             Suppliers
         </a>
 
-        <span>
-            /
-        </span>
+        <span>/</span>
 
         <a href="{{ route('suppliers.show', $supplier) }}">
             {{ $supplier->name }}
         </a>
 
-        <span>
-            /
-        </span>
+        <span>/</span>
 
         <span>
             Edit
@@ -129,103 +125,63 @@
 
 
     {{-- =========================================================
-         EDIT SUPPLIER PANEL
+         FORM
     ========================================================== --}}
 
-    <div class="supplier-edit-panel">
+    <form
+        method="POST"
+        action="{{ route('suppliers.update', $supplier) }}"
+        id="supplier-edit-form"
+    >
+
+        @csrf
+
+        @method('PUT')
 
 
         {{-- =====================================================
-             PANEL HEADER
+             TOP TWO PANELS
         ====================================================== --}}
 
-        <div class="supplier-edit-panel-header">
-
-            <div>
-
-                <div class="supplier-edit-panel-title">
-                    Supplier Information
-                </div>
-
-                <div class="supplier-edit-panel-subtitle">
-                    Update the information below and save your changes.
-                </div>
-
-            </div>
+        <div class="supplier-top-panels">
 
 
-            <div class="supplier-current-status">
+            {{-- =================================================
+                 SUPPLIER INFORMATION
+            ================================================== --}}
 
-                @if ($supplier->status === 'Active')
-
-                    <span class="supplier-status supplier-status-active">
-                        ACTIVE
-                    </span>
-
-                @else
-
-                    <span class="supplier-status supplier-status-inactive">
-                        INACTIVE
-                    </span>
-
-                @endif
-
-            </div>
-
-        </div>
+            <div class="supplier-edit-panel">
 
 
-        {{-- =====================================================
-             FORM
-        ====================================================== --}}
+                {{-- PANEL HEADER --}}
 
-        <form
-            method="POST"
-            action="{{ route('suppliers.update', $supplier) }}"
-            id="supplier-edit-form"
-        >
+                <div class="supplier-edit-panel-header">
 
-            @csrf
+                    <div>
 
-            @method('PUT')
-
-
-            <div class="supplier-edit-body">
-
-
-                {{-- =================================================
-                     BASIC INFORMATION
-                ================================================== --}}
-
-                <section class="supplier-edit-section">
-
-                    <div class="supplier-section-heading">
-
-                        <div class="supplier-section-number">
-                            01
+                        <div class="supplier-edit-panel-title">
+                            Supplier Information
                         </div>
 
-                        <div>
-
-                            <h2>
-                                Basic Information
-                            </h2>
-
-                            <p>
-                                General information about the supplier.
-                            </p>
-
+                        <div class="supplier-edit-panel-subtitle">
+                            Update the supplier's basic business information.
                         </div>
 
                     </div>
 
+                </div>
+
+
+                {{-- PANEL BODY --}}
+
+                <div class="supplier-edit-panel-body">
 
                     <div class="supplier-form-grid">
 
 
                         {{-- Supplier Name --}}
 
-                        <div class="supplier-form-group">
+                        <div class="supplier-form-group supplier-full-width">
 
                             <label
                                 for="name"
@@ -259,7 +215,7 @@
 
                         {{-- Contact Person --}}
 
-                        <div class="supplier-form-group">
+                        <div class="supplier-form-group supplier-full-width">
 
                             <label
                                 for="contact_person"
@@ -288,44 +244,40 @@
 
                         </div>
 
-                    </div>
 
-                </section>
+                        {{-- Email --}}
 
+                        <div class="supplier-form-group">
 
-                {{-- =================================================
-                     CONTACT INFORMATION
-                ================================================== --}}
+                            <label
+                                for="email"
+                                class="supplier-form-label"
+                            >
+                                Email Address
+                            </label>
 
-                <section class="supplier-edit-section">
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                value="{{ old('email', $supplier->email) }}"
+                                class="supplier-form-input"
+                                placeholder="supplier@example.com"
+                                maxlength="255"
+                            >
 
-                    <div class="supplier-section-heading">
+                            @error('email')
 
-                        <div class="supplier-section-number">
-                            02
+                                <div class="supplier-field-error">
+                                    {{ $message }}
+                                </div>
+
+                            @enderror
+
                         </div>
 
-                        <div>
 
-                            <h2>
-                                Contact & Address
-                            </h2>
-
-                            <p>
-                                Update supplier communication and complete location details.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="supplier-form-grid">
-
-
-                        {{-- =================================================
-                             PHONE
-                        ================================================== --}}
+                        {{-- Phone --}}
 
                         <div class="supplier-form-group">
 
@@ -335,7 +287,6 @@
                             >
                                 Phone Number
                             </label>
-
 
                             <div class="phone-input">
 
@@ -357,12 +308,6 @@
 
                             </div>
 
-
-                            <small class="supplier-form-help">
-                                Philippine mobile number. +63 is added automatically.
-                            </small>
-
-
                             @error('phone')
 
                                 <div class="supplier-field-error">
@@ -373,261 +318,61 @@
 
                         </div>
 
-
-                        {{-- =================================================
-                             EMAIL
-                        ================================================== --}}
-
-                        <div class="supplier-form-group">
-
-                            <label
-                                for="email"
-                                class="supplier-form-label"
-                            >
-                                Email Address
-                            </label>
-
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                value="{{ old('email', $supplier->email) }}"
-                                class="supplier-form-input"
-                                placeholder="supplier@example.com"
-                                maxlength="255"
-                            >
-
-                            <small class="supplier-form-help">
-                                Supplier's business email address.
-                            </small>
-
-                            @error('email')
-
-                                <div class="supplier-field-error">
-                                    {{ $message }}
-                                </div>
-
-                            @enderror
-
-                        </div>
-
-
-                        {{-- =================================================
-                             STREET / BUILDING
-                        ================================================== --}}
-
-                        <div class="supplier-form-group supplier-full-width">
-
-                            <label
-                                for="street"
-                                class="supplier-form-label"
-                            >
-                                Street / Building / House No.
-                            </label>
-
-                            <input
-                                type="text"
-                                id="street"
-                                name="street"
-                                value="{{ old('street') }}"
-                                class="supplier-form-input"
-                                placeholder="Example: 123 Main Street, Building A"
-                                maxlength="255"
-                            >
-
-                            <small class="supplier-form-help">
-                                House number, street, building, subdivision,
-                                or other specific location.
-                            </small>
-
-                        </div>
-
-
-                        {{-- =================================================
-                             PROVINCE
-                        ================================================== --}}
-
-                        <div class="supplier-form-group">
-
-                            <label
-                                for="province"
-                                class="supplier-form-label"
-                            >
-                                Province
-                                <span class="supplier-required">*</span>
-                            </label>
-
-                            <select
-                                id="province"
-                                name="province"
-                                class="supplier-form-select"
-                                required
-                            >
-
-                                <option value="">
-                                    Loading provinces...
-                                </option>
-
-                            </select>
-
-                            <small class="supplier-form-help">
-                                Select the supplier's province.
-                            </small>
-
-                        </div>
-
-
-                        {{-- =================================================
-                             CITY / MUNICIPALITY
-                        ================================================== --}}
-
-                        <div class="supplier-form-group">
-
-                            <label
-                                for="city_municipality"
-                                class="supplier-form-label"
-                            >
-                                City / Municipality
-                                <span class="supplier-required">*</span>
-                            </label>
-
-                            <select
-                                id="city_municipality"
-                                name="city_municipality"
-                                class="supplier-form-select"
-                                required
-                                disabled
-                            >
-
-                                <option value="">
-                                    Select province first
-                                </option>
-
-                            </select>
-
-                            <small class="supplier-form-help">
-                                Automatically filtered according to the province.
-                            </small>
-
-                        </div>
-
-
-                        {{-- =================================================
-                             BARANGAY
-                        ================================================== --}}
-
-                        <div class="supplier-form-group supplier-full-width">
-
-                            <label
-                                for="barangay"
-                                class="supplier-form-label"
-                            >
-                                Barangay
-                                <span class="supplier-required">*</span>
-                            </label>
-
-                            <select
-                                id="barangay"
-                                name="barangay"
-                                class="supplier-form-select"
-                                required
-                                disabled
-                            >
-
-                                <option value="">
-                                    Select city / municipality first
-                                </option>
-
-                            </select>
-
-                            <small class="supplier-form-help">
-                                Automatically filtered according to the selected city or municipality.
-                            </small>
-
-                        </div>
-
-
-                        {{-- =================================================
-                             COMPLETE ADDRESS PREVIEW
-                        ================================================== --}}
-
-                        <div class="supplier-form-group supplier-full-width">
-
-                            <div class="address-preview">
-
-                                <div class="address-preview-icon">
-                                    ⌖
-                                </div>
-
-                                <div class="address-preview-content">
-
-                                    <div class="address-preview-title">
-                                        Complete Address
-                                    </div>
-
-                                    <div
-                                        class="address-preview-text"
-                                        id="address-preview-text"
-                                    >
-                                        {{ $supplier->address ?: 'Select the address information above.' }}
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-
-                            {{-- Actual database value --}}
-
-                            <input
-                                type="hidden"
-                                id="address"
-                                name="address"
-                                value="{{ old('address', $supplier->address) }}"
-                            >
-
-                            @error('address')
-
-                                <div class="supplier-field-error">
-                                    {{ $message }}
-                                </div>
-
-                            @enderror
-
-                        </div>
-
-
                     </div>
 
-                </section>
+                </div>
+
+            </div>
 
 
-                {{-- =================================================
-                     STATUS AND NOTES
-                ================================================== --}}
+            {{-- =================================================
+                 SUPPLIER STATUS
+            ================================================== --}}
 
-                <section class="supplier-edit-section">
+            <div class="supplier-edit-panel">
 
-                    <div class="supplier-section-heading">
 
-                        <div class="supplier-section-number">
-                            03
+                {{-- PANEL HEADER --}}
+
+                <div class="supplier-edit-panel-header">
+
+                    <div>
+
+                        <div class="supplier-edit-panel-title">
+                            Supplier Status
                         </div>
 
-                        <div>
-
-                            <h2>
-                                Supplier Status
-                            </h2>
-
-                            <p>
-                                Manage availability and additional notes.
-                            </p>
-
+                        <div class="supplier-edit-panel-subtitle">
+                            Manage supplier availability and record details.
                         </div>
 
                     </div>
 
+
+                    <div class="supplier-current-status">
+
+                        @if ($supplier->status === 'Active')
+
+                            <span class="supplier-status supplier-status-active">
+                                ACTIVE
+                            </span>
+
+                        @else
+
+                            <span class="supplier-status supplier-status-inactive">
+                                INACTIVE
+                            </span>
+
+                        @endif
+
+                    </div>
+
+                </div>
+
+
+                {{-- PANEL BODY --}}
+
+                <div class="supplier-edit-panel-body">
 
                     <div class="supplier-form-grid">
 
@@ -667,10 +412,6 @@
 
                             </select>
 
-                            <small class="supplier-form-help">
-                                Inactive suppliers remain in historical records.
-                            </small>
-
                             @error('status')
 
                                 <div class="supplier-field-error">
@@ -699,67 +440,264 @@
                         </div>
 
 
-                        {{-- Notes --}}
+                        {{-- Last Updated --}}
 
                         <div class="supplier-form-group supplier-full-width">
 
-                            <label
-                                for="notes"
-                                class="supplier-form-label"
-                            >
-                                Notes
+                            <label class="supplier-form-label">
+                                Last Updated
                             </label>
 
-                            <textarea
-                                id="notes"
-                                name="notes"
-                                class="supplier-form-textarea"
-                                placeholder="Optional notes about this supplier..."
-                                maxlength="5000"
-                            >{{ old('notes', $supplier->notes) }}</textarea>
+                            <div class="supplier-readonly">
 
-                            <small class="supplier-form-help">
-                                Optional supplier information, payment terms,
-                                delivery details, or other useful notes.
-                            </small>
+                                {{ $supplier->updated_at?->format('M d, Y h:i A') ?? '—' }}
 
-                            @error('notes')
+                            </div>
 
-                                <div class="supplier-field-error">
-                                    {{ $message }}
+                        </div>
+
+                    </div>
+
+
+                    {{-- STATUS INFORMATION --}}
+
+                    <div class="supplier-status-note">
+
+                        <div class="supplier-status-note-icon">
+                            i
+                        </div>
+
+                        <div>
+
+                            <div class="supplier-status-note-title">
+                                Supplier availability
+                            </div>
+
+                            <div class="supplier-status-note-text">
+                                Inactive suppliers remain available in historical
+                                purchasing and reporting records.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {{-- =====================================================
+             CONTACT & ADDRESS PANEL
+        ====================================================== --}}
+
+        <div class="supplier-edit-panel supplier-contact-panel">
+
+
+            {{-- PANEL HEADER --}}
+
+            <div class="supplier-edit-panel-header">
+
+                <div>
+
+                    <div class="supplier-edit-panel-title">
+                        Contact & Address
+                    </div>
+
+                    <div class="supplier-edit-panel-subtitle">
+                        Update supplier communication and complete location details.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {{-- PANEL BODY --}}
+
+            <div class="supplier-edit-panel-body">
+
+                <div class="supplier-form-grid">
+
+
+                    {{-- Street / Building --}}
+
+                    <div class="supplier-form-group supplier-full-width">
+
+                        <label
+                            for="street"
+                            class="supplier-form-label"
+                        >
+                            Street / Building / House No.
+                        </label>
+
+                        <input
+                            type="text"
+                            id="street"
+                            name="street"
+                            value="{{ old('street') }}"
+                            class="supplier-form-input"
+                            placeholder="Example: 123 Main Street, Building A"
+                            maxlength="255"
+                        >
+
+                    </div>
+
+
+                    {{-- Province --}}
+
+                    <div class="supplier-form-group">
+
+                        <label
+                            for="province"
+                            class="supplier-form-label"
+                        >
+                            Province
+                            <span class="supplier-required">*</span>
+                        </label>
+
+                        <select
+                            id="province"
+                            name="province"
+                            class="supplier-form-select"
+                            required
+                        >
+
+                            <option value="">
+                                Loading provinces...
+                            </option>
+
+                        </select>
+
+                        @error('province')
+
+                            <div class="supplier-field-error">
+                                {{ $message }}
+                            </div>
+
+                        @enderror
+
+                    </div>
+
+
+                    {{-- City / Municipality --}}
+
+                    <div class="supplier-form-group">
+
+                        <label
+                            for="city_municipality"
+                            class="supplier-form-label"
+                        >
+                            City / Municipality
+                            <span class="supplier-required">*</span>
+                        </label>
+
+                        <select
+                            id="city_municipality"
+                            name="city_municipality"
+                            class="supplier-form-select"
+                            required
+                            disabled
+                        >
+
+                            <option value="">
+                                Select province first
+                            </option>
+
+                        </select>
+
+                        @error('city_municipality')
+
+                            <div class="supplier-field-error">
+                                {{ $message }}
+                            </div>
+
+                        @enderror
+
+                    </div>
+
+
+                    {{-- Barangay --}}
+
+                    <div class="supplier-form-group supplier-full-width">
+
+                        <label
+                            for="barangay"
+                            class="supplier-form-label"
+                        >
+                            Barangay
+                            <span class="supplier-required">*</span>
+                        </label>
+
+                        <select
+                            id="barangay"
+                            name="barangay"
+                            class="supplier-form-select"
+                            required
+                            disabled
+                        >
+
+                            <option value="">
+                                Select city / municipality first
+                            </option>
+
+                        </select>
+
+                        @error('barangay')
+
+                            <div class="supplier-field-error">
+                                {{ $message }}
+                            </div>
+
+                        @enderror
+
+                    </div>
+
+
+                    {{-- Complete Address Preview --}}
+
+                    <div class="supplier-form-group supplier-full-width">
+
+                        <div class="address-preview">
+
+                            <div class="address-preview-icon">
+                                ⌖
+                            </div>
+
+                            <div class="address-preview-content">
+
+                                <div class="address-preview-title">
+                                    Complete Address
                                 </div>
 
-                            @enderror
+                                <div
+                                    class="address-preview-text"
+                                    id="address-preview-text"
+                                >
+                                    {{ $supplier->address ?: 'Select the address information above.' }}
+                                </div>
+
+                            </div>
 
                         </div>
 
-                    </div>
 
-                </section>
+                        <input
+                            type="hidden"
+                            id="address"
+                            name="address"
+                            value="{{ old('address', $supplier->address) }}"
+                        >
 
+                        @error('address')
 
-                {{-- =================================================
-                     STATUS INFORMATION
-                ================================================== --}}
+                            <div class="supplier-field-error">
+                                {{ $message }}
+                            </div>
 
-                <div class="supplier-information-box">
-
-                    <div class="supplier-information-icon">
-                        i
-                    </div>
-
-                    <div>
-
-                        <div class="supplier-information-title">
-                            Supplier records are retained
-                        </div>
-
-                        <div class="supplier-information-text">
-                            Setting a supplier to inactive does not delete
-                            the supplier or its information. Historical
-                            purchasing and reporting records can still
-                            reference this supplier.
-                        </div>
+                        @enderror
 
                     </div>
 
@@ -767,53 +705,142 @@
 
             </div>
 
-
-            {{-- =====================================================
-                 FOOTER
-            ====================================================== --}}
-
-            <div class="supplier-edit-footer">
-
-                <div class="supplier-last-updated">
-
-                    Last updated:
-
-                    <strong>
-                        {{ $supplier->updated_at?->format('M d, Y h:i A') ?? '—' }}
-                    </strong>
-
-                </div>
+        </div>
 
 
-                <div class="supplier-edit-actions">
+        {{-- =====================================================
+             NOTES PANEL
+        ====================================================== --}}
 
-                    <a
-                        href="{{ route('suppliers.show', $supplier) }}"
-                        class="supplier-cancel-button"
-                    >
-                        Cancel
-                    </a>
+        <div class="supplier-edit-panel supplier-notes-panel">
 
-                    <button
-                        type="submit"
-                        class="supplier-save-button"
-                    >
 
-                        <span>
-                            ✓
-                        </span>
+            {{-- PANEL HEADER --}}
 
-                        Save Changes
+            <div class="supplier-edit-panel-header">
 
-                    </button>
+                <div>
+
+                    <div class="supplier-edit-panel-title">
+                        Additional Notes
+                    </div>
+
+                    <div class="supplier-edit-panel-subtitle">
+                        Add useful supplier information, payment terms, or delivery details.
+                    </div>
 
                 </div>
 
             </div>
 
-        </form>
 
-    </div>
+            {{-- PANEL BODY --}}
+
+            <div class="supplier-edit-panel-body">
+
+                <div class="supplier-form-group">
+
+                    <label
+                        for="notes"
+                        class="supplier-form-label"
+                    >
+                        Notes
+                    </label>
+
+                    <textarea
+                        id="notes"
+                        name="notes"
+                        class="supplier-form-textarea"
+                        placeholder="Optional notes about this supplier..."
+                        maxlength="5000"
+                    >{{ old('notes', $supplier->notes) }}</textarea>
+
+                    @error('notes')
+
+                        <div class="supplier-field-error">
+                            {{ $message }}
+                        </div>
+
+                    @enderror
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {{-- =====================================================
+             INFORMATION BOX
+        ====================================================== --}}
+
+        <div class="supplier-information-box">
+
+            <div class="supplier-information-icon">
+                i
+            </div>
+
+            <div>
+
+                <div class="supplier-information-title">
+                    Supplier records are retained
+                </div>
+
+                <div class="supplier-information-text">
+                    Setting a supplier to inactive does not delete the supplier
+                    or its information. Historical purchasing and reporting
+                    records can still reference this supplier.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {{-- =====================================================
+             FOOTER
+        ====================================================== --}}
+
+        <div class="supplier-edit-footer">
+
+            <div class="supplier-last-updated">
+
+                Last updated:
+
+                <strong>
+                    {{ $supplier->updated_at?->format('M d, Y h:i A') ?? '—' }}
+                </strong>
+
+            </div>
+
+
+            <div class="supplier-edit-actions">
+
+                <a
+                    href="{{ route('suppliers.show', $supplier) }}"
+                    class="supplier-cancel-button"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="supplier-save-button"
+                >
+
+                    <span>
+                        ✓
+                    </span>
+
+                    Save Changes
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
 
 </div>
 
@@ -829,28 +856,96 @@
 ========================================================= */
 
 .supplier-edit-page {
+
     width: 100%;
+
+    max-width: 1120px;
+
+    margin: 0 auto;
+
+    padding-bottom: 30px;
+
 }
 
 
 /* =========================================================
-   PAGE TITLE
-   Same hierarchy as Add Supplier / Products / Inventory
+   TOPBAR
 ========================================================= */
+
+.supplier-edit-page .topbar {
+
+    margin-bottom: 14px;
+
+}
+
+
+.supplier-edit-page .page-title small {
+
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: var(--orange-dark);
+
+    font-size: 10px;
+
+    line-height: 1.2;
+
+    font-weight: 700;
+
+    letter-spacing: 0.08em;
+
+    text-transform: uppercase;
+
+}
+
 
 .supplier-edit-page .page-title h1 {
 
-    font-size: clamp(
-        1.75rem,
-        2.2vw,
-        2rem
-    );
+    margin: 0;
+
+    color: var(--dark);
+
+    font-size: 29px;
 
     line-height: 1.15;
 
     letter-spacing: -0.045rem;
 
     font-weight: 700;
+
+}
+
+
+.supplier-edit-page .page-title p {
+
+    margin: 5px 0 0;
+
+    color: var(--muted);
+
+    font-size: 12px;
+
+    line-height: 1.45;
+
+    font-weight: 400;
+
+}
+
+
+.supplier-edit-page .date-box {
+
+    min-width: 145px;
+
+    padding: 9px 12px;
+
+}
+
+
+.supplier-edit-page .date-icon {
+
+    width: 30px;
+
+    height: 30px;
 
 }
 
@@ -869,11 +964,11 @@
 
     gap: 7px;
 
-    margin-bottom: 18px;
+    margin-bottom: 17px;
 
     color: var(--muted);
 
-    font-size: 10px;
+    font-size: 11px;
 
     font-weight: 600;
 
@@ -913,17 +1008,17 @@
 
     align-items: flex-start;
 
-    gap: 10px;
+    gap: 9px;
 
-    margin-bottom: 18px;
+    margin-bottom: 16px;
 
-    padding: 12px 14px;
+    padding: 11px 13px;
 
     border: 1px solid var(--border);
 
     border-radius: 9px;
 
-    font-size: 12px;
+    font-size: 11px;
 
     line-height: 1.5;
 
@@ -960,11 +1055,11 @@
 
 .supplier-alert-icon {
 
-    width: 22px;
+    width: 21px;
 
-    height: 22px;
+    height: 21px;
 
-    flex: 0 0 22px;
+    flex: 0 0 21px;
 
     display: flex;
 
@@ -976,7 +1071,7 @@
 
     background: rgba(255, 255, 255, 0.7);
 
-    font-size: 11px;
+    font-size: 10px;
 
     font-weight: 700;
 
@@ -985,9 +1080,9 @@
 
 .supplier-error-title {
 
-    margin-bottom: 5px;
+    margin-bottom: 4px;
 
-    font-size: 12px;
+    font-size: 11px;
 
     font-weight: 700;
 
@@ -998,7 +1093,7 @@
 
     margin: 0;
 
-    padding-left: 17px;
+    padding-left: 16px;
 
 }
 
@@ -1011,7 +1106,26 @@
 
 
 /* =========================================================
-   EDIT PANEL
+   TOP PANELS
+========================================================= */
+
+.supplier-top-panels {
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+
+    gap: 15px;
+
+    margin-bottom: 15px;
+
+}
+
+
+/* =========================================================
+   MAIN PANELS
 ========================================================= */
 
 .supplier-edit-panel {
@@ -1022,11 +1136,25 @@
 
     border: 1px solid var(--border);
 
-    border-radius: 17px;
+    border-radius: 15px;
 
     box-shadow:
         0 5px 18px
         rgba(43, 31, 23, 0.035);
+
+}
+
+
+.supplier-contact-panel {
+
+    margin-bottom: 15px;
+
+}
+
+
+.supplier-notes-panel {
+
+    margin-bottom: 15px;
 
 }
 
@@ -1037,7 +1165,7 @@
 
 .supplier-edit-panel-header {
 
-    min-height: 75px;
+    min-height: 65px;
 
     display: flex;
 
@@ -1045,9 +1173,9 @@
 
     justify-content: space-between;
 
-    gap: 20px;
+    gap: 18px;
 
-    padding: 17px 21px;
+    padding: 14px 19px;
 
     border-bottom: 1px solid var(--border);
 
@@ -1058,7 +1186,7 @@
 
     color: var(--dark);
 
-    font-size: 19px;
+    font-size: 17px;
 
     line-height: 1.3;
 
@@ -1069,13 +1197,13 @@
 
 .supplier-edit-panel-subtitle {
 
-    margin-top: 4px;
+    margin-top: 3px;
 
     color: var(--muted);
 
-    font-size: 12px;
+    font-size: 11px;
 
-    line-height: 1.45;
+    line-height: 1.4;
 
     font-weight: 400;
 
@@ -1085,6 +1213,17 @@
 .supplier-current-status {
 
     flex-shrink: 0;
+
+}
+
+
+/* =========================================================
+   PANEL BODY
+========================================================= */
+
+.supplier-edit-panel-body {
+
+    padding: 18px;
 
 }
 
@@ -1101,11 +1240,11 @@
 
     justify-content: center;
 
-    padding: 6px 9px;
+    padding: 5px 8px;
 
     border-radius: 7px;
 
-    font-size: 9px;
+    font-size: 8px;
 
     line-height: 1;
 
@@ -1135,98 +1274,6 @@
 
 
 /* =========================================================
-   FORM BODY
-========================================================= */
-
-.supplier-edit-body {
-
-    padding: 23px 21px;
-
-}
-
-
-/* =========================================================
-   SECTIONS
-========================================================= */
-
-.supplier-edit-section {
-
-    margin-bottom: 28px;
-
-}
-
-
-.supplier-section-heading {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 11px;
-
-    margin-bottom: 16px;
-
-}
-
-
-.supplier-section-number {
-
-    width: 32px;
-
-    height: 32px;
-
-    flex: 0 0 32px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    border-radius: 9px;
-
-    background: var(--orange-light);
-
-    color: var(--orange-dark);
-
-    font-size: 10px;
-
-    font-weight: 700;
-
-}
-
-
-.supplier-section-heading h2 {
-
-    margin: 0;
-
-    color: var(--dark);
-
-    font-size: 19px;
-
-    line-height: 1.3;
-
-    font-weight: 700;
-
-}
-
-
-.supplier-section-heading p {
-
-    margin: 4px 0 0;
-
-    color: var(--muted);
-
-    font-size: 12px;
-
-    line-height: 1.45;
-
-    font-weight: 400;
-
-}
-
-
-/* =========================================================
    FORM GRID
 ========================================================= */
 
@@ -1237,7 +1284,7 @@
     grid-template-columns:
         repeat(2, minmax(0, 1fr));
 
-    gap: 16px;
+    gap: 15px;
 
 }
 
@@ -1268,7 +1315,7 @@
 
     color: #55483f;
 
-    font-size: 13px;
+    font-size: 11px;
 
     line-height: 1.35;
 
@@ -1300,7 +1347,7 @@
 
     border: 1px solid #ddd3ca;
 
-    border-radius: 9px;
+    border-radius: 8px;
 
     background: white;
 
@@ -1308,7 +1355,7 @@
 
     font-family: inherit;
 
-    font-size: 13px;
+    font-size: 12px;
 
     line-height: 1.4;
 
@@ -1328,7 +1375,7 @@
 
     height: 39px;
 
-    padding: 0 12px;
+    padding: 0 11px;
 
 }
 
@@ -1337,7 +1384,7 @@
 
     min-height: 105px;
 
-    padding: 10px 12px;
+    padding: 10px 11px;
 
     resize: vertical;
 
@@ -1381,27 +1428,6 @@
 
 
 /* =========================================================
-   FORM HELP
-========================================================= */
-
-.supplier-form-help {
-
-    display: block;
-
-    margin-top: 5px;
-
-    color: #9d958f;
-
-    font-size: 12px;
-
-    line-height: 1.45;
-
-    font-weight: 400;
-
-}
-
-
-/* =========================================================
    PHONE
 ========================================================= */
 
@@ -1418,7 +1444,7 @@
 
     top: 50%;
 
-    left: 12px;
+    left: 11px;
 
     z-index: 2;
 
@@ -1426,7 +1452,7 @@
 
     color: #8c684b;
 
-    font-size: 13px;
+    font-size: 12px;
 
     font-weight: 600;
 
@@ -1437,7 +1463,7 @@
 
 .phone-input .supplier-form-input {
 
-    padding-left: 43px;
+    padding-left: 41px;
 
 }
 
@@ -1452,7 +1478,7 @@
 
     color: #a64b3f;
 
-    font-size: 11px;
+    font-size: 10px;
 
     line-height: 1.4;
 
@@ -1462,7 +1488,7 @@
 
 
 /* =========================================================
-   READONLY FIELD
+   READONLY
 ========================================================= */
 
 .supplier-readonly {
@@ -1477,19 +1503,99 @@
 
     align-items: center;
 
-    padding: 0 12px;
+    padding: 0 11px;
 
     border: 1px solid #e3dbd4;
 
-    border-radius: 9px;
+    border-radius: 8px;
 
     background: #f8f5f1;
 
     color: #81776f;
 
-    font-size: 13px;
+    font-size: 12px;
 
     line-height: 1.4;
+
+    font-weight: 400;
+
+}
+
+
+/* =========================================================
+   STATUS NOTE
+========================================================= */
+
+.supplier-status-note {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 9px;
+
+    margin-top: 15px;
+
+    padding: 10px 11px;
+
+    border: 1px solid #eadfd6;
+
+    border-radius: 9px;
+
+    background: var(--card-soft);
+
+}
+
+
+.supplier-status-note-icon {
+
+    width: 28px;
+
+    height: 28px;
+
+    flex: 0 0 28px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 7px;
+
+    background: var(--orange-light);
+
+    color: var(--orange-dark);
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+}
+
+
+.supplier-status-note-title {
+
+    margin-bottom: 2px;
+
+    color: #4a3c33;
+
+    font-size: 10px;
+
+    line-height: 1.35;
+
+    font-weight: 700;
+
+}
+
+
+.supplier-status-note-text {
+
+    color: var(--muted);
+
+    font-size: 10px;
+
+    line-height: 1.45;
 
     font-weight: 400;
 
@@ -1506,13 +1612,13 @@
 
     align-items: flex-start;
 
-    gap: 11px;
+    gap: 10px;
 
-    padding: 13px;
+    padding: 11px 12px;
 
     border: 1px solid #eadfd6;
 
-    border-radius: 11px;
+    border-radius: 10px;
 
     background: var(--card-soft);
 
@@ -1521,11 +1627,11 @@
 
 .address-preview-icon {
 
-    width: 31px;
+    width: 30px;
 
-    height: 31px;
+    height: 30px;
 
-    flex: 0 0 31px;
+    flex: 0 0 30px;
 
     display: flex;
 
@@ -1539,7 +1645,7 @@
 
     color: var(--orange-dark);
 
-    font-size: 12px;
+    font-size: 11px;
 
     font-weight: 700;
 
@@ -1559,7 +1665,7 @@
 
     color: #4a3c33;
 
-    font-size: 12px;
+    font-size: 11px;
 
     line-height: 1.35;
 
@@ -1572,9 +1678,9 @@
 
     color: var(--muted);
 
-    font-size: 12px;
+    font-size: 11px;
 
-    line-height: 1.55;
+    line-height: 1.5;
 
     font-weight: 400;
 
@@ -1593,13 +1699,15 @@
 
     align-items: flex-start;
 
-    gap: 11px;
+    gap: 10px;
 
-    padding: 14px;
+    margin-bottom: 15px;
+
+    padding: 11px 12px;
 
     border: 1px solid #eadfd6;
 
-    border-radius: 11px;
+    border-radius: 10px;
 
     background: var(--card-soft);
 
@@ -1608,11 +1716,11 @@
 
 .supplier-information-icon {
 
-    width: 31px;
+    width: 30px;
 
-    height: 31px;
+    height: 30px;
 
-    flex: 0 0 31px;
+    flex: 0 0 30px;
 
     display: flex;
 
@@ -1626,7 +1734,7 @@
 
     color: var(--orange-dark);
 
-    font-size: 12px;
+    font-size: 11px;
 
     font-weight: 700;
 
@@ -1639,7 +1747,7 @@
 
     color: #4a3c33;
 
-    font-size: 12px;
+    font-size: 11px;
 
     line-height: 1.35;
 
@@ -1652,7 +1760,7 @@
 
     color: var(--muted);
 
-    font-size: 12px;
+    font-size: 11px;
 
     line-height: 1.5;
 
@@ -1667,7 +1775,7 @@
 
 .supplier-edit-footer {
 
-    min-height: 68px;
+    min-height: 62px;
 
     display: flex;
 
@@ -1675,11 +1783,13 @@
 
     justify-content: space-between;
 
-    gap: 20px;
+    gap: 18px;
 
-    padding: 14px 21px;
+    padding: 12px 18px;
 
-    border-top: 1px solid var(--border);
+    border: 1px solid var(--border);
+
+    border-radius: 15px;
 
     background: var(--card-soft);
 
@@ -1690,7 +1800,7 @@
 
     color: var(--muted);
 
-    font-size: 12px;
+    font-size: 11px;
 
     line-height: 1.4;
 
@@ -1736,13 +1846,13 @@
 
     gap: 6px;
 
-    padding: 0 15px;
+    padding: 0 14px;
 
-    border-radius: 9px;
+    border-radius: 8px;
 
     font-family: inherit;
 
-    font-size: 13px;
+    font-size: 11px;
 
     line-height: 1.2;
 
@@ -1829,7 +1939,7 @@
 
 .supplier-save-button span {
 
-    font-size: 12px;
+    font-size: 11px;
 
 }
 
@@ -1838,7 +1948,14 @@
    RESPONSIVE
 ========================================================= */
 
-@media (max-width: 760px) {
+@media (max-width: 850px) {
+
+    .supplier-top-panels {
+
+        grid-template-columns: 1fr;
+
+    }
+
 
     .supplier-form-grid {
 
@@ -1853,6 +1970,10 @@
 
     }
 
+}
+
+
+@media (max-width: 700px) {
 
     .supplier-edit-panel-header {
 
@@ -1891,30 +2012,37 @@
 
 @media (max-width: 480px) {
 
-    .supplier-edit-body {
+    .supplier-edit-page {
 
-        padding: 18px 14px;
+        padding-bottom: 18px;
+
+    }
+
+
+    .supplier-edit-page .page-title h1 {
+
+        font-size: 26px;
 
     }
 
 
     .supplier-edit-panel-header {
 
-        padding: 16px 14px;
+        padding: 14px;
 
     }
 
 
-    .supplier-edit-footer {
+    .supplier-edit-panel-body {
 
         padding: 14px;
 
     }
 
 
-    .supplier-section-heading {
+    .supplier-edit-footer {
 
-        align-items: flex-start;
+        padding: 12px 14px;
 
     }
 
@@ -2190,12 +2318,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 );
 
 
-            /*
-             * If oldProvince is empty,
-             * identify the province from
-             * the existing address.
-             */
-
             if (
                 !provinceOption &&
                 oldAddress
@@ -2302,11 +2424,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 );
 
 
-            /*
-             * If oldCity is unavailable,
-             * search the existing address.
-             */
-
             if (
                 !cityOption &&
                 oldAddress
@@ -2405,11 +2522,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     oldBarangay
                 );
 
-
-            /*
-             * If oldBarangay is unavailable,
-             * identify it from the existing address.
-             */
 
             if (
                 !barangayOption &&
@@ -2615,12 +2727,6 @@ document.addEventListener('DOMContentLoaded', function () {
             parts.join(', ');
 
 
-        /*
-         * Only replace the old address
-         * when structured address information
-         * is available.
-         */
-
         if (completeAddress) {
 
             addressInput.value =
@@ -2666,14 +2772,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 );
 
 
-        /*
-         * Existing database value may already be:
-         *
-         * +639123456789
-         *
-         * Remove country code.
-         */
-
         if (
             phone.startsWith('63') &&
             phone.length >= 12
@@ -2684,14 +2782,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         }
 
-
-        /*
-         * Existing number may be:
-         *
-         * 09123456789
-         *
-         * Remove leading zero.
-         */
 
         if (
             phone.startsWith('0')
@@ -2710,11 +2800,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     }
 
-
-    /*
-     * Show only the local 10 digits
-     * because +63 is displayed separately.
-     */
 
     phoneInput.value =
         normalizePhone(
@@ -2737,10 +2822,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 );
 
 
-            /*
-             * Remove +63 if pasted.
-             */
-
             if (
                 value.startsWith('63') &&
                 value.length > 10
@@ -2752,10 +2833,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
 
-            /*
-             * Remove leading 0.
-             */
-
             if (
                 value.startsWith('0')
             ) {
@@ -2765,10 +2842,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             }
 
-
-            /*
-             * Maximum 10 digits.
-             */
 
             value =
                 value.substring(
@@ -2796,18 +2869,8 @@ document.addEventListener('DOMContentLoaded', function () {
             'submit',
             function () {
 
-                /*
-                 * Update complete address.
-                 */
-
                 updateAddressPreview();
 
-
-                /*
-                 * Store phone as:
-                 *
-                 * +639123456789
-                 */
 
                 let phone =
                     phoneInput.value.replace(

@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'BiteSync | Products')
+@section('title', 'BiteSync | Expenses')
 
 @section('content')
 
-<div class="products-page">
+<div class="inventory-page">
 
 <!-- =========================================================
-     PRODUCTS TOPBAR
+     EXPENSE TOPBAR
 ========================================================== -->
 
 <div class="topbar">
@@ -15,18 +15,19 @@
     <div class="page-title">
 
         <small>
-            Product Management
+            Expense Management
         </small>
 
         <h1>
-            Products
+            Expenses
         </h1>
 
         <p>
-            Manage your BiteSync menu and product records.
+            Track operating expenses and manage your BiteSync spending records.
         </p>
 
     </div>
+
 
     <div class="date-box">
 
@@ -43,131 +44,141 @@
 
 <!-- =========================================================
      SUMMARY CARDS
+     SAME FORMAT AS INVENTORY
 ========================================================== -->
 
-<section class="products-stats">
+<section class="inventory-stats">
 
-    <!-- TOTAL PRODUCTS -->
 
-    <div class="products-stat">
+    <!-- TOTAL EXPENSES -->
 
-        <div class="products-stat-left">
+    <div class="inventory-stat">
 
-            <div class="products-stat-label">
-                TOTAL PRODUCTS
+        <div class="inventory-stat-left">
+
+            <div class="inventory-stat-label">
+                TOTAL EXPENSES
             </div>
 
-            <div class="products-stat-note">
-                All product records
-            </div>
-
-        </div>
-
-
-        <div class="products-stat-right">
-
-            <div class="products-stat-icon">
-                ▦
-            </div>
-
-            <div class="products-stat-value">
-                {{ $totalProducts }}
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ACTIVE PRODUCTS -->
-
-    <div class="products-stat">
-
-        <div class="products-stat-left">
-
-            <div class="products-stat-label">
-                ACTIVE PRODUCTS
-            </div>
-
-            <div class="products-stat-note">
-                Currently available
+            <div class="inventory-stat-note">
+                All expense records
             </div>
 
         </div>
 
 
-        <div class="products-stat-right">
+        <div class="inventory-stat-right">
 
-            <div class="products-stat-icon">
-                ✓
-            </div>
-
-            <div class="products-stat-value">
-                {{ $activeProducts }}
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- INACTIVE PRODUCTS -->
-
-    <div class="products-stat">
-
-        <div class="products-stat-left">
-
-            <div class="products-stat-label">
-                INACTIVE PRODUCTS
-            </div>
-
-            <div class="products-stat-note">
-                Not currently available
-            </div>
-
-        </div>
-
-
-        <div class="products-stat-right">
-
-            <div class="products-stat-icon">
-                ×
-            </div>
-
-            <div class="products-stat-value">
-                {{ $inactiveProducts }}
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ACTIVE SELLING VALUE -->
-
-    <div class="products-stat">
-
-        <div class="products-stat-left">
-
-            <div class="products-stat-label">
-                ACTIVE SELLING VALUE
-            </div>
-
-            <div class="products-stat-note">
-                Sum of active selling prices
-            </div>
-
-        </div>
-
-
-        <div class="products-stat-right">
-
-            <div class="products-stat-icon">
+            <div class="inventory-stat-icon">
                 ₱
             </div>
 
-            <div class="products-stat-value products-money">
-                ₱{{ number_format((float) $totalProductValue, 2) }}
+            <div class="inventory-stat-value inventory-money">
+
+                ₱{{ number_format((float) ($totalExpenses ?? 0), 2) }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- THIS MONTH -->
+
+    <div class="inventory-stat">
+
+        <div class="inventory-stat-left">
+
+            <div class="inventory-stat-label">
+                THIS MONTH
+            </div>
+
+            <div class="inventory-stat-note">
+                Expenses recorded this month
+            </div>
+
+        </div>
+
+
+        <div class="inventory-stat-right">
+
+            <div class="inventory-stat-icon">
+                ◷
+            </div>
+
+            <div class="inventory-stat-value inventory-money">
+
+                ₱{{ number_format((float) ($monthlyExpenses ?? 0), 2) }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- EXPENSE RECORDS -->
+
+    <div class="inventory-stat">
+
+        <div class="inventory-stat-left">
+
+            <div class="inventory-stat-label">
+                EXPENSE RECORDS
+            </div>
+
+            <div class="inventory-stat-note">
+                Number of recorded expenses
+            </div>
+
+        </div>
+
+
+        <div class="inventory-stat-right">
+
+            <div class="inventory-stat-icon">
+                ▦
+            </div>
+
+            <div class="inventory-stat-value">
+
+                {{ $expenseCount ?? 0 }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- AVERAGE EXPENSE -->
+
+    <div class="inventory-stat">
+
+        <div class="inventory-stat-left">
+
+            <div class="inventory-stat-label">
+                AVERAGE EXPENSE
+            </div>
+
+            <div class="inventory-stat-note">
+                Average amount per record
+            </div>
+
+        </div>
+
+
+        <div class="inventory-stat-right">
+
+            <div class="inventory-stat-icon">
+                ≈
+            </div>
+
+            <div class="inventory-stat-value inventory-money">
+
+                ₱{{ number_format((float) ($averageExpense ?? 0), 2) }}
+
             </div>
 
         </div>
@@ -178,44 +189,43 @@
 
 
 <!-- =========================================================
-     PRODUCT RECORDS PANEL
+     EXPENSE RECORDS PANEL
 ========================================================== -->
 
-<div class="products-panel">
+<div class="inventory-panel">
+
 
     <!-- =====================================================
          PANEL HEADER
     ====================================================== -->
 
-    <div class="products-panel-header">
+    <div class="inventory-panel-header">
 
         <div>
 
-            <div class="products-panel-title">
-                Product Records
+            <div class="inventory-panel-title">
+                Expense Records
             </div>
 
-            <div class="products-panel-subtitle">
-                Search and manage your café product records.
+            <div class="inventory-panel-subtitle">
+                Search and monitor your recorded operating expenses.
             </div>
 
         </div>
 
 
-        @if ($user->role === 'CEO/Admin')
+        <a
+            href="{{ route('expenses.create') }}"
+            class="inventory-add-button"
+        >
 
-            <a
-                href="{{ route('products.create') }}"
-                class="products-add-button"
-            >
+            <span>
+                +
+            </span>
 
-                <span>+</span>
+            Add Expense
 
-                Add Product
-
-            </a>
-
-        @endif
+        </a>
 
     </div>
 
@@ -226,62 +236,96 @@
 
     <form
         method="GET"
-        action="{{ route('products.index') }}"
-        class="products-filters"
+        action="{{ route('expenses.index') }}"
+        class="inventory-filters"
     >
 
-        <div class="products-search-wrapper">
 
-            <span class="products-search-icon">
+        <!-- SEARCH -->
+
+        <div class="inventory-search-wrapper">
+
+            <span class="inventory-search-icon">
                 ⌕
             </span>
 
             <input
                 type="text"
                 name="search"
-                value="{{ $search }}"
-                placeholder="Search products..."
+                value="{{ request('search') }}"
+                placeholder="Search expenses..."
             >
 
         </div>
 
 
-        <select name="status">
+        <!-- CATEGORY -->
+
+        <select
+            name="category"
+            aria-label="Filter by category"
+        >
 
             <option value="">
-                All Status
+                All Categories
             </option>
 
-            <option
-                value="active"
-                {{ $status === 'active' ? 'selected' : '' }}
-            >
-                Active
-            </option>
+            @foreach (($categories ?? []) as $category)
 
-            <option
-                value="inactive"
-                {{ $status === 'inactive' ? 'selected' : '' }}
-            >
-                Inactive
-            </option>
+                <option
+                    value="{{ $category }}"
+                    @selected(request('category') === $category)
+                >
+                    {{ $category }}
+                </option>
+
+            @endforeach
 
         </select>
 
 
+        <!-- MONTH -->
+
+        <select
+            name="month"
+            aria-label="Filter by month"
+        >
+
+            <option value="">
+                All Months
+            </option>
+
+            @for ($month = 1; $month <= 12; $month++)
+
+                <option
+                    value="{{ $month }}"
+                    @selected((string) request('month') === (string) $month)
+                >
+                    {{ \Carbon\Carbon::create()->month($month)->format('F') }}
+                </option>
+
+            @endfor
+
+        </select>
+
+
+        <!-- FILTER -->
+
         <button
             type="submit"
-            class="products-filter-button"
+            class="inventory-filter-button"
         >
             Filter
         </button>
 
 
-        @if ($search || $status)
+        <!-- CLEAR -->
+
+        @if(request()->hasAny(['search', 'category', 'month']))
 
             <a
-                href="{{ route('products.index') }}"
-                class="products-clear-button"
+                href="{{ route('expenses.index') }}"
+                class="inventory-clear-button"
             >
                 Clear
             </a>
@@ -292,23 +336,19 @@
 
 
     <!-- =====================================================
-         PRODUCT TABLE
-    ====================================================== -->
+         EXPENSE TABLE
+====================================================== -->
 
-    <div class="products-table-wrapper">
+    <div class="inventory-table-wrapper">
 
-        <table class="products-table">
+        <table class="inventory-table">
 
             <thead>
 
                 <tr>
 
                     <th>
-                        Product
-                    </th>
-
-                    <th>
-                        SKU
+                        Date
                     </th>
 
                     <th>
@@ -316,20 +356,20 @@
                     </th>
 
                     <th>
-                        Selling Price
+                        Description
                     </th>
 
                     <th>
-                        Status
+                        Amount
                     </th>
 
-                    @if ($user->role === 'CEO/Admin')
+                    <th>
+                        Recorded By
+                    </th>
 
-                        <th class="products-actions-header">
-                            Actions
-                        </th>
-
-                    @endif
+                    <th class="inventory-actions-header">
+                        Actions
+                    </th>
 
                 </tr>
 
@@ -338,82 +378,29 @@
 
             <tbody>
 
-                @forelse ($products as $product)
+                @forelse (($expenses ?? collect()) as $expense)
+
 
                     <tr>
 
-                        <!-- PRODUCT -->
+
+                        <!-- =================================================
+                             DATE
+                        ================================================== -->
 
                         <td>
 
-                            <div class="products-item-cell">
+                            @if ($expense->expense_date)
 
-                                <div class="products-item-image">
+                                <span class="expense-date">
 
-                                    @if ($product->image)
+                                    {{ $expense->expense_date->format('M d, Y') }}
 
-                                        <img
-                                            src="{{ asset('storage/' . $product->image) }}"
-                                            alt="{{ $product->name }}"
-                                        >
-
-                                    @else
-
-                                        <span class="products-fallback-icon">
-                                            🍔
-                                        </span>
-
-                                    @endif
-
-                                </div>
-
-
-                                <div class="products-item-info">
-
-                                    <div class="products-name">
-                                        {{ $product->name }}
-                                    </div>
-
-
-                                    @if ($product->description)
-
-                                        <div class="products-description">
-                                            {{ $product->description }}
-                                        </div>
-
-                                    @endif
-
-                                </div>
-
-                            </div>
-
-                        </td>
-
-
-                        <!-- SKU -->
-
-                        <td>
-
-                            <span class="products-sku">
-                                {{ $product->sku }}
-                            </span>
-
-                        </td>
-
-
-                        <!-- CATEGORY -->
-
-                        <td>
-
-                            @if ($product->category)
-
-                                <span class="products-category">
-                                    {{ $product->category->name }}
                                 </span>
 
                             @else
 
-                                <span class="products-muted">
+                                <span class="inventory-muted">
                                     —
                                 </span>
 
@@ -422,31 +409,24 @@
                         </td>
 
 
-                        <!-- SELLING PRICE -->
+                        <!-- =================================================
+                             CATEGORY
+                        ================================================== -->
 
                         <td>
 
-                            <span class="products-price">
-                                ₱{{ number_format((float) $product->selling_price, 2) }}
-                            </span>
+                            @if ($expense->category)
 
-                        </td>
+                                <span class="inventory-category">
 
+                                    {{ $expense->category }}
 
-                        <!-- STATUS -->
-
-                        <td>
-
-                            @if ($product->is_active)
-
-                                <span class="products-status products-status-active">
-                                    ACTIVE
                                 </span>
 
                             @else
 
-                                <span class="products-status products-status-inactive">
-                                    INACTIVE
+                                <span class="inventory-muted">
+                                    —
                                 </span>
 
                             @endif
@@ -454,78 +434,186 @@
                         </td>
 
 
-                        <!-- ACTIONS -->
+                        <!-- =================================================
+                             DESCRIPTION
+                        ================================================== -->
 
-                        @if ($user->role === 'CEO/Admin')
+                        <td>
 
-                            <td>
+                            @if ($expense->description)
 
-                                <div class="products-table-actions">
+                                <div class="expense-description">
 
-                                    <a
-                                        href="{{ route('recipes.edit', $product) }}"
-                                        class="products-recipe-button"
-                                    >
-
-                                        <span>
-                                            ≡
-                                        </span>
-
-                                        Recipe
-
-                                    </a>
-
-
-                                    <a
-                                        href="{{ route('products.edit', $product) }}"
-                                        class="products-edit-button"
-                                    >
-
-                                        <span>
-                                            ✎
-                                        </span>
-
-                                        Edit
-
-                                    </a>
+                                    {{ $expense->description }}
 
                                 </div>
 
-                            </td>
+                            @else
 
-                        @endif
+                                <span class="inventory-muted">
+                                    —
+                                </span>
+
+                            @endif
+
+                        </td>
+
+
+                        <!-- =================================================
+                             AMOUNT
+                        ================================================== -->
+
+                        <td>
+
+                            <span class="inventory-price">
+
+                                ₱{{ number_format((float) ($expense->amount ?? 0), 2) }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- =================================================
+                             RECORDED BY
+                        ================================================== -->
+
+                        <td>
+
+                            @if ($expense->user)
+
+                                <span class="expense-recorder">
+
+                                    {{ $expense->user->name
+                                        ?? $expense->user->full_name
+                                        ?? '—' }}
+
+                                </span>
+
+                            @else
+
+                                <span class="inventory-muted">
+                                    —
+                                </span>
+
+                            @endif
+
+                        </td>
+
+
+                        <!-- =================================================
+                             ACTIONS
+                        ================================================== -->
+
+                        <td>
+
+                            <div class="inventory-table-actions">
+
+
+                                <!-- VIEW -->
+
+                                <a
+                                    href="{{ route('expenses.show', $expense) }}"
+                                    class="expense-view-button"
+                                >
+
+                                    <span>
+                                        ◉
+                                    </span>
+
+                                    View
+
+                                </a>
+
+
+                                <!-- EDIT -->
+
+                                <a
+                                    href="{{ route('expenses.edit', $expense) }}"
+                                    class="inventory-edit-button"
+                                >
+
+                                    <span>
+                                        ✎
+                                    </span>
+
+                                    Edit
+
+                                </a>
+
+
+                                <!-- DELETE -->
+
+                                <form
+                                    method="POST"
+                                    action="{{ route('expenses.destroy', $expense) }}"
+                                    onsubmit="return confirm('Are you sure you want to delete this expense?');"
+                                    class="expense-delete-form"
+                                >
+
+                                    @csrf
+
+                                    @method('DELETE')
+
+                                    <button
+                                        type="submit"
+                                        class="expense-delete-button"
+                                    >
+
+                                        <span>
+                                            ×
+                                        </span>
+
+                                        Delete
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </td>
 
                     </tr>
 
 
                 @empty
 
+
+                    <!-- =================================================
+                         EMPTY STATE
+                    ================================================== -->
+
                     <tr>
 
                         <td
-                            colspan="{{ $user->role === 'CEO/Admin' ? 6 : 5 }}"
-                            class="products-empty-state"
+                            colspan="6"
+                            class="inventory-empty-state"
                         >
 
-                            <div class="products-empty-icon">
-                                ▦
+                            <div class="inventory-empty-icon">
+                                ₱
                             </div>
 
 
-                            <div class="products-empty-title">
-                                No product records found
+                            <div class="inventory-empty-title">
+                                No expense records found
                             </div>
 
 
-                            <div class="products-empty-description">
+                            <div class="inventory-empty-description">
 
-                                @if ($search || $status)
+                                @if (
+                                    request('search') ||
+                                    request('category') ||
+                                    request('month')
+                                )
 
                                     Try changing your search or filter.
 
                                 @else
 
-                                    Your product records will appear here.
+                                    Your expense records will appear here.
 
                                 @endif
 
@@ -534,6 +622,7 @@
                         </td>
 
                     </tr>
+
 
                 @endforelse
 
@@ -548,32 +637,11 @@
          PAGINATION
     ====================================================== -->
 
-    @if ($products->hasPages())
+    @if(isset($expenses) && method_exists($expenses, 'links') && $expenses->hasPages())
 
-        <div class="products-pagination-wrapper">
+        <div class="inventory-pagination-wrapper">
 
-            <div class="products-pagination-inner">
-
-                <div class="products-pagination-info">
-
-                    Showing
-                    <strong>{{ $products->firstItem() }}</strong>
-                    to
-                    <strong>{{ $products->lastItem() }}</strong>
-                    of
-                    <strong>{{ $products->total() }}</strong>
-                    records
-
-                </div>
-
-
-                <div class="products-pagination-links">
-
-                    {{ $products->links() }}
-
-                </div>
-
-            </div>
+            {{ $expenses->links() }}
 
         </div>
 
@@ -585,15 +653,17 @@
 
 @endsection
 
+
 @push('styles')
 
 <style>
 
 /* =========================================================
-   PRODUCTS PAGE
+   EXPENSE PAGE
+   USES INVENTORY LAYOUT
 ========================================================= */
 
-.products-page {
+.inventory-page {
     width: 100%;
 }
 
@@ -602,7 +672,7 @@
    PAGE TITLE
 ========================================================= */
 
-.products-page .page-title h1 {
+.inventory-page .page-title h1 {
 
     font-size:
         clamp(1.6rem, 2vw, 1.9rem);
@@ -615,9 +685,10 @@
 
 /* =========================================================
    SUMMARY CARDS
+   EXACT INVENTORY FORMAT
 ========================================================= */
 
-.products-stats {
+.inventory-stats {
 
     display: grid;
 
@@ -630,7 +701,7 @@
 }
 
 
-.products-stat {
+.inventory-stat {
 
     min-height: 125px;
 
@@ -668,7 +739,7 @@
    LEFT ACCENT
 ========================================================= */
 
-.products-stat::before {
+.inventory-stat::before {
 
     content: "";
 
@@ -693,7 +764,7 @@
    LEFT SIDE
 ========================================================= */
 
-.products-stat-left {
+.inventory-stat-left {
 
     min-width: 0;
 
@@ -716,10 +787,10 @@
 
 
 /* =========================================================
-   HEADER LABEL
+   LABEL
 ========================================================= */
 
-.products-stat-label {
+.inventory-stat-label {
 
     color: var(--muted);
 
@@ -736,10 +807,10 @@
 
 
 /* =========================================================
-   SUBTEXT
+   NOTE
 ========================================================= */
 
-.products-stat-note {
+.inventory-stat-note {
 
     margin-top: 58px;
 
@@ -757,7 +828,7 @@
    RIGHT SIDE
 ========================================================= */
 
-.products-stat-right {
+.inventory-stat-right {
 
     min-width: 82px;
 
@@ -779,7 +850,7 @@
    ICON
 ========================================================= */
 
-.products-stat-icon {
+.inventory-stat-icon {
 
     width: 34px;
 
@@ -814,7 +885,7 @@
    VALUE
 ========================================================= */
 
-.products-stat-value {
+.inventory-stat-value {
 
     margin-top: 13px;
 
@@ -834,10 +905,10 @@
 
 
 /* =========================================================
-   MONEY VALUE
+   MONEY
 ========================================================= */
 
-.products-money {
+.inventory-money {
 
     font-size:
         clamp(1rem, 1.3vw, 1.25rem);
@@ -847,10 +918,10 @@
 
 
 /* =========================================================
-   PRODUCTS PANEL
+   PANEL
 ========================================================= */
 
-.products-panel {
+.inventory-panel {
 
     background: white;
 
@@ -871,7 +942,7 @@
    PANEL HEADER
 ========================================================= */
 
-.products-panel-header {
+.inventory-panel-header {
 
     min-height: 65px;
 
@@ -892,7 +963,7 @@
 }
 
 
-.products-panel-title {
+.inventory-panel-title {
 
     color: var(--dark);
 
@@ -904,7 +975,7 @@
 }
 
 
-.products-panel-subtitle {
+.inventory-panel-subtitle {
 
     margin-top: 3px;
 
@@ -917,10 +988,10 @@
 
 
 /* =========================================================
-   ADD PRODUCT
+   ADD BUTTON
 ========================================================= */
 
-.products-add-button {
+.inventory-add-button {
 
     display: inline-flex;
 
@@ -965,7 +1036,7 @@
 }
 
 
-.products-add-button:hover {
+.inventory-add-button:hover {
 
     color: white;
 
@@ -982,7 +1053,7 @@
 }
 
 
-.products-add-button span {
+.inventory-add-button span {
 
     font-size: 0.8125rem;
 
@@ -994,7 +1065,7 @@
    FILTERS
 ========================================================= */
 
-.products-filters {
+.inventory-filters {
 
     display: flex;
 
@@ -1013,7 +1084,7 @@
 }
 
 
-.products-search-wrapper {
+.inventory-search-wrapper {
 
     flex: 1;
 
@@ -1023,7 +1094,7 @@
 }
 
 
-.products-search-wrapper input {
+.inventory-search-wrapper input {
 
     width: 100%;
 
@@ -1056,7 +1127,7 @@
 }
 
 
-.products-search-wrapper input:focus {
+.inventory-search-wrapper input:focus {
 
     border-color: #d5a77d;
 
@@ -1066,13 +1137,13 @@
 }
 
 
-.products-search-wrapper input::placeholder {
+.inventory-search-wrapper input::placeholder {
 
     color: #aaa19a;
 }
 
 
-.products-search-icon {
+.inventory-search-icon {
 
     position: absolute;
 
@@ -1091,7 +1162,11 @@
 }
 
 
-.products-filters select {
+/* =========================================================
+   FILTER SELECT
+========================================================= */
+
+.inventory-filters select {
 
     height: 35px;
 
@@ -1121,11 +1196,11 @@
 
 
 /* =========================================================
-   FILTER BUTTON
+   FILTER / CLEAR BUTTON
 ========================================================= */
 
-.products-filter-button,
-.products-clear-button {
+.inventory-filter-button,
+.inventory-clear-button {
 
     height: 35px;
 
@@ -1155,7 +1230,7 @@
 }
 
 
-.products-filter-button {
+.inventory-filter-button {
 
     border: none;
 
@@ -1168,13 +1243,13 @@
 }
 
 
-.products-filter-button:hover {
+.inventory-filter-button:hover {
 
     background: var(--dark-soft);
 }
 
 
-.products-clear-button {
+.inventory-clear-button {
 
     border:
         1px solid var(--border);
@@ -1189,7 +1264,7 @@
 }
 
 
-.products-clear-button:hover {
+.inventory-clear-button:hover {
 
     background: #faf7f3;
 
@@ -1198,10 +1273,10 @@
 
 
 /* =========================================================
-   TABLE
+   TABLE WRAPPER
 ========================================================= */
 
-.products-table-wrapper {
+.inventory-table-wrapper {
 
     width: 100%;
 
@@ -1209,17 +1284,21 @@
 }
 
 
-.products-table {
+/* =========================================================
+   TABLE
+========================================================= */
+
+.inventory-table {
 
     width: 100%;
 
-    min-width: 900px;
+    min-width: 1000px;
 
     border-collapse: collapse;
 }
 
 
-.products-table th {
+.inventory-table th {
 
     padding:
         10px
@@ -1248,7 +1327,7 @@
 }
 
 
-.products-table td {
+.inventory-table td {
 
     padding:
         11px
@@ -1267,134 +1346,77 @@
 }
 
 
-.products-table tbody tr {
+.inventory-table tbody tr {
 
     background: white;
 }
 
 
-.products-table tbody tr:hover {
+.inventory-table tbody tr:hover {
 
     background: #fdfaf7;
 }
 
 
 /* =========================================================
-   PRODUCT ITEM
+   DATE
 ========================================================= */
 
-.products-item-cell {
+.expense-date {
 
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-}
-
-
-.products-item-image {
-
-    width: 38px;
-
-    height: 38px;
-
-    border-radius: 50%;
-
-    overflow: hidden;
-
-    flex-shrink: 0;
-
-    background: #f8f1e9;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    border:
-        1px solid #f0e6db;
-}
-
-
-.products-item-image img {
-
-    width: 100%;
-
-    height: 100%;
-
-    object-fit: cover;
-}
-
-
-.products-fallback-icon {
-
-    font-size: 1.05rem;
-
-    line-height: 1;
-}
-
-
-.products-item-info {
-
-    min-width: 0;
-}
-
-
-.products-name {
-
-    color: var(--dark);
+    color: #625951;
 
     font-size: 0.75rem;
 
     line-height: 1.4;
 
-    font-weight: 700;
-}
-
-
-.products-description {
-
-    max-width: 210px;
-
-    margin-top: 2px;
-
-    color: var(--muted);
-
-    font-size: 0.625rem;
-
-    line-height: 1.35;
+    font-weight: 600;
 
     white-space: nowrap;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
 }
 
 
 /* =========================================================
-   SKU
+   DESCRIPTION
 ========================================================= */
 
-.products-sku {
+.expense-description {
 
-    display: inline-block;
+    max-width: 290px;
 
-    padding:
-        3px
-        5px;
+    overflow: hidden;
 
-    border-radius: 5px;
+    color: #625951;
 
-    background: #f5f0eb;
+    text-overflow: ellipsis;
 
-    color: var(--brown);
+    white-space: nowrap;
+}
 
-    font-family: monospace;
 
-    font-size: 0.625rem;
+/* =========================================================
+   RECORDED BY
+========================================================= */
+
+.expense-recorder {
+
+    color: #766b63;
+
+    font-size: 0.6875rem;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   MUTED
+========================================================= */
+
+.inventory-muted {
+
+    color: #a39b95;
+
+    font-size: 0.75rem;
 }
 
 
@@ -1402,7 +1424,7 @@
    CATEGORY
 ========================================================= */
 
-.products-category {
+.inventory-category {
 
     display: inline-flex;
 
@@ -1423,14 +1445,8 @@
     line-height: 1.2;
 
     font-weight: 600;
-}
 
-
-.products-muted {
-
-    color: #a39b95;
-
-    font-size: 0.75rem;
+    white-space: nowrap;
 }
 
 
@@ -1438,7 +1454,7 @@
    PRICE
 ========================================================= */
 
-.products-price {
+.inventory-price {
 
     color: var(--dark);
 
@@ -1451,66 +1467,12 @@
 
 
 /* =========================================================
-   STATUS
+   ACTION HEADER
 ========================================================= */
 
-.products-status {
+.inventory-actions-header {
 
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 4px;
-
-    padding:
-        4px
-        7px;
-
-    border-radius: 7px;
-
-    font-size: 0.625rem;
-
-    line-height: 1.2;
-
-    font-weight: 800;
-
-    white-space: nowrap;
-
-    letter-spacing: 0.015rem;
-}
-
-
-.products-status::before {
-
-    content: "";
-
-    width: 5px;
-
-    height: 5px;
-
-    flex-shrink: 0;
-
-    border-radius: 50%;
-
-    background: currentColor;
-}
-
-
-.products-status-active {
-
-    color: var(--green);
-
-    background: var(--green-light);
-}
-
-
-.products-status-inactive {
-
-    color: var(--muted);
-
-    background: #f1eeeb;
+    text-align: center !important;
 }
 
 
@@ -1518,13 +1480,7 @@
    ACTIONS
 ========================================================= */
 
-.products-actions-header {
-
-    text-align: center !important;
-}
-
-
-.products-table-actions {
+.inventory-table-actions {
 
     display: flex;
 
@@ -1538,11 +1494,19 @@
 }
 
 
+.inventory-table-actions form {
+
+    margin: 0;
+
+    padding: 0;
+}
+
+
 /* =========================================================
-   RECIPE BUTTON
+   VIEW BUTTON
 ========================================================= */
 
-.products-recipe-button {
+.expense-view-button {
 
     height: 27px;
 
@@ -1559,13 +1523,13 @@
         7px;
 
     border:
-        1px solid #d7e5dc;
+        1px solid #d9d0c8;
 
     border-radius: 7px;
 
-    background: #f6fbf8;
+    background: white;
 
-    color: var(--green);
+    color: #75685d;
 
     text-decoration: none;
 
@@ -1586,19 +1550,19 @@
 }
 
 
-.products-recipe-button:hover {
+.expense-view-button:hover {
 
-    background: #edf8f1;
+    background: #faf6f2;
 
-    border-color: #c4dccd;
+    border-color: #cdbba9;
 
-    color: #2e6c46;
+    color: #59483b;
 }
 
 
-.products-recipe-button span {
+.expense-view-button span {
 
-    font-size: 0.6875rem;
+    font-size: 0.625rem;
 
     line-height: 1;
 }
@@ -1608,7 +1572,7 @@
    EDIT BUTTON
 ========================================================= */
 
-.products-edit-button {
+.inventory-edit-button {
 
     height: 27px;
 
@@ -1652,7 +1616,7 @@
 }
 
 
-.products-edit-button:hover {
+.inventory-edit-button:hover {
 
     background: #faf5ef;
 
@@ -1662,7 +1626,7 @@
 }
 
 
-.products-edit-button span {
+.inventory-edit-button span {
 
     font-size: 0.6875rem;
 
@@ -1671,10 +1635,75 @@
 
 
 /* =========================================================
-   EMPTY STATE
+   DELETE BUTTON
 ========================================================= */
 
-.products-empty-state {
+.expense-delete-button {
+
+    height: 27px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 3px;
+
+    padding:
+        0
+        7px;
+
+    border:
+        1px solid #e1cfcb;
+
+    border-radius: 7px;
+
+    background: white;
+
+    color: #a15d50;
+
+    font-family: inherit;
+
+    font-size: 0.625rem;
+
+    line-height: 1.2;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease;
+}
+
+
+.expense-delete-button:hover {
+
+    background: #fff7f5;
+
+    border-color: #dfbcb4;
+
+    color: #8d463b;
+}
+
+
+.expense-delete-button span {
+
+    font-size: 0.75rem;
+
+    line-height: 1;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   EXACT INVENTORY FORMAT
+========================================================= */
+
+.inventory-empty-state {
 
     padding:
         55px
@@ -1684,7 +1713,7 @@
 }
 
 
-.products-empty-icon {
+.inventory-empty-icon {
 
     width: 46px;
 
@@ -1711,7 +1740,7 @@
 }
 
 
-.products-empty-title {
+.inventory-empty-title {
 
     color: var(--dark);
 
@@ -1721,7 +1750,7 @@
 }
 
 
-.products-empty-description {
+.inventory-empty-description {
 
     margin-top: 4px;
 
@@ -1737,178 +1766,26 @@
    PAGINATION
 ========================================================= */
 
-.products-pagination-wrapper {
+.inventory-pagination-wrapper {
 
     padding:
-        12px
+        13px
         18px;
 
     border-top:
         1px solid var(--border);
-
-    background: white;
 }
 
 
-.products-pagination-inner {
+.inventory-pagination-wrapper nav {
 
     display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    gap: 15px;
-}
-
-
-.products-pagination-info {
-
-    color: var(--muted);
-
-    font-size: 0.6875rem;
-
-    line-height: 1.4;
-
-    white-space: nowrap;
-}
-
-
-.products-pagination-info strong {
-
-    color: var(--dark);
-
-    font-weight: 700;
-}
-
-
-.products-pagination-links {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: flex-end;
-}
-
-
-.products-pagination-links nav {
-
-    display: flex;
-
-    align-items: center;
 
     justify-content: center;
 }
 
 
-.products-pagination-links nav > div {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-}
-
-
-.products-pagination-links nav > div > span,
-.products-pagination-links nav > div > a {
-
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    min-width: 30px;
-
-    height: 30px;
-
-    margin-left: 4px;
-
-    padding:
-        0
-        8px;
-
-    border:
-        1px solid var(--border);
-
-    border-radius: 7px;
-
-    background: white;
-
-    color: var(--muted);
-
-    font-size: 0.6875rem;
-
-    line-height: 1;
-
-    font-weight: 700;
-
-    text-decoration: none;
-
-    transition:
-        background-color 0.18s ease,
-        border-color 0.18s ease,
-        color 0.18s ease;
-}
-
-
-.products-pagination-links nav > div > a:hover {
-
-    background: #faf5ef;
-
-    border-color: #d8c2ae;
-
-    color: var(--orange);
-}
-
-
-/* =========================================================
-   ACTIVE PAGE
-========================================================= */
-
-.products-pagination-links nav > div > span[aria-current="page"] {
-
-    border-color: var(--orange);
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--orange),
-            var(--orange-dark)
-        );
-
-    color: white;
-
-    box-shadow:
-        0 3px 8px
-        rgba(168, 95, 40, 0.12);
-}
-
-
-/* =========================================================
-   DISABLED BUTTONS
-========================================================= */
-
-.products-pagination-links nav > div > span[aria-disabled="true"] {
-
-    opacity: 0.45;
-
-    cursor: not-allowed;
-
-    background: #faf8f6;
-
-    color: #aaa19a;
-}
-
-
-/* =========================================================
-   PAGINATION SVG
-========================================================= */
-
-.products-pagination-links svg {
+.inventory-pagination-wrapper svg {
 
     width: 14px;
 
@@ -1922,7 +1799,7 @@
 
 @media (max-width: 1200px) {
 
-    .products-stats {
+    .inventory-stats {
 
         grid-template-columns:
             repeat(2, minmax(0, 1fr));
@@ -1933,25 +1810,25 @@
 
 @media (max-width: 700px) {
 
-    .products-stats {
+    .inventory-stats {
 
         grid-template-columns: 1fr;
     }
 
 
-    .products-stat {
+    .inventory-stat {
 
         min-height: 115px;
     }
 
 
-    .products-stat-left {
+    .inventory-stat-left {
 
         padding-top: 1px;
     }
 
 
-    .products-stat-right {
+    .inventory-stat-right {
 
         min-width: 72px;
 
@@ -1959,25 +1836,25 @@
     }
 
 
-    .products-stat-value {
+    .inventory-stat-value {
 
         font-size: 1.45rem;
     }
 
 
-    .products-money {
+    .inventory-money {
 
         font-size: 1.05rem;
     }
 
 
-    .products-stat-note {
+    .inventory-stat-note {
 
         margin-top: 55px;
     }
 
 
-    .products-panel-header {
+    .inventory-panel-header {
 
         align-items: flex-start;
 
@@ -1985,13 +1862,13 @@
     }
 
 
-    .products-add-button {
+    .inventory-add-button {
 
         width: 100%;
     }
 
 
-    .products-filters {
+    .inventory-filters {
 
         align-items: stretch;
 
@@ -1999,68 +1876,23 @@
     }
 
 
-    .products-search-wrapper {
+    .inventory-search-wrapper {
 
         width: 100%;
     }
 
 
-    .products-filters select,
-    .products-filter-button,
-    .products-clear-button {
+    .inventory-filters select,
+    .inventory-filter-button,
+    .inventory-clear-button {
 
         width: 100%;
     }
 
 
-    .products-table-actions {
+    .inventory-table-actions {
 
         justify-content: flex-start;
-    }
-
-
-    /* =====================================================
-       MOBILE PAGINATION
-    ===================================================== */
-
-    .products-pagination-inner {
-
-        align-items: center;
-
-        flex-direction: column;
-
-        justify-content: center;
-
-        gap: 9px;
-    }
-
-
-    .products-pagination-info {
-
-        text-align: center;
-    }
-
-
-    .products-pagination-links {
-
-        width: 100%;
-
-        justify-content: center;
-    }
-
-
-    .products-pagination-links nav > div > span,
-    .products-pagination-links nav > div > a {
-
-        min-width: 28px;
-
-        height: 28px;
-
-        padding:
-            0
-            6px;
-
-        font-size: 0.625rem;
     }
 
 }

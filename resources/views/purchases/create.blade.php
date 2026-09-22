@@ -3,17 +3,21 @@
 @section('title', 'BiteSync | Add Purchase')
 
 @php
-    $oldItems = old('items');
 
-    if ($oldItems === null || empty($oldItems)) {
-        $oldItems = [
-            [
-                'inventory_item_id' => '',
-                'quantity' => '',
-                'unit_cost' => '',
-            ],
-        ];
-    }
+$oldItems = old('items');
+
+if ($oldItems === null || empty($oldItems)) {
+
+    $oldItems = [
+        [
+            'inventory_item_id' => '',
+            'quantity' => '',
+            'unit_cost' => '',
+        ],
+    ];
+
+}
+
 @endphp
 
 @section('content')
@@ -37,7 +41,7 @@
             </h1>
 
             <p>
-                Create a new purchase order and add the inventory items you need.
+                Create one purchase and add all inventory items included in the supplier order.
             </p>
 
         </div>
@@ -48,17 +52,7 @@
                 ◷
             </span>
 
-            <div>
-
-                <small>
-                    Today
-                </small>
-
-                <strong>
-                    {{ now()->format('F d, Y') }}
-                </strong>
-
-            </div>
+            {{ now()->format('F d, Y') }}
 
         </div>
 
@@ -69,7 +63,7 @@
          BREADCRUMB
     ========================================================== --}}
 
-    <div class="breadcrumb">
+    <div class="purchase-breadcrumb">
 
         <a href="{{ route('purchases.index') }}">
             Purchases
@@ -92,7 +86,7 @@
 
     @if ($errors->any())
 
-        <div class="alert alert-danger">
+        <div class="form-alert form-alert-error">
 
             <div class="alert-icon">
                 !
@@ -100,11 +94,11 @@
 
             <div>
 
-                <strong>
-                    Please correct the following errors:
-                </strong>
+                <div class="alert-title">
+                    Please check the form.
+                </div>
 
-                <ul>
+                <ul class="alert-list">
 
                     @foreach ($errors->all() as $error)
 
@@ -149,31 +143,31 @@
 
             <div class="form-panel">
 
-                <div class="panel-header">
-
-                    <div class="panel-icon">
-                        🧾
-                    </div>
+                <div class="form-panel-header">
 
                     <div>
 
-                        <h2>
+                        <div class="form-panel-title">
                             Purchase Information
-                        </h2>
+                        </div>
 
-                        <p>
-                            Enter the basic details of this purchase.
-                        </p>
+                        <div class="form-panel-subtitle">
+                            Enter the supplier and purchase schedule.
+                        </div>
 
+                    </div>
+
+                    <div class="form-panel-icon">
+                        🧾
                     </div>
 
                 </div>
 
 
-                <div class="panel-body">
+                <div class="form-content">
 
 
-                    {{-- Supplier --}}
+                    {{-- SUPPLIER --}}
 
                     <div class="form-group">
 
@@ -181,7 +175,7 @@
 
                             Supplier
 
-                            <span class="required">
+                            <span>
                                 *
                             </span>
 
@@ -190,7 +184,6 @@
                         <select
                             name="supplier_id"
                             id="supplier_id"
-                            class="form-control @error('supplier_id') is-invalid @enderror"
                             required
                         >
 
@@ -211,14 +204,10 @@
 
                         </select>
 
-                        <span class="helper-text">
-                            Select the supplier for this purchase order.
-                        </span>
-
                     </div>
 
 
-                    {{-- Purchase Date --}}
+                    {{-- PURCHASE DATE --}}
 
                     <div class="form-group">
 
@@ -226,7 +215,7 @@
 
                             Purchase Date
 
-                            <span class="required">
+                            <span>
                                 *
                             </span>
 
@@ -236,19 +225,14 @@
                             type="date"
                             name="purchase_date"
                             id="purchase_date"
-                            class="form-control @error('purchase_date') is-invalid @enderror"
                             value="{{ old('purchase_date', now()->format('Y-m-d')) }}"
                             required
                         >
 
-                        <span class="helper-text">
-                            Date when the purchase order is created.
-                        </span>
-
                     </div>
 
 
-                    {{-- Expected Delivery --}}
+                    {{-- EXPECTED DELIVERY --}}
 
                     <div class="form-group">
 
@@ -260,13 +244,8 @@
                             type="date"
                             name="expected_date"
                             id="expected_date"
-                            class="form-control @error('expected_date') is-invalid @enderror"
                             value="{{ old('expected_date') }}"
                         >
-
-                        <span class="helper-text">
-                            Optional expected delivery date.
-                        </span>
 
                     </div>
 
@@ -281,31 +260,31 @@
 
             <div class="form-panel">
 
-                <div class="panel-header">
-
-                    <div class="panel-icon">
-                        ₱
-                    </div>
+                <div class="form-panel-header">
 
                     <div>
 
-                        <h2>
+                        <div class="form-panel-title">
                             Purchase Summary
-                        </h2>
+                        </div>
 
-                        <p>
+                        <div class="form-panel-subtitle">
                             Review the calculated purchase amount.
-                        </p>
+                        </div>
 
+                    </div>
+
+                    <div class="form-panel-icon">
+                        ₱
                     </div>
 
                 </div>
 
 
-                <div class="panel-body">
+                <div class="form-content">
 
 
-                    {{-- Subtotal --}}
+                    {{-- SUBTOTAL --}}
 
                     <div class="summary-row">
 
@@ -328,7 +307,7 @@
                     </div>
 
 
-                    {{-- Tax --}}
+                    {{-- TAX --}}
 
                     <div class="form-group tax-group">
 
@@ -336,7 +315,7 @@
                             Tax
                         </label>
 
-                        <div class="input-prefix">
+                        <div class="currency-input">
 
                             <span>
                                 ₱
@@ -346,7 +325,6 @@
                                 type="number"
                                 name="tax"
                                 id="tax"
-                                class="form-control @error('tax') is-invalid @enderror"
                                 value="{{ old('tax', 0) }}"
                                 min="0"
                                 step="0.01"
@@ -354,14 +332,10 @@
 
                         </div>
 
-                        <span class="helper-text">
-                            Enter the tax amount for this purchase.
-                        </span>
-
                     </div>
 
 
-                    {{-- Total --}}
+                    {{-- TOTAL --}}
 
                     <div class="summary-total">
 
@@ -384,19 +358,25 @@
                     </div>
 
 
-                    {{-- Draft Notice --}}
+                    {{-- DRAFT NOTE --}}
 
-                    <div class="draft-note">
+                    <div class="purchase-note">
 
-                        <span class="draft-note-icon">
+                        <div class="purchase-note-icon">
                             i
-                        </span>
+                        </div>
 
-                        <span>
-                            New purchases are saved as
-                            <strong>Draft</strong>
-                            until submitted for approval.
-                        </span>
+                        <div>
+
+                            <strong>
+                                New purchases are saved as Draft.
+                            </strong>
+
+                            <p>
+                                Purchases remain in Draft status until submitted for approval.
+                            </p>
+
+                        </div>
 
                     </div>
 
@@ -411,34 +391,25 @@
              PURCHASE ITEMS
         ====================================================== --}}
 
-        <div class="form-panel full-panel">
+        <div class="form-panel additional-panel purchase-items-panel">
 
-            <div class="panel-header panel-header-with-action">
+            <div class="form-panel-header purchase-items-header">
 
-                <div class="panel-header-left">
+                <div>
 
-                    <div class="panel-icon">
-                        📦
+                    <div class="form-panel-title">
+                        Purchase Items
                     </div>
 
-                    <div>
-
-                        <h2>
-                            Purchase Items
-                        </h2>
-
-                        <p>
-                            Add the inventory items included in this purchase.
-                        </p>
-
+                    <div class="form-panel-subtitle">
+                        Add every inventory item included in this purchase.
                     </div>
 
                 </div>
 
-
                 <button
                     type="button"
-                    class="btn btn-secondary"
+                    class="add-item-button"
                     id="addItemBtn"
                 >
 
@@ -453,7 +424,7 @@
             </div>
 
 
-            <div class="panel-body items-panel-body">
+            <div class="form-content items-content">
 
                 <div class="table-wrapper">
 
@@ -495,13 +466,13 @@
                                 <tr class="item-row">
 
 
-                                    {{-- Inventory Item --}}
+                                    {{-- INVENTORY ITEM --}}
 
                                     <td>
 
                                         <select
                                             name="items[{{ $index }}][inventory_item_id]"
-                                            class="form-control item-select"
+                                            class="item-select"
                                             required
                                         >
 
@@ -519,7 +490,9 @@
                                                     {{ $inventoryItem->name }}
 
                                                     @if ($inventoryItem->unit)
+
                                                         ({{ $inventoryItem->unit->abbreviation }})
+
                                                     @endif
 
                                                 </option>
@@ -531,14 +504,14 @@
                                     </td>
 
 
-                                    {{-- Quantity --}}
+                                    {{-- QUANTITY --}}
 
                                     <td>
 
                                         <input
                                             type="number"
                                             name="items[{{ $index }}][quantity]"
-                                            class="form-control quantity-input"
+                                            class="quantity-input"
                                             value="{{ $oldItem['quantity'] ?? '' }}"
                                             min="0.01"
                                             step="0.01"
@@ -549,11 +522,11 @@
                                     </td>
 
 
-                                    {{-- Unit Cost --}}
+                                    {{-- UNIT COST --}}
 
                                     <td>
 
-                                        <div class="input-prefix">
+                                        <div class="currency-input">
 
                                             <span>
                                                 ₱
@@ -562,7 +535,7 @@
                                             <input
                                                 type="number"
                                                 name="items[{{ $index }}][unit_cost]"
-                                                class="form-control unit-cost-input"
+                                                class="unit-cost-input"
                                                 value="{{ $oldItem['unit_cost'] ?? '' }}"
                                                 min="0"
                                                 step="0.01"
@@ -575,7 +548,7 @@
                                     </td>
 
 
-                                    {{-- Subtotal --}}
+                                    {{-- SUBTOTAL --}}
 
                                     <td>
 
@@ -586,7 +559,7 @@
                                     </td>
 
 
-                                    {{-- Remove --}}
+                                    {{-- ACTION --}}
 
                                     <td class="action-cell">
 
@@ -613,13 +586,21 @@
 
                 <div class="items-helper">
 
-                    <span class="helper-icon">
+                    <div class="items-helper-icon">
                         i
-                    </span>
+                    </div>
 
-                    <span>
-                        Add all inventory items included in this purchase. The subtotal is calculated automatically.
-                    </span>
+                    <div>
+
+                        <strong>
+                            One purchase can contain multiple items
+                        </strong>
+
+                        <p>
+                            Add all items from the supplier order here. Each row represents a different inventory item, quantity, and unit cost.
+                        </p>
+
+                    </div>
 
                 </div>
 
@@ -629,7 +610,7 @@
 
 
         {{-- =====================================================
-             HIDDEN TEMPLATE FOR NEW ITEMS
+             HIDDEN TEMPLATE
         ====================================================== --}}
 
         <template id="itemRowTemplate">
@@ -639,7 +620,7 @@
                 <td>
 
                     <select
-                        class="form-control item-select"
+                        class="item-select"
                         required
                     >
 
@@ -654,7 +635,9 @@
                                 {{ $inventoryItem->name }}
 
                                 @if ($inventoryItem->unit)
+
                                     ({{ $inventoryItem->unit->abbreviation }})
+
                                 @endif
 
                             </option>
@@ -670,7 +653,7 @@
 
                     <input
                         type="number"
-                        class="form-control quantity-input"
+                        class="quantity-input"
                         min="0.01"
                         step="0.01"
                         placeholder="0"
@@ -682,7 +665,7 @@
 
                 <td>
 
-                    <div class="input-prefix">
+                    <div class="currency-input">
 
                         <span>
                             ₱
@@ -690,7 +673,7 @@
 
                         <input
                             type="number"
-                            class="form-control unit-cost-input"
+                            class="unit-cost-input"
                             min="0"
                             step="0.01"
                             placeholder="0.00"
@@ -732,30 +715,30 @@
              ADDITIONAL INFORMATION
         ====================================================== --}}
 
-        <div class="form-panel full-panel">
+        <div class="form-panel additional-panel">
 
-            <div class="panel-header">
-
-                <div class="panel-icon">
-                    📝
-                </div>
+            <div class="form-panel-header">
 
                 <div>
 
-                    <h2>
+                    <div class="form-panel-title">
                         Additional Information
-                    </h2>
+                    </div>
 
-                    <p>
-                        Add notes or special instructions for this purchase.
-                    </p>
+                    <div class="form-panel-subtitle">
+                        Add optional notes about this purchase.
+                    </div>
 
+                </div>
+
+                <div class="form-panel-icon">
+                    ≡
                 </div>
 
             </div>
 
 
-            <div class="panel-body">
+            <div class="form-content">
 
                 <div class="form-group">
 
@@ -766,14 +749,10 @@
                     <textarea
                         name="notes"
                         id="notes"
-                        class="form-control textarea-control @error('notes') is-invalid @enderror"
-                        rows="5"
-                        placeholder="Enter any additional notes or instructions..."
+                        rows="4"
+                        maxlength="2000"
+                        placeholder="Enter additional notes or instructions..."
                     >{{ old('notes') }}</textarea>
-
-                    <span class="helper-text">
-                        Optional. You can include delivery instructions, special requests, or other purchase details.
-                    </span>
 
                 </div>
 
@@ -783,25 +762,25 @@
 
 
         {{-- =====================================================
-             FORM ACTIONS
+             ACTION BUTTONS
         ====================================================== --}}
 
         <div class="form-actions">
 
             <a
                 href="{{ route('purchases.index') }}"
-                class="btn btn-cancel"
+                class="cancel-button"
             >
                 Cancel
             </a>
 
             <button
                 type="submit"
-                class="btn btn-primary"
+                class="save-button"
             >
 
                 <span>
-                    ✓
+                    +
                 </span>
 
                 Create Purchase
@@ -821,349 +800,406 @@
 
 <style>
 
-/* ============================================================
+/* ================================================================
    PAGE
-============================================================ */
+================================================================ */
 
 .purchase-create-page {
     width: 100%;
-    max-width: 1500px;
+    max-width: 1120px;
     margin: 0 auto;
+    padding-bottom: 30px;
 }
 
 
-/* ============================================================
-   TOPBAR
-============================================================ */
+/* ================================================================
+   TOP BAR
+================================================================ */
 
 .purchase-create-page .topbar {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 30px;
-    margin-bottom: 18px;
+    gap: 25px;
+    margin-bottom: 14px;
 }
 
 .purchase-create-page .page-title small {
     display: block;
     margin-bottom: 5px;
-    color: var(--orange);
-    font-size: 11px;
+    color: #a9825b;
+    font-size: 10px;
     font-weight: 700;
-    letter-spacing: 1.1px;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
 }
 
 .purchase-create-page .page-title h1 {
     margin: 0;
-    color: #2b1f17;
+    color: var(--dark);
     font-size: 29px;
-    line-height: 1.15;
     font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.045rem;
 }
 
 .purchase-create-page .page-title p {
-    margin: 7px 0 0;
-    color: #84776d;
-    font-size: 13px;
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 12px;
     line-height: 1.5;
+    font-weight: 400;
 }
 
+
+/* ================================================================
+   DATE
+================================================================ */
+
 .purchase-create-page .date-box {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 11px;
-    min-width: 165px;
-    padding: 11px 14px;
+    gap: 9px;
+    min-width: 145px;
+    padding: 9px 12px;
     border: 1px solid var(--border);
-    border-radius: 12px;
-    background: #ffffff;
-    box-shadow: 0 4px 15px rgba(43, 31, 23, .035);
+    border-radius: 10px;
+    background: white;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow:
+        0 3px 12px
+        rgba(43, 31, 23, .025);
 }
 
 .purchase-create-page .date-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 9px;
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    border-radius: 8px;
     background: var(--orange-light);
     color: var(--orange);
-    font-size: 20px;
-}
-
-.purchase-create-page .date-box small {
-    display: block;
-    margin-bottom: 2px;
-    color: #978a80;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: .7px;
-}
-
-.purchase-create-page .date-box strong {
-    color: #3a2c23;
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 17px;
 }
 
 
-/* ============================================================
+/* ================================================================
    BREADCRUMB
-============================================================ */
+================================================================ */
 
-.purchase-create-page .breadcrumb {
+.purchase-breadcrumb {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 20px;
-    color: #95887e;
-    font-size: 12px;
+    gap: 7px;
+    margin-bottom: 17px;
+    color: #96877b;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.3;
 }
 
-.purchase-create-page .breadcrumb a {
-    color: var(--orange);
+.purchase-breadcrumb a {
+    color: #a16e42;
+    font-weight: 600;
     text-decoration: none;
+    transition: color 0.18s ease;
+}
+
+.purchase-breadcrumb a:hover {
+    color: #7d4e29;
+}
+
+.purchase-breadcrumb span {
+    color: #c2b5aa;
+}
+
+.purchase-breadcrumb strong {
+    color: #6f6259;
     font-weight: 600;
 }
 
-.purchase-create-page .breadcrumb strong {
-    color: #5f5148;
-    font-weight: 600;
-}
 
-
-/* ============================================================
+/* ================================================================
    ALERT
-============================================================ */
+================================================================ */
 
-.purchase-create-page .alert {
+.form-alert {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 20px;
-    padding: 13px 15px;
-    border-radius: 11px;
-    font-size: 12px;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding: 11px 13px;
+    border-radius: 10px;
+    font-size: 11px;
+    line-height: 1.45;
+    font-weight: 400;
 }
 
-.purchase-create-page .alert-danger {
-    border: 1px solid #efcaca;
-    background: #fff6f6;
-    color: #8f3636;
+.form-alert-error {
+    border: 1px solid #efd4cf;
+    background: #fff7f5;
+    color: #7d433b;
 }
 
-.purchase-create-page .alert-icon {
+.alert-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 0 0 auto;
-    width: 23px;
-    height: 23px;
-    border-radius: 50%;
-    background: #d9534f;
-    color: #ffffff;
-    font-size: 12px;
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    border-radius: 7px;
+    background: #f3d4cf;
+    color: #8a4339;
+    font-size: 11px;
     font-weight: 700;
 }
 
-.purchase-create-page .alert strong {
-    display: block;
-    margin-bottom: 5px;
+.alert-title {
+    margin-bottom: 4px;
+    font-size: 11px;
+    font-weight: 700;
 }
 
-.purchase-create-page .alert ul {
-    margin: 0;
-    padding-left: 17px;
+.alert-list {
+    margin: 4px 0 0;
+    padding-left: 16px;
+    line-height: 1.45;
+}
+
+.alert-list li {
+    margin-bottom: 2px;
+    font-size: 11px;
+    font-weight: 400;
 }
 
 
-/* ============================================================
-   GRID
-============================================================ */
+/* ================================================================
+   SIDE-BY-SIDE PANELS
+================================================================ */
 
 .purchase-create-page .information-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
-    margin-bottom: 18px;
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+    gap: 17px;
+    align-items: stretch;
+    margin-bottom: 17px;
 }
 
 
-/* ============================================================
-   PANELS
-============================================================ */
+/* ================================================================
+   FORM PANEL
+================================================================ */
 
 .purchase-create-page .form-panel {
     overflow: hidden;
     border: 1px solid var(--border);
-    border-radius: 17px;
-    background: #ffffff;
-    box-shadow: 0 5px 18px rgba(43, 31, 23, .035);
+    border-radius: 15px;
+    background: white;
+    box-shadow:
+        0 4px 16px
+        rgba(43, 31, 23, 0.035);
 }
 
-.purchase-create-page .full-panel {
-    margin-bottom: 18px;
+.purchase-create-page .additional-panel {
+    margin-bottom: 17px;
 }
 
-.purchase-create-page .panel-header {
+
+/* ================================================================
+   PANEL HEADER
+================================================================ */
+
+.purchase-create-page .form-panel-header {
+    min-height: 65px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    min-height: 68px;
-    padding: 15px 18px;
-    border-bottom: 1px solid #eee7e1;
-}
-
-.purchase-create-page .panel-header-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.purchase-create-page .panel-header-with-action {
     justify-content: space-between;
+    gap: 15px;
+    padding: 14px 19px;
+    border-bottom: 1px solid var(--border);
+    background: white;
 }
 
-.purchase-create-page .panel-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 auto;
-    width: 32px;
-    height: 32px;
-    border-radius: 9px;
-    background: var(--orange-light);
-    color: var(--orange);
-    font-size: 15px;
-}
-
-.purchase-create-page .panel-header h2 {
-    margin: 0;
-    color: #35281f;
-    font-size: 19px;
-    line-height: 1.2;
+.purchase-create-page .form-panel-title {
+    color: var(--dark);
+    font-size: 17px;
+    line-height: 1.3;
     font-weight: 700;
 }
 
-.purchase-create-page .panel-header p {
-    margin: 3px 0 0;
-    color: #93877d;
-    font-size: 12px;
+.purchase-create-page .form-panel-subtitle {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 11px;
     line-height: 1.4;
+    font-weight: 400;
 }
 
-.purchase-create-page .panel-body {
+.purchase-create-page .form-panel-icon {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: var(--orange-light);
+    color: var(--orange);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+/* ================================================================
+   CONTENT
+================================================================ */
+
+.purchase-create-page .form-content {
     padding: 18px;
 }
 
 
-/* ============================================================
-   FORM CONTROLS
-============================================================ */
+/* ================================================================
+   FORM GROUP
+================================================================ */
 
 .purchase-create-page .form-group {
-    margin-bottom: 16px;
+    min-width: 0;
+    margin-bottom: 17px;
 }
 
 .purchase-create-page .form-group:last-child {
     margin-bottom: 0;
 }
 
-.purchase-create-page label {
+.purchase-create-page .form-group label {
     display: block;
-    margin-bottom: 7px;
-    color: #4a3b31;
-    font-size: 12px;
-    font-weight: 700;
+    margin-bottom: 6px;
+    color: #4c3c31;
+    font-size: 11px;
+    line-height: 1.35;
+    font-weight: 600;
 }
 
-.purchase-create-page .required {
-    color: #d75f4f;
+.purchase-create-page .form-group label span {
+    color: #b65f45;
+    font-weight: 600;
 }
 
-.purchase-create-page .form-control {
-    display: block;
+
+/* ================================================================
+   INPUTS
+================================================================ */
+
+.purchase-create-page .form-group input,
+.purchase-create-page .form-group select,
+.purchase-create-page .form-group textarea,
+.purchase-create-page .items-table input,
+.purchase-create-page .items-table select {
     width: 100%;
-    height: 41px;
-    padding: 0 11px;
+    box-sizing: border-box;
     border: 1px solid #ded4cb;
-    border-radius: 9px;
-    outline: none;
-    background: #ffffff;
-    color: #3b2e26;
+    border-radius: 8px;
+    background: white;
+    color: var(--text);
     font-family: inherit;
-    font-size: 13px;
+    font-size: 12px;
+    line-height: 1.4;
+    font-weight: 400;
+    outline: none;
     transition:
-        border-color .18s ease,
-        box-shadow .18s ease;
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
 }
 
-.purchase-create-page select.form-control {
-    cursor: pointer;
+.purchase-create-page .form-group input,
+.purchase-create-page .form-group select {
+    height: 39px;
+    padding: 0 11px;
 }
 
-.purchase-create-page textarea.form-control {
-    height: auto;
-    min-height: 115px;
-    padding: 11px;
+.purchase-create-page .form-group textarea {
+    min-height: 100px;
+    padding: 10px 11px;
     resize: vertical;
     line-height: 1.5;
 }
 
-.purchase-create-page .form-control::placeholder {
-    color: #b0a59d;
+.purchase-create-page .form-group input::placeholder,
+.purchase-create-page .form-group textarea::placeholder,
+.purchase-create-page .items-table input::placeholder {
+    color: #b8aaa0;
+    font-weight: 400;
 }
 
-.purchase-create-page .form-control:focus {
+.purchase-create-page .form-group input:focus,
+.purchase-create-page .form-group select:focus,
+.purchase-create-page .form-group textarea:focus,
+.purchase-create-page .items-table input:focus,
+.purchase-create-page .items-table select:focus {
     border-color: #d2a47b;
-    box-shadow: 0 0 0 3px rgba(210, 164, 123, .12);
+    box-shadow:
+        0 0 0 3px
+        rgba(196, 122, 58, 0.075);
 }
 
-.purchase-create-page .form-control.is-invalid {
-    border-color: #d9534f;
-}
-
-.purchase-create-page .helper-text {
-    display: block;
-    margin-top: 6px;
-    color: #988b82;
-    font-size: 11px;
-    line-height: 1.45;
+.purchase-create-page .form-group select,
+.purchase-create-page .items-table select {
+    cursor: pointer;
 }
 
 
-/* ============================================================
+/* ================================================================
+   NUMBER INPUT
+================================================================ */
+
+.purchase-create-page input[type="number"] {
+    appearance: textfield;
+}
+
+.purchase-create-page input[type="number"]::-webkit-inner-spin-button,
+.purchase-create-page input[type="number"]::-webkit-outer-spin-button {
+    opacity: 0.6;
+}
+
+
+/* ================================================================
    CURRENCY INPUT
-============================================================ */
+================================================================ */
 
-.purchase-create-page .input-prefix {
+.purchase-create-page .currency-input {
     position: relative;
 }
 
-.purchase-create-page .input-prefix > span {
+.purchase-create-page .currency-input > span {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 50%;
+    left: 11px;
     z-index: 2;
-    display: flex;
-    align-items: center;
-    height: 41px;
-    padding-left: 11px;
-    color: #8a7b70;
-    font-size: 13px;
+    transform: translateY(-50%);
+    color: #8c684b;
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 600;
     pointer-events: none;
 }
 
-.purchase-create-page .input-prefix .form-control {
-    padding-left: 28px;
+.purchase-create-page .currency-input input {
+    padding-left: 27px;
 }
 
 
-/* ============================================================
+/* ================================================================
    SUMMARY
-============================================================ */
+================================================================ */
 
 .purchase-create-page .summary-row,
 .purchase-create-page .summary-total {
@@ -1174,153 +1210,145 @@
 }
 
 .purchase-create-page .summary-row {
-    padding-bottom: 15px;
+    padding-bottom: 14px;
     margin-bottom: 15px;
-    border-bottom: 1px solid #eee7e1;
+    border-bottom: 1px solid var(--border);
 }
 
 .purchase-create-page .summary-row span,
 .purchase-create-page .summary-total span {
     display: block;
-    color: #4b3c32;
-    font-size: 13px;
-    font-weight: 700;
+    color: #4c3c31;
+    font-size: 12px;
+    line-height: 1.35;
+    font-weight: 600;
 }
 
 .purchase-create-page .summary-row small,
 .purchase-create-page .summary-total small {
     display: block;
     margin-top: 3px;
-    color: #988b82;
-    font-size: 10px;
+    color: var(--muted);
+    font-size: 9px;
+    line-height: 1.35;
 }
 
 .purchase-create-page .summary-row strong {
-    color: #4d3a2e;
-    font-size: 17px;
+    color: #594536;
+    font-size: 16px;
+    line-height: 1;
+    font-weight: 700;
 }
 
 .purchase-create-page .tax-group {
     padding-bottom: 15px;
     margin-bottom: 15px;
-    border-bottom: 1px solid #eee7e1;
+    border-bottom: 1px solid var(--border);
 }
 
 .purchase-create-page .summary-total strong {
     color: var(--orange);
-    font-size: 22px;
+    font-size: 21px;
+    line-height: 1;
     font-weight: 800;
 }
 
-.purchase-create-page .draft-note {
+
+/* ================================================================
+   PURCHASE NOTE
+================================================================ */
+
+.purchase-create-page .purchase-note {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
-    margin-top: 18px;
-    padding: 10px 11px;
-    border: 1px solid #eee3d8;
-    border-radius: 9px;
-    background: #fcf9f5;
-    color: #88796e;
-    font-size: 11px;
-    line-height: 1.5;
+    gap: 9px;
+    margin-top: 15px;
+    padding: 10px;
+    border: 1px solid #e9dfd5;
+    border-radius: 8px;
+    background: #fbf8f4;
 }
 
-.purchase-create-page .draft-note strong {
-    color: #645044;
-}
-
-.purchase-create-page .draft-note-icon {
+.purchase-create-page .purchase-note-icon {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 0 0 auto;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: var(--orange-light);
-    color: var(--orange);
-    font-size: 10px;
+    border-radius: 7px;
+    background: #eadbc9;
+    color: #855b38;
+    font-size: 9px;
     font-weight: 700;
 }
 
+.purchase-create-page .purchase-note strong {
+    display: block;
+    margin-bottom: 3px;
+    color: #594536;
+    font-size: 10px;
+    line-height: 1.35;
+    font-weight: 700;
+}
 
-/* ============================================================
-   BUTTONS
-============================================================ */
+.purchase-create-page .purchase-note p {
+    margin: 0;
+    color: #95867b;
+    font-size: 9px;
+    line-height: 1.45;
+    font-weight: 400;
+}
 
-.purchase-create-page .btn {
+
+/* ================================================================
+   PURCHASE ITEMS HEADER
+================================================================ */
+
+.purchase-create-page .purchase-items-header {
+    align-items: center;
+}
+
+.purchase-create-page .add-item-button {
+    min-height: 37px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 7px;
-    min-height: 41px;
-    padding: 0 16px;
-    border: 0;
-    border-radius: 9px;
+    gap: 6px;
+    padding: 0 13px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    color: #76553c;
     font-family: inherit;
-    font-size: 12px;
+    font-size: 11px;
+    line-height: 1;
     font-weight: 700;
-    text-decoration: none;
     cursor: pointer;
     transition:
-        transform .18s ease,
-        box-shadow .18s ease,
-        background .18s ease;
+        background-color 0.18s ease,
+        border-color 0.18s ease,
+        transform 0.18s ease;
 }
 
-.purchase-create-page .btn:hover {
+.purchase-create-page .add-item-button:hover {
+    border-color: #d4c6ba;
+    background: #faf7f4;
     transform: translateY(-1px);
 }
 
-.purchase-create-page .btn-primary {
-    color: #ffffff;
-    background: linear-gradient(
-        135deg,
-        var(--orange),
-        #bd8957
-    );
-    box-shadow: 0 5px 12px rgba(180, 125, 75, .18);
-}
-
-.purchase-create-page .btn-primary:hover {
-    box-shadow: 0 7px 16px rgba(180, 125, 75, .24);
-}
-
-.purchase-create-page .btn-cancel {
-    border: 1px solid #ded4cb;
-    background: #ffffff;
-    color: #66584f;
-}
-
-.purchase-create-page .btn-cancel:hover {
-    background: #faf7f4;
-}
-
-.purchase-create-page .btn-secondary {
-    min-height: 36px;
-    padding: 0 13px;
-    border: 1px solid #e0d4ca;
-    background: #ffffff;
-    color: #76553c;
-}
-
-.purchase-create-page .btn-secondary:hover {
-    border-color: #d1b39a;
-    background: #fdf9f5;
-}
-
-.purchase-create-page .btn-secondary span {
-    font-size: 17px;
+.purchase-create-page .add-item-button span {
+    font-size: 15px;
     line-height: 1;
+    font-weight: 400;
 }
 
 
-/* ============================================================
+/* ================================================================
    ITEMS TABLE
-============================================================ */
+================================================================ */
 
-.purchase-create-page .items-panel-body {
+.purchase-create-page .items-content {
     padding-top: 16px;
 }
 
@@ -1336,19 +1364,20 @@
 }
 
 .purchase-create-page .items-table th {
-    padding: 10px;
+    padding: 9px 10px;
     border-bottom: 1px solid #e8e0d9;
     background: #fcfaf8;
     color: #796b61;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
-    letter-spacing: .4px;
+    letter-spacing: .055em;
+    line-height: 1.3;
     text-align: left;
     text-transform: uppercase;
 }
 
 .purchase-create-page .items-table td {
-    padding: 10px;
+    padding: 9px 10px;
     border-bottom: 1px solid #eee8e2;
     vertical-align: middle;
 }
@@ -1357,12 +1386,20 @@
     border-bottom: 0;
 }
 
-.purchase-create-page .items-table .form-control {
+.purchase-create-page .items-table input,
+.purchase-create-page .items-table select {
     height: 39px;
+    padding: 0 10px;
 }
 
-.purchase-create-page .items-table .input-prefix > span {
+.purchase-create-page .items-table .currency-input > span {
     height: 39px;
+    display: flex;
+    align-items: center;
+}
+
+.purchase-create-page .items-table .currency-input input {
+    padding-left: 27px;
 }
 
 .purchase-create-page .row-subtotal {
@@ -1371,10 +1408,11 @@
     align-items: center;
     padding: 0 10px;
     border: 1px solid #e8e0d9;
-    border-radius: 9px;
+    border-radius: 8px;
     background: #fcfaf8;
-    color: #4d3b30;
-    font-size: 13px;
+    color: #594536;
+    font-size: 12px;
+    line-height: 1;
     font-weight: 700;
     white-space: nowrap;
 }
@@ -1387,19 +1425,20 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border: 1px solid #ead7d3;
     border-radius: 8px;
     background: #fff8f7;
     color: #c45e55;
-    font-size: 20px;
+    font-family: inherit;
+    font-size: 18px;
     line-height: 1;
     cursor: pointer;
     transition:
-        background .18s ease,
-        border-color .18s ease,
-        transform .18s ease;
+        background-color 0.18s ease,
+        border-color 0.18s ease,
+        transform 0.18s ease;
 }
 
 .purchase-create-page .remove-item-btn:hover {
@@ -1408,50 +1447,153 @@
     transform: translateY(-1px);
 }
 
+
+/* ================================================================
+   ITEMS HELPER
+================================================================ */
+
 .purchase-create-page .items-helper {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
-    margin-top: 12px;
-    padding: 10px 11px;
-    border-radius: 9px;
-    background: #fcf9f5;
-    color: #8c7e74;
-    font-size: 11px;
-    line-height: 1.5;
+    gap: 9px;
+    margin-top: 14px;
+    padding: 10px;
+    border: 1px solid #e9dfd5;
+    border-radius: 8px;
+    background: #fbf8f4;
 }
 
-.purchase-create-page .helper-icon {
+.purchase-create-page .items-helper-icon {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 0 0 auto;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: var(--orange-light);
-    color: var(--orange);
-    font-size: 10px;
+    border-radius: 7px;
+    background: #eadbc9;
+    color: #855b38;
+    font-size: 9px;
     font-weight: 700;
 }
 
+.purchase-create-page .items-helper strong {
+    display: block;
+    margin-bottom: 3px;
+    color: #594536;
+    font-size: 10px;
+    line-height: 1.35;
+    font-weight: 700;
+}
 
-/* ============================================================
-   FORM ACTIONS
-============================================================ */
-
-.purchase-create-page .form-actions {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 9px;
-    padding-bottom: 20px;
+.purchase-create-page .items-helper p {
+    margin: 0;
+    color: #95867b;
+    font-size: 9px;
+    line-height: 1.45;
+    font-weight: 400;
 }
 
 
-/* ============================================================
-   RESPONSIVE
-============================================================ */
+/* ================================================================
+   ACTION BUTTONS
+================================================================ */
+
+.purchase-create-page .form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 0;
+    padding-bottom: 4px;
+}
+
+.purchase-create-page .cancel-button,
+.purchase-create-page .save-button {
+    min-height: 37px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 14px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 11px;
+    line-height: 1;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+/* ================================================================
+   CANCEL
+================================================================ */
+
+.purchase-create-page .cancel-button {
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--muted);
+    transition:
+        background-color 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease;
+}
+
+.purchase-create-page .cancel-button:hover {
+    border-color: #d4c6ba;
+    background: #faf7f4;
+    color: var(--dark);
+}
+
+
+/* ================================================================
+   SAVE
+================================================================ */
+
+.purchase-create-page .save-button {
+    min-width: 120px;
+    border: none;
+    background:
+        linear-gradient(
+            135deg,
+            var(--orange),
+            var(--orange-dark)
+        );
+    color: white;
+    box-shadow:
+        0 4px 11px
+        rgba(145, 97, 55, 0.14);
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.purchase-create-page .save-button:hover {
+    background:
+        linear-gradient(
+            135deg,
+            var(--orange-dark),
+            var(--orange-dark)
+        );
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 6px 14px
+        rgba(145, 97, 55, 0.18);
+}
+
+.purchase-create-page .save-button span {
+    font-size: 13px;
+    line-height: 1;
+    font-weight: 400;
+}
+
+
+/* ================================================================
+   TABLET
+================================================================ */
 
 @media (max-width: 1100px) {
 
@@ -1461,48 +1603,82 @@
 
 }
 
+
+/* ================================================================
+   MOBILE
+================================================================ */
+
 @media (max-width: 700px) {
+
+    .purchase-create-page {
+        max-width: 100%;
+    }
 
     .purchase-create-page .topbar {
         flex-direction: column;
-        gap: 15px;
+        align-items: flex-start;
+        gap: 12px;
     }
 
     .purchase-create-page .date-box {
-        width: 100%;
+        align-self: flex-start;
     }
 
-    .purchase-create-page .panel-header-with-action {
+    .purchase-create-page .purchase-items-header {
         align-items: flex-start;
         flex-direction: column;
     }
 
-    .purchase-create-page .btn-secondary {
+    .purchase-create-page .add-item-button {
         width: 100%;
+    }
+
+    .purchase-create-page .form-content {
+        padding: 15px;
+    }
+
+    .purchase-create-page .form-panel-header {
+        padding: 14px 15px;
+    }
+
+    .purchase-create-page .form-actions {
+        justify-content: stretch;
+    }
+
+    .purchase-create-page .cancel-button,
+    .purchase-create-page .save-button {
+        flex: 1;
+    }
+
+}
+
+
+/* ================================================================
+   SMALL MOBILE
+================================================================ */
+
+@media (max-width: 480px) {
+
+    .purchase-create-page .page-title h1 {
+        font-size: 23px;
+    }
+
+    .purchase-create-page .form-panel-title {
+        font-size: 17px;
+    }
+
+    .purchase-create-page .form-panel-subtitle {
+        max-width: 220px;
+        font-size: 11px;
     }
 
     .purchase-create-page .form-actions {
         flex-direction: column-reverse;
     }
 
-    .purchase-create-page .form-actions .btn {
+    .purchase-create-page .cancel-button,
+    .purchase-create-page .save-button {
         width: 100%;
-    }
-
-}
-
-@media (max-width: 480px) {
-
-    .purchase-create-page .page-title h1 {
-        font-size: 25px;
-    }
-
-    .purchase-create-page .panel-header {
-        padding: 14px;
-    }
-
-    .purchase-create-page .panel-body {
-        padding: 14px;
     }
 
 }
@@ -1518,11 +1694,10 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    /*
-    |--------------------------------------------------------------------------
-    | Elements
-    |--------------------------------------------------------------------------
-    */
+
+    /* ============================================================
+       ELEMENTS
+    ============================================================ */
 
     const itemsContainer =
         document.getElementById('itemsContainer');
@@ -1543,11 +1718,9 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('itemRowTemplate');
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Currency
-    |--------------------------------------------------------------------------
-    */
+    /* ============================================================
+       CURRENCY
+    ============================================================ */
 
     function formatCurrency(value) {
 
@@ -1565,11 +1738,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Re-index item rows
-    |--------------------------------------------------------------------------
-    */
+    /* ============================================================
+       RE-INDEX ROWS
+    ============================================================ */
 
     function reindexRows() {
 
@@ -1623,11 +1794,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Calculate one row
-    |--------------------------------------------------------------------------
-    */
+    /* ============================================================
+       CALCULATE ROW
+    ============================================================ */
 
     function calculateRow(row) {
 
@@ -1639,6 +1808,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const subtotalElement =
             row.querySelector('.row-subtotal');
+
+
+        if (!quantityInput ||
+            !unitCostInput ||
+            !subtotalElement) {
+
+            return 0;
+
+        }
 
 
         const quantity =
@@ -1661,11 +1839,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Calculate all totals
-    |--------------------------------------------------------------------------
-    */
+    /* ============================================================
+       CALCULATE TOTALS
+    ============================================================ */
 
     function calculateTotals() {
 
@@ -1701,11 +1877,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Attach row events
-    |--------------------------------------------------------------------------
-    */
+    /* ============================================================
+       ATTACH ROW EVENTS
+    ============================================================ */
 
     function attachRowEvents(row) {
 
@@ -1750,10 +1924,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
                     /*
-                    |--------------------------------------------------------------------------
-                    | Never remove the final row completely.
-                    |--------------------------------------------------------------------------
-                    */
+                     * Keep one row available at all times.
+                     */
 
                     if (rows.length === 1) {
 
@@ -1767,11 +1939,17 @@ document.addEventListener('DOMContentLoaded', function () {
                             row.querySelector('.unit-cost-input');
 
 
-                        select.value = '';
+                        if (select) {
+                            select.value = '';
+                        }
 
-                        quantity.value = '';
+                        if (quantity) {
+                            quantity.value = '';
+                        }
 
-                        unitCost.value = '';
+                        if (unitCost) {
+                            unitCost.value = '';
+                        }
 
 
                         calculateTotals();
@@ -1795,11 +1973,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Add new item row
-    |--------------------------------------------------------------------------
-    */
+    /* ============================================================
+       ADD NEW ITEM ROW
+    ============================================================ */
 
     function addItemRow() {
 
@@ -1834,11 +2010,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Add Item button
-    |--------------------------------------------------------------------------
-    */
+    /* ============================================================
+       ADD ITEM BUTTON
+    ============================================================ */
 
     if (addItemBtn) {
 
@@ -1854,11 +2028,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Tax
-    |--------------------------------------------------------------------------
-    */
+    /* ============================================================
+       TAX
+    ============================================================ */
 
     if (taxInput) {
 
@@ -1874,11 +2046,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Existing rows
-    |--------------------------------------------------------------------------
-    */
+    /* ============================================================
+       EXISTING ROWS
+    ============================================================ */
 
     const existingRows =
         itemsContainer.querySelectorAll('.item-row');
@@ -1891,11 +2061,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Initial setup
-    |--------------------------------------------------------------------------
-    */
+    /* ============================================================
+       INITIAL SETUP
+    ============================================================ */
 
     reindexRows();
 

@@ -6,68 +6,120 @@
 
 @php
 
+    use App\Models\Purchase;
+
     /*
     |--------------------------------------------------------------------------
-    | PURCHASE PAGE DATA
+    | CURRENT USER
     |--------------------------------------------------------------------------
     */
 
-    $role = $user->role;
+    $currentUser = auth()->user();
+
+    $role = $currentUser?->role;
+
+    $isAdmin = $role === 'CEO/Admin';
+
+    $canManagePurchases = in_array(
+        $role,
+        ['CEO/Admin', 'Procurement'],
+        true
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PURCHASE STATUS STYLES
+    |--------------------------------------------------------------------------
+    */
 
     $statusClasses = [
 
-        'Draft'
-            => 'purchase-status-draft',
+        'Draft' =>
+            'purchase-status-draft',
 
-        'Pending Approval'
-            => 'purchase-status-pending',
+        'Pending Approval' =>
+            'purchase-status-pending',
 
-        'Approved'
-            => 'purchase-status-approved',
+        'Approved' =>
+            'purchase-status-approved',
 
-        'Rejected'
-            => 'purchase-status-rejected',
+        'Rejected' =>
+            'purchase-status-rejected',
 
-        'Ordered'
-            => 'purchase-status-ordered',
+        'Ordered' =>
+            'purchase-status-ordered',
 
-        'Partially Received'
-            => 'purchase-status-partial',
+        'Partially Received' =>
+            'purchase-status-partial',
 
-        'Received'
-            => 'purchase-status-received',
+        'Received' =>
+            'purchase-status-received',
 
-        'Cancelled'
-            => 'purchase-status-cancelled',
+        'Cancelled' =>
+            'purchase-status-cancelled',
 
     ];
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | PURCHASE STATUS ICONS
+    |--------------------------------------------------------------------------
+    */
+
     $statusIcons = [
 
-        'Draft'
-            => '📝',
+        'Draft' =>
+            '📝',
 
-        'Pending Approval'
-            => '⏳',
+        'Pending Approval' =>
+            '⏳',
 
-        'Approved'
-            => '✓',
+        'Approved' =>
+            '✓',
 
-        'Rejected'
-            => '✕',
+        'Rejected' =>
+            '✕',
 
-        'Ordered'
-            => '📦',
+        'Ordered' =>
+            '📦',
 
-        'Partially Received'
-            => '◐',
+        'Partially Received' =>
+            '◐',
 
-        'Received'
-            => '✓',
+        'Received' =>
+            '✓',
 
-        'Cancelled'
-            => '⊘',
+        'Cancelled' =>
+            '⊘',
+
+    ];
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | STATUS FILTER OPTIONS
+    |--------------------------------------------------------------------------
+    */
+
+    $statuses = [
+
+        Purchase::STATUS_DRAFT,
+
+        Purchase::STATUS_PENDING_APPROVAL,
+
+        Purchase::STATUS_APPROVED,
+
+        Purchase::STATUS_REJECTED,
+
+        Purchase::STATUS_ORDERED,
+
+        Purchase::STATUS_PARTIALLY_RECEIVED,
+
+        Purchase::STATUS_RECEIVED,
+
+        Purchase::STATUS_CANCELLED,
 
     ];
 
@@ -79,8 +131,6 @@
 
     <!-- =========================================================
          PURCHASES TOPBAR
-
-         Same structure as Products
     ========================================================== -->
 
     <div class="topbar">
@@ -96,7 +146,7 @@
             </h1>
 
             <p>
-                Manage supplier orders, approvals, and purchasing records.
+                Manage supplier orders, approvals, receiving, and purchasing records.
             </p>
 
         </div>
@@ -115,126 +165,146 @@
     </div>
 
 
+
     <!-- =========================================================
          SUMMARY CARDS
     ========================================================== -->
 
-    <section class="purchase-stats">
+    <section class="purchases-stats">
 
 
         <!-- TOTAL PURCHASES -->
 
-        <div class="purchase-stat">
+        <div class="purchases-stat">
 
-            <div>
+            <div class="purchases-stat-left">
 
-                <div class="purchase-stat-label">
+                <div class="purchases-stat-label">
                     TOTAL PURCHASES
                 </div>
 
-                <div class="purchase-stat-value">
-                    {{ $stats['total'] }}
-                </div>
-
-                <div class="purchase-stat-note">
+                <div class="purchases-stat-note">
                     All purchase records
                 </div>
 
             </div>
 
 
-            <div class="purchase-stat-icon">
-                ▦
+            <div class="purchases-stat-right">
+
+                <div class="purchases-stat-icon">
+                    ▦
+                </div>
+
+                <div class="purchases-stat-value">
+                    {{ $stats['total'] }}
+                </div>
+
             </div>
 
         </div>
 
 
-        <!-- DRAFTS -->
 
-        <div class="purchase-stat">
+        <!-- DRAFT PURCHASES -->
 
-            <div>
+        <div class="purchases-stat">
 
-                <div class="purchase-stat-label">
-                    DRAFTS
+            <div class="purchases-stat-left">
+
+                <div class="purchases-stat-label">
+                    DRAFT PURCHASES
                 </div>
 
-                <div class="purchase-stat-value">
+                <div class="purchases-stat-note">
+                    Currently being prepared
+                </div>
+
+            </div>
+
+
+            <div class="purchases-stat-right">
+
+                <div class="purchases-stat-icon">
+                    📝
+                </div>
+
+                <div class="purchases-stat-value">
                     {{ $stats['draft'] }}
                 </div>
 
-                <div class="purchase-stat-note">
-                    Purchases still being prepared
-                </div>
-
-            </div>
-
-
-            <div class="purchase-stat-icon">
-                📝
             </div>
 
         </div>
 
 
-        <!-- PENDING APPROVAL -->
 
-        <div class="purchase-stat">
+        <!-- PENDING PURCHASES -->
 
-            <div>
+        <div class="purchases-stat">
 
-                <div class="purchase-stat-label">
-                    PENDING APPROVAL
+            <div class="purchases-stat-left">
+
+                <div class="purchases-stat-label">
+                    PENDING PURCHASES
                 </div>
 
-                <div class="purchase-stat-value">
-                    {{ $stats['pending'] }}
-                </div>
-
-                <div class="purchase-stat-note">
+                <div class="purchases-stat-note">
                     Awaiting approval
                 </div>
 
             </div>
 
 
-            <div class="purchase-stat-icon">
-                ⏳
+            <div class="purchases-stat-right">
+
+                <div class="purchases-stat-icon">
+                    ⏳
+                </div>
+
+                <div class="purchases-stat-value">
+                    {{ $stats['pending'] }}
+                </div>
+
             </div>
 
         </div>
 
 
-        <!-- RECEIVED -->
 
-        <div class="purchase-stat">
+        <!-- RECEIVED PURCHASES -->
 
-            <div>
+        <div class="purchases-stat">
 
-                <div class="purchase-stat-label">
-                    RECEIVED
+            <div class="purchases-stat-left">
+
+                <div class="purchases-stat-label">
+                    RECEIVED PURCHASES
                 </div>
 
-                <div class="purchase-stat-value">
+                <div class="purchases-stat-note">
+                    Completed purchase records
+                </div>
+
+            </div>
+
+
+            <div class="purchases-stat-right">
+
+                <div class="purchases-stat-icon">
+                    ✓
+                </div>
+
+                <div class="purchases-stat-value">
                     {{ $stats['received'] }}
                 </div>
 
-                <div class="purchase-stat-note">
-                    Successfully received
-                </div>
-
-            </div>
-
-
-            <div class="purchase-stat-icon">
-                ✓
             </div>
 
         </div>
 
-
     </section>
+
 
 
     <!-- =========================================================
@@ -246,8 +316,6 @@
 
         <!-- =====================================================
              PANEL HEADER
-
-             Same structure as Products
         ====================================================== -->
 
         <div class="purchases-panel-header">
@@ -259,22 +327,17 @@
                 </div>
 
                 <div class="purchases-panel-subtitle">
-                    Search and manage your supplier purchase records.
+                    Search supplier orders and manage each purchase according to its current status.
                 </div>
 
             </div>
 
 
-            <!-- ADD PURCHASE -->
-
-            @if (
-                $role === 'CEO/Admin' ||
-                $role === 'Procurement'
-            )
+            @if ($canManagePurchases)
 
                 <a
                     href="{{ route('purchases.create') }}"
-                    class="purchase-add-button"
+                    class="purchases-add-button"
                 >
 
                     <span>
@@ -290,33 +353,35 @@
         </div>
 
 
+
         <!-- =====================================================
-             SEARCH / FILTER
+             SEARCH / FILTERS
         ====================================================== -->
 
         <form
             method="GET"
             action="{{ route('purchases.index') }}"
-            class="purchase-filters"
+            class="purchases-filters"
         >
 
 
             <!-- SEARCH -->
 
-            <div class="purchase-search-wrapper">
+            <div class="purchases-search-wrapper">
 
-                <span class="purchase-search-icon">
+                <span class="purchases-search-icon">
                     ⌕
                 </span>
 
                 <input
                     type="text"
                     name="search"
-                    value="{{ request('search') }}"
+                    value="{{ request('search', '') }}"
                     placeholder="Search purchase number or supplier..."
                 >
 
             </div>
+
 
 
             <!-- STATUS -->
@@ -327,19 +392,19 @@
                     All Status
                 </option>
 
-
-                @foreach ($statuses as $status)
+                @foreach ($statuses as $purchaseStatus)
 
                     <option
-                        value="{{ $status }}"
-                        {{ request('status') === $status ? 'selected' : '' }}
+                        value="{{ $purchaseStatus }}"
+                        {{ request('status') === $purchaseStatus ? 'selected' : '' }}
                     >
-                        {{ $status }}
+                        {{ $purchaseStatus }}
                     </option>
 
                 @endforeach
 
             </select>
+
 
 
             <!-- SUPPLIER -->
@@ -349,7 +414,6 @@
                 <option value="">
                     All Suppliers
                 </option>
-
 
                 @foreach ($suppliers as $supplier)
 
@@ -365,14 +429,16 @@
             </select>
 
 
+
             <!-- FILTER -->
 
             <button
                 type="submit"
-                class="purchase-filter-button"
+                class="purchases-filter-button"
             >
                 Filter
             </button>
+
 
 
             <!-- CLEAR -->
@@ -385,7 +451,7 @@
 
                 <a
                     href="{{ route('purchases.index') }}"
-                    class="purchase-clear-button"
+                    class="purchases-clear-button"
                 >
                     Clear
                 </a>
@@ -395,44 +461,14 @@
         </form>
 
 
-        <!-- =====================================================
-             SUCCESS MESSAGE
-        ====================================================== -->
-
-        @if (session('success'))
-
-            <div class="purchase-alert purchase-alert-success">
-
-                {{ session('success') }}
-
-            </div>
-
-        @endif
-
-
-        <!-- =====================================================
-             ERROR MESSAGE
-        ====================================================== -->
-
-        @if ($errors->any())
-
-            <div class="purchase-alert purchase-alert-error">
-
-                {{ $errors->first() }}
-
-            </div>
-
-        @endif
-
 
         <!-- =====================================================
              PURCHASE TABLE
         ====================================================== -->
 
-        <div class="purchase-table-wrapper">
+        <div class="purchases-table-wrapper">
 
             <table class="purchases-table">
-
 
                 <thead>
 
@@ -466,7 +502,7 @@
                             Created By
                         </th>
 
-                        <th class="purchase-actions-header">
+                        <th class="purchases-actions-header">
                             Actions
                         </th>
 
@@ -477,20 +513,74 @@
 
                 <tbody>
 
-
                     @forelse ($purchases as $purchase)
-
 
                         @php
 
-                            $statusClass =
-                                $statusClasses[$purchase->status]
-                                ?? 'purchase-status-draft';
+                            $purchaseStatus =
+                                $purchase->status ?? Purchase::STATUS_DRAFT;
 
+                            $statusClass =
+                                $statusClasses[$purchaseStatus]
+                                ?? 'purchase-status-default';
 
                             $statusIcon =
-                                $statusIcons[$purchase->status]
+                                $statusIcons[$purchaseStatus]
                                 ?? '•';
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | STATUS-AWARE ACTIONS
+                            |--------------------------------------------------------------------------
+                            */
+
+                            $canEditPurchase =
+                                $canManagePurchases &&
+                                (
+                                    $purchase->isDraft() ||
+                                    $purchase->isRejected()
+                                );
+
+
+                            $canSubmitPurchase =
+                                $canManagePurchases &&
+                                (
+                                    $purchase->isDraft() ||
+                                    $purchase->isRejected()
+                                );
+
+
+                            $canApprovePurchase =
+                                $isAdmin &&
+                                $purchase->isPendingApproval();
+
+
+                            $canRejectPurchase =
+                                $isAdmin &&
+                                $purchase->isPendingApproval();
+
+
+                            $canOrderPurchase =
+                                $canManagePurchases &&
+                                $purchase->isApproved();
+
+
+                            $canReceivePurchase =
+                                $canManagePurchases &&
+                                (
+                                    $purchase->isOrdered() ||
+                                    $purchase->isPartiallyReceived()
+                                );
+
+
+                            $canCancelPurchase =
+                                $canManagePurchases &&
+                                !$purchase->isCancelled() &&
+                                !$purchase->isReceived() &&
+                                !$purchase->items()
+                                    ->where('received_quantity', '>', 0)
+                                    ->exists();
 
                         @endphp
 
@@ -505,18 +595,14 @@
                             <td>
 
                                 <a
-                                    href="{{ route(
-                                        'purchases.show',
-                                        $purchase
-                                    ) }}"
-                                    class="purchase-number"
+                                    href="{{ route('purchases.show', $purchase) }}"
+                                    class="purchases-number"
                                 >
-
                                     {{ $purchase->purchase_number }}
-
                                 </a>
 
                             </td>
+
 
 
                             <!-- =================================================
@@ -527,21 +613,32 @@
 
                                 @if ($purchase->supplier)
 
-                                    <div class="purchase-supplier">
+                                    <div class="purchases-supplier">
 
-                                        {{ $purchase->supplier->name }}
+                                        <div class="purchases-supplier-name">
+                                            {{ $purchase->supplier->name }}
+                                        </div>
+
+                                        @if ($purchase->supplier->contact_person)
+
+                                            <div class="purchases-supplier-contact">
+                                                {{ $purchase->supplier->contact_person }}
+                                            </div>
+
+                                        @endif
 
                                     </div>
 
                                 @else
 
-                                    <span class="purchase-muted">
+                                    <span class="purchases-muted">
                                         —
                                     </span>
 
                                 @endif
 
                             </td>
+
 
 
                             <!-- =================================================
@@ -550,19 +647,17 @@
 
                             <td>
 
-                                @if ($purchase->purchase_date)
+                                <span class="purchases-date">
 
-                                    {{ $purchase->purchase_date->format('M d, Y') }}
+                                    {{ $purchase->purchase_date
+                                        ? \Carbon\Carbon::parse($purchase->purchase_date)->format('M d, Y')
+                                        : '—'
+                                    }}
 
-                                @else
-
-                                    <span class="purchase-muted">
-                                        —
-                                    </span>
-
-                                @endif
+                                </span>
 
                             </td>
+
 
 
                             <!-- =================================================
@@ -571,19 +666,17 @@
 
                             <td>
 
-                                @if ($purchase->expected_date)
+                                <span class="purchases-date">
 
-                                    {{ $purchase->expected_date->format('M d, Y') }}
+                                    {{ $purchase->expected_date
+                                        ? \Carbon\Carbon::parse($purchase->expected_date)->format('M d, Y')
+                                        : '—'
+                                    }}
 
-                                @else
-
-                                    <span class="purchase-muted">
-                                        —
-                                    </span>
-
-                                @endif
+                                </span>
 
                             </td>
+
 
 
                             <!-- =================================================
@@ -592,16 +685,14 @@
 
                             <td>
 
-                                <span class="purchase-price">
+                                <span class="purchases-total">
 
-                                    ₱{{ number_format(
-                                        (float) $purchase->total,
-                                        2
-                                    ) }}
+                                    ₱{{ number_format((float) $purchase->total, 2) }}
 
                                 </span>
 
                             </td>
+
 
 
                             <!-- =================================================
@@ -611,18 +702,19 @@
                             <td>
 
                                 <span
-                                    class="purchase-status {{ $statusClass }}"
+                                    class="purchases-status {{ $statusClass }}"
                                 >
 
-                                    <span class="purchase-status-icon">
+                                    <span class="purchases-status-icon">
                                         {{ $statusIcon }}
                                     </span>
 
-                                    {{ $purchase->status }}
+                                    {{ $purchaseStatus }}
 
                                 </span>
 
                             </td>
+
 
 
                             <!-- =================================================
@@ -633,11 +725,17 @@
 
                                 @if ($purchase->creator)
 
-                                    {{ $purchase->creator->name }}
+                                    <div class="purchases-creator">
+
+                                        <div class="purchases-creator-name">
+                                            {{ $purchase->creator->name }}
+                                        </div>
+
+                                    </div>
 
                                 @else
 
-                                    <span class="purchase-muted">
+                                    <span class="purchases-muted">
                                         System
                                     </span>
 
@@ -646,63 +744,198 @@
                             </td>
 
 
+
                             <!-- =================================================
                                  ACTIONS
                             ================================================== -->
 
                             <td>
 
-                                <div class="purchase-table-actions">
+                                <div class="purchases-table-actions">
 
 
                                     <!-- VIEW -->
 
                                     <a
-                                        href="{{ route(
-                                            'purchases.show',
-                                            $purchase
-                                        ) }}"
-                                        class="purchase-view-button"
+                                        href="{{ route('purchases.show', $purchase) }}"
+                                        class="purchase-action purchase-action-view"
+                                        title="View purchase details"
+                                        aria-label="View purchase details"
                                     >
-
-                                        <span>
-                                            ◉
-                                        </span>
-
-                                        View
-
+                                        <span>◉</span>
                                     </a>
+
 
 
                                     <!-- EDIT -->
 
-                                    @if (
-                                        (
-                                            $role === 'CEO/Admin' ||
-                                            $role === 'Procurement'
-                                        )
-                                        &&
-                                        (
-                                            $purchase->isDraft() ||
-                                            $purchase->isRejected()
-                                        )
-                                    )
+                                    @if ($canEditPurchase)
 
                                         <a
-                                            href="{{ route(
-                                                'purchases.edit',
-                                                $purchase
-                                            ) }}"
-                                            class="purchase-edit-button"
+                                            href="{{ route('purchases.edit', $purchase) }}"
+                                            class="purchase-action purchase-action-edit"
+                                            title="Edit purchase"
+                                            aria-label="Edit purchase"
+                                        >
+                                            <span>✎</span>
+                                        </a>
+
+                                    @endif
+
+
+
+                                    <!-- SUBMIT -->
+
+                                    @if ($canSubmitPurchase)
+
+                                        <form
+                                            method="POST"
+                                            action="{{ route('purchases.submit', $purchase) }}"
+                                            class="purchase-action-form"
+                                            onsubmit="return confirm('Submit {{ $purchase->purchase_number }} for approval?');"
                                         >
 
-                                            <span>
-                                                ✎
-                                            </span>
+                                            @csrf
 
-                                            Edit
+                                            <button
+                                                type="submit"
+                                                class="purchase-action purchase-action-submit"
+                                                title="Submit for approval"
+                                                aria-label="Submit for approval"
+                                            >
+                                                <span>↑</span>
+                                            </button>
 
+                                        </form>
+
+                                    @endif
+
+
+
+                                    <!-- APPROVE -->
+
+                                    @if ($canApprovePurchase)
+
+                                        <form
+                                            method="POST"
+                                            action="{{ route('purchases.approve', $purchase) }}"
+                                            class="purchase-action-form"
+                                            onsubmit="return confirm('Approve {{ $purchase->purchase_number }}?');"
+                                        >
+
+                                            @csrf
+
+                                            <button
+                                                type="submit"
+                                                class="purchase-action purchase-action-approve"
+                                                title="Approve purchase"
+                                                aria-label="Approve purchase"
+                                            >
+                                                <span>✓</span>
+                                            </button>
+
+                                        </form>
+
+                                    @endif
+
+
+
+                                    <!-- REJECT -->
+
+                                    @if ($canRejectPurchase)
+
+                                        <form
+                                            method="POST"
+                                            action="{{ route('purchases.reject', $purchase) }}"
+                                            class="purchase-action-form"
+                                            onsubmit="return confirm('Reject {{ $purchase->purchase_number }}?');"
+                                        >
+
+                                            @csrf
+
+                                            <button
+                                                type="submit"
+                                                class="purchase-action purchase-action-reject"
+                                                title="Reject purchase"
+                                                aria-label="Reject purchase"
+                                            >
+                                                <span>✕</span>
+                                            </button>
+
+                                        </form>
+
+                                    @endif
+
+
+
+                                    <!-- ORDER -->
+
+                                    @if ($canOrderPurchase)
+
+                                        <form
+                                            method="POST"
+                                            action="{{ route('purchases.order', $purchase) }}"
+                                            class="purchase-action-form"
+                                            onsubmit="return confirm('Mark {{ $purchase->purchase_number }} as ordered?');"
+                                        >
+
+                                            @csrf
+
+                                            <button
+                                                type="submit"
+                                                class="purchase-action purchase-action-order"
+                                                title="Mark purchase as ordered"
+                                                aria-label="Mark purchase as ordered"
+                                            >
+                                                <span>📦</span>
+                                            </button>
+
+                                        </form>
+
+                                    @endif
+
+
+
+                                    <!-- RECEIVE -->
+
+                                    @if ($canReceivePurchase)
+
+                                        <a
+                                            href="{{ route('purchases.show', $purchase) }}"
+                                            class="purchase-action purchase-action-receive"
+                                            title="Receive purchase stock"
+                                            aria-label="Receive purchase stock"
+                                        >
+                                            <span>↓</span>
                                         </a>
+
+                                    @endif
+
+
+
+                                    <!-- CANCEL -->
+
+                                    @if ($canCancelPurchase)
+
+                                        <form
+                                            method="POST"
+                                            action="{{ route('purchases.cancel', $purchase) }}"
+                                            class="purchase-action-form"
+                                            onsubmit="return confirm('Cancel {{ $purchase->purchase_number }}? This action cannot be undone.');"
+                                        >
+
+                                            @csrf
+
+                                            <button
+                                                type="submit"
+                                                class="purchase-action purchase-action-cancel"
+                                                title="Cancel purchase"
+                                                aria-label="Cancel purchase"
+                                            >
+                                                <span>⊘</span>
+                                            </button>
+
+                                        </form>
 
                                     @endif
 
@@ -711,35 +944,29 @@
 
                             </td>
 
-
                         </tr>
 
 
                     @empty
 
-
-                        <!-- =================================================
-                             EMPTY STATE
-                        ================================================== -->
-
                         <tr>
 
                             <td
                                 colspan="8"
-                                class="purchase-empty-state"
+                                class="purchases-empty-state"
                             >
 
-                                <div class="purchase-empty-icon">
+                                <div class="purchases-empty-icon">
                                     ▦
                                 </div>
 
 
-                                <div class="purchase-empty-title">
+                                <div class="purchases-empty-title">
                                     No purchase records found
                                 </div>
 
 
-                                <div class="purchase-empty-description">
+                                <div class="purchases-empty-description">
 
                                     @if (
                                         request('search') ||
@@ -747,58 +974,21 @@
                                         request('supplier_id')
                                     )
 
-                                        Try changing your search
-                                        or filter.
+                                        Try changing your search or filter.
 
                                     @else
 
-                                        Your purchase records
-                                        will appear here.
+                                        Your purchase records will appear here.
 
                                     @endif
 
                                 </div>
 
-
-                                @if (
-                                    (
-                                        $role === 'CEO/Admin' ||
-                                        $role === 'Procurement'
-                                    )
-                                    &&
-                                    !request('search')
-                                    &&
-                                    !request('status')
-                                    &&
-                                    !request('supplier_id')
-                                )
-
-                                    <div style="margin-top: 16px;">
-
-                                        <a
-                                            href="{{ route('purchases.create') }}"
-                                            class="purchase-add-button"
-                                        >
-
-                                            <span>
-                                                +
-                                            </span>
-
-                                            Add First Purchase
-
-                                        </a>
-
-                                    </div>
-
-                                @endif
-
                             </td>
 
                         </tr>
 
-
                     @endforelse
-
 
                 </tbody>
 
@@ -807,20 +997,40 @@
         </div>
 
 
+
         <!-- =====================================================
              PAGINATION
         ====================================================== -->
 
         @if ($purchases->hasPages())
 
-            <div class="purchase-pagination-wrapper">
+            <div class="purchases-pagination-wrapper">
 
-                {{ $purchases->links() }}
+                <div class="purchases-pagination">
+
+                    <div class="purchases-pagination-info">
+
+                        Showing
+                        <strong>{{ $purchases->firstItem() }}</strong>
+                        to
+                        <strong>{{ $purchases->lastItem() }}</strong>
+                        of
+                        <strong>{{ $purchases->total() }}</strong>
+                        purchases
+
+                    </div>
+
+                    <div class="purchases-pagination-links">
+
+                        {{ $purchases->links() }}
+
+                    </div>
+
+                </div>
 
             </div>
 
         @endif
-
 
     </div>
 
@@ -829,21 +1039,19 @@
 @endsection
 
 
+
 @push('styles')
 
 <style>
 
 /* =========================================================
    PURCHASES PAGE
-
-   Same layout structure as Products
 ========================================================= */
 
 .purchases-page {
-
     width: 100%;
-
 }
+
 
 
 /* =========================================================
@@ -852,24 +1060,21 @@
 
 .purchases-page .page-title h1 {
 
-    font-size: clamp(
-        1.75rem,
-        2.2vw,
-        2rem
-    );
+    font-size:
+        clamp(1.6rem, 2vw, 1.9rem);
 
     line-height: 1.15;
 
-    letter-spacing: -0.045rem;
-
+    letter-spacing: -0.04rem;
 }
+
 
 
 /* =========================================================
    SUMMARY CARDS
 ========================================================= */
 
-.purchase-stats {
+.purchases-stats {
 
     display: grid;
 
@@ -878,14 +1083,13 @@
 
     gap: 17px;
 
-    margin-bottom: 22px;
-
+    margin-bottom: 17px;
 }
 
 
-.purchase-stat {
+.purchases-stat {
 
-    min-height: 135px;
+    min-height: 125px;
 
     display: flex;
 
@@ -895,40 +1099,39 @@
 
     gap: 15px;
 
-    padding: 20px;
+    padding:
+        16px
+        17px
+        15px;
 
-    border: 1px solid var(--border);
+    border:
+        1px solid var(--border);
 
-    border-radius: 17px;
+    border-radius: 15px;
 
     background: white;
 
     box-shadow:
-        0 7px 22px
-        rgba(43, 31, 23, 0.055);
+        0 5px 18px
+        rgba(43, 31, 23, 0.045);
 
     position: relative;
 
     overflow: hidden;
-
 }
 
 
-/* LEFT ACCENT */
-
-.purchase-stat::before {
+.purchases-stat::before {
 
     content: "";
 
     position: absolute;
 
     top: 0;
-
     left: 0;
-
     bottom: 0;
 
-    width: 4px;
+    width: 3px;
 
     background:
         linear-gradient(
@@ -936,58 +1139,84 @@
             var(--orange),
             #e2a16c
         );
-
 }
 
 
-.purchase-stat-label {
+.purchases-stat-left {
+
+    min-width: 0;
+
+    flex: 1;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    justify-content: flex-start;
+
+    align-self: stretch;
+
+    padding-left: 1px;
+
+    padding-top: 2px;
+}
+
+
+.purchases-stat-label {
 
     color: var(--muted);
 
-    font-size: 0.8125rem;
+    font-size: 0.6875rem;
 
     line-height: 1.3;
 
     font-weight: 800;
 
-    letter-spacing: 0.05rem;
+    letter-spacing: 0.045rem;
 
+    white-space: nowrap;
 }
 
 
-.purchase-stat-value {
+.purchases-stat-note {
 
-    margin-top: 14px;
-
-    color: var(--dark);
-
-    font-size: 1.875rem;
-
-    line-height: 1;
-
-    font-weight: 800;
-
-}
-
-
-.purchase-stat-note {
-
-    margin-top: 8px;
+    margin-top: 58px;
 
     color: #9d958f;
 
-    font-size: 0.8125rem;
+    font-size: 0.6875rem;
 
     line-height: 1.4;
 
+    max-width: 155px;
 }
 
 
-.purchase-stat-icon {
+.purchases-stat-right {
 
-    width: 40px;
+    min-width: 82px;
 
-    height: 40px;
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-end;
+
+    justify-content: flex-start;
+
+    padding-top: 3px;
+
+    flex-shrink: 0;
+}
+
+
+.purchases-stat-icon {
+
+    width: 34px;
+
+    height: 34px;
 
     display: flex;
 
@@ -997,7 +1226,7 @@
 
     flex-shrink: 0;
 
-    border-radius: 11px;
+    border-radius: 9px;
 
     background:
         linear-gradient(
@@ -1008,11 +1237,30 @@
 
     color: var(--orange);
 
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
+
+    font-weight: 800;
+}
+
+
+.purchases-stat-value {
+
+    margin-top: 13px;
+
+    color: var(--dark);
+
+    font-size:
+        clamp(1.45rem, 1.8vw, 1.75rem);
+
+    line-height: 1;
 
     font-weight: 800;
 
+    text-align: right;
+
+    white-space: nowrap;
 }
+
 
 
 /* =========================================================
@@ -1023,17 +1271,18 @@
 
     background: white;
 
-    border: 1px solid var(--border);
+    border:
+        1px solid var(--border);
 
-    border-radius: 17px;
+    border-radius: 15px;
 
     overflow: hidden;
 
     box-shadow:
-        0 5px 18px
+        0 4px 16px
         rgba(43, 31, 23, 0.035);
-
 }
+
 
 
 /* =========================================================
@@ -1042,7 +1291,7 @@
 
 .purchases-panel-header {
 
-    min-height: 75px;
+    min-height: 65px;
 
     display: flex;
 
@@ -1050,12 +1299,14 @@
 
     justify-content: space-between;
 
-    gap: 20px;
+    gap: 17px;
 
-    padding: 17px 21px;
+    padding:
+        14px
+        18px;
 
-    border-bottom: 1px solid var(--border);
-
+    border-bottom:
+        1px solid var(--border);
 }
 
 
@@ -1063,33 +1314,32 @@
 
     color: var(--dark);
 
-    font-size: 1rem;
+    font-size: 0.875rem;
 
     line-height: 1.3;
 
     font-weight: 700;
-
 }
 
 
 .purchases-panel-subtitle {
 
-    margin-top: 4px;
+    margin-top: 3px;
 
     color: var(--muted);
 
-    font-size: 0.8125rem;
+    font-size: 0.6875rem;
 
     line-height: 1.4;
-
 }
+
 
 
 /* =========================================================
    ADD PURCHASE
 ========================================================= */
 
-.purchase-add-button {
+.purchases-add-button {
 
     display: inline-flex;
 
@@ -1097,9 +1347,13 @@
 
     justify-content: center;
 
-    gap: 6px;
+    gap: 5px;
 
-    padding: 8px 12px;
+    min-height: 32px;
+
+    padding:
+        0
+        10px;
 
     border-radius: 8px;
 
@@ -1114,24 +1368,23 @@
 
     text-decoration: none;
 
-    font-size: 0.8125rem;
+    font-size: 0.6875rem;
 
     line-height: 1.2;
 
     font-weight: 700;
 
     box-shadow:
-        0 4px 11px
-        rgba(168, 95, 40, 0.14);
+        0 3px 9px
+        rgba(168, 95, 40, 0.12);
 
     transition:
         background 0.18s ease,
         box-shadow 0.18s ease;
-
 }
 
 
-.purchase-add-button:hover {
+.purchases-add-button:hover {
 
     color: white;
 
@@ -1143,64 +1396,67 @@
         );
 
     box-shadow:
-        0 5px 12px
-        rgba(168, 95, 40, 0.16);
-
+        0 4px 10px
+        rgba(168, 95, 40, 0.15);
 }
 
 
-.purchase-add-button span {
+.purchases-add-button span {
 
-    font-size: 0.9375rem;
+    font-size: 0.8125rem;
 
     line-height: 1;
-
 }
+
 
 
 /* =========================================================
    FILTERS
-
-   Same structure as Products
 ========================================================= */
 
-.purchase-filters {
+.purchases-filters {
 
     display: flex;
 
     align-items: center;
 
-    gap: 10px;
+    gap: 8px;
 
-    padding: 15px 21px;
+    padding:
+        12px
+        18px;
 
     background: var(--card-soft);
 
-    border-bottom: 1px solid var(--border);
-
+    border-bottom:
+        1px solid var(--border);
 }
 
 
-.purchase-search-wrapper {
+.purchases-search-wrapper {
 
     flex: 1;
 
     position: relative;
 
     min-width: 180px;
-
 }
 
 
-.purchase-search-wrapper input {
+.purchases-search-wrapper input {
 
     width: 100%;
 
-    height: 37px;
+    height: 35px;
 
-    padding: 0 13px 0 37px;
+    padding:
+        0
+        11px
+        0
+        34px;
 
-    border: 1px solid var(--border);
+    border:
+        1px solid var(--border);
 
     border-radius: 8px;
 
@@ -1210,63 +1466,63 @@
 
     font-family: inherit;
 
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
 
     outline: none;
 
     transition:
         border-color 0.18s ease,
         box-shadow 0.18s ease;
-
 }
 
 
-.purchase-search-wrapper input:focus {
+.purchases-search-wrapper input:focus {
 
     border-color: #d5a77d;
 
     box-shadow:
         0 0 0 3px
-        rgba(196, 122, 58, 0.08);
-
+        rgba(196, 122, 58, 0.07);
 }
 
 
-.purchase-search-wrapper input::placeholder {
+.purchases-search-wrapper input::placeholder {
 
     color: #aaa19a;
-
 }
 
 
-.purchase-search-icon {
+.purchases-search-icon {
 
     position: absolute;
 
-    left: 13px;
+    left: 11px;
 
     top: 50%;
 
-    transform: translateY(-50%);
+    transform:
+        translateY(-50%);
 
     color: var(--muted);
 
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
 
     pointer-events: none;
-
 }
 
 
-.purchase-filters select {
+.purchases-filters select {
 
-    height: 37px;
+    height: 35px;
 
-    min-width: 135px;
+    min-width: 145px;
 
-    padding: 0 11px;
+    padding:
+        0
+        10px;
 
-    border: 1px solid var(--border);
+    border:
+        1px solid var(--border);
 
     border-radius: 8px;
 
@@ -1276,23 +1532,23 @@
 
     font-family: inherit;
 
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
 
     outline: none;
 
     cursor: pointer;
-
 }
 
 
+
 /* =========================================================
-   FILTER / CLEAR
+   FILTER BUTTON
 ========================================================= */
 
-.purchase-filter-button,
-.purchase-clear-button {
+.purchases-filter-button,
+.purchases-clear-button {
 
-    height: 37px;
+    height: 35px;
 
     display: inline-flex;
 
@@ -1300,13 +1556,15 @@
 
     justify-content: center;
 
-    padding: 0 13px;
+    padding:
+        0
+        11px;
 
     border-radius: 8px;
 
     font-family: inherit;
 
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
 
     font-weight: 700;
 
@@ -1315,11 +1573,10 @@
     text-decoration: none;
 
     cursor: pointer;
-
 }
 
 
-.purchase-filter-button {
+.purchases-filter-button {
 
     border: none;
 
@@ -1329,20 +1586,19 @@
 
     transition:
         background-color 0.18s ease;
-
 }
 
 
-.purchase-filter-button:hover {
+.purchases-filter-button:hover {
 
     background: var(--dark-soft);
-
 }
 
 
-.purchase-clear-button {
+.purchases-clear-button {
 
-    border: 1px solid var(--border);
+    border:
+        1px solid var(--border);
 
     background: white;
 
@@ -1351,70 +1607,27 @@
     transition:
         background-color 0.18s ease,
         color 0.18s ease;
-
 }
 
 
-.purchase-clear-button:hover {
+.purchases-clear-button:hover {
 
     background: #faf7f3;
 
     color: var(--dark);
-
 }
 
-
-/* =========================================================
-   ALERTS
-========================================================= */
-
-.purchase-alert {
-
-    margin: 15px 21px 0;
-
-    padding: 10px 13px;
-
-    border-radius: 8px;
-
-    font-size: 0.75rem;
-
-    font-weight: 650;
-
-}
-
-
-.purchase-alert-success {
-
-    background: #edf8f0;
-
-    border: 1px solid #cfe5d5;
-
-    color: #39704d;
-
-}
-
-
-.purchase-alert-error {
-
-    background: #fff0ee;
-
-    border: 1px solid #eccfcb;
-
-    color: #9e4942;
-
-}
 
 
 /* =========================================================
    TABLE
 ========================================================= */
 
-.purchase-table-wrapper {
+.purchases-table-wrapper {
 
     width: 100%;
 
     overflow-x: auto;
-
 }
 
 
@@ -1422,32 +1635,28 @@
 
     width: 100%;
 
-    min-width: 900px;
+    min-width: 1120px;
 
     border-collapse: collapse;
-
 }
 
 
-/* =========================================================
-   TABLE HEADER
-
-   Same as Products
-========================================================= */
-
 .purchases-table th {
 
-    padding: 11px 14px;
+    padding:
+        10px
+        12px;
 
     background: #fbf9f6;
 
     color: var(--muted);
 
-    border-bottom: 1px solid var(--border);
+    border-bottom:
+        1px solid var(--border);
 
     text-align: left;
 
-    font-size: 0.6875rem;
+    font-size: 0.625rem;
 
     line-height: 1.3;
 
@@ -1455,126 +1664,172 @@
 
     text-transform: uppercase;
 
-    letter-spacing: 0.045rem;
+    letter-spacing: 0.04rem;
 
     white-space: nowrap;
-
 }
 
 
-/* =========================================================
-   TABLE BODY
-========================================================= */
-
 .purchases-table td {
 
-    padding: 13px 14px;
+    padding:
+        11px
+        12px;
 
     color: #625951;
 
-    border-bottom: 1px solid #f0ebe6;
+    border-bottom:
+        1px solid #f0ebe6;
 
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
 
     line-height: 1.4;
 
     vertical-align: middle;
-
 }
 
 
 .purchases-table tbody tr {
 
     background: white;
-
 }
 
 
 .purchases-table tbody tr:hover {
 
     background: #fdfaf7;
-
 }
+
 
 
 /* =========================================================
    PURCHASE NUMBER
 ========================================================= */
 
-.purchase-number {
+.purchases-number {
 
-    color: var(--orange);
+    color: var(--dark);
 
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
 
-    line-height: 1.4;
-
-    font-weight: 700;
+    font-weight: 800;
 
     text-decoration: none;
 
     white-space: nowrap;
-
 }
 
 
-.purchase-number:hover {
+.purchases-number:hover {
 
-    color: var(--orange-dark);
-
-    text-decoration: underline;
-
+    color: var(--orange);
 }
+
 
 
 /* =========================================================
    SUPPLIER
 ========================================================= */
 
-.purchase-supplier {
+.purchases-supplier {
+
+    min-width: 130px;
+}
+
+
+.purchases-supplier-name {
 
     color: var(--dark);
 
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
 
     line-height: 1.4;
 
     font-weight: 700;
-
 }
 
 
-.purchase-muted {
+.purchases-supplier-contact {
 
-    color: #a39b95;
+    margin-top: 2px;
 
-    font-size: 0.8125rem;
+    color: var(--muted);
 
+    font-size: 0.625rem;
+
+    line-height: 1.35;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    max-width: 150px;
 }
+
 
 
 /* =========================================================
-   PURCHASE PRICE
+   DATES
 ========================================================= */
 
-.purchase-price {
+.purchases-date {
+
+    color: #625951;
+
+    font-size: 0.6875rem;
+
+    white-space: nowrap;
+}
+
+
+
+/* =========================================================
+   TOTAL
+========================================================= */
+
+.purchases-total {
 
     color: var(--dark);
 
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
 
     font-weight: 800;
 
     white-space: nowrap;
-
 }
+
+
+
+/* =========================================================
+   CREATED BY
+========================================================= */
+
+.purchases-creator-name {
+
+    color: #625951;
+
+    font-size: 0.6875rem;
+
+    white-space: nowrap;
+}
+
+
+.purchases-muted {
+
+    color: #a39b95;
+
+    font-size: 0.75rem;
+}
+
 
 
 /* =========================================================
    STATUS
 ========================================================= */
 
-.purchase-status {
+.purchases-status {
 
     display: inline-flex;
 
@@ -1584,11 +1839,13 @@
 
     gap: 4px;
 
-    padding: 5px 8px;
+    padding:
+        4px
+        7px;
 
     border-radius: 7px;
 
-    font-size: 0.6875rem;
+    font-size: 0.625rem;
 
     line-height: 1.2;
 
@@ -1596,71 +1853,68 @@
 
     white-space: nowrap;
 
-    letter-spacing: 0.02rem;
-
+    letter-spacing: 0.01rem;
 }
 
 
-.purchase-status-icon {
+.purchases-status-icon {
 
-    font-size: 0.6875rem;
+    font-size: 0.625rem;
 
     line-height: 1;
-
 }
 
+
+
+/* =========================================================
+   STATUS COLORS
+========================================================= */
 
 .purchase-status-draft {
 
-    color: var(--muted);
+    color: #806d5c;
 
-    background: #f1eeeb;
-
+    background: #f4eee8;
 }
 
 
 .purchase-status-pending {
 
-    color: #a66b22;
+    color: #956d2f;
 
-    background: #fff2dc;
-
+    background: #fff4df;
 }
 
 
 .purchase-status-approved {
 
-    color: var(--green);
+    color: #39704d;
 
-    background: var(--green-light);
-
+    background: #edf7f0;
 }
 
 
 .purchase-status-rejected {
 
-    color: #a94f48;
+    color: #9a4d43;
 
-    background: #fff0ee;
-
+    background: #faeeee;
 }
 
 
 .purchase-status-ordered {
 
-    color: #4d7095;
+    color: #536f8a;
 
-    background: #eaf1f8;
-
+    background: #edf3f8;
 }
 
 
 .purchase-status-partial {
 
-    color: #765998;
+    color: #8a7042;
 
-    background: #f2ebf8;
-
+    background: #f7f1e4;
 }
 
 
@@ -1669,33 +1923,38 @@
     color: var(--green);
 
     background: var(--green-light);
-
 }
 
 
 .purchase-status-cancelled {
 
+    color: #817a75;
+
+    background: #f1eeeb;
+}
+
+
+.purchase-status-default {
+
     color: var(--muted);
 
     background: #f1eeeb;
-
 }
+
 
 
 /* =========================================================
    ACTIONS
-
-   Same compact style as Products
+   Minimal icon-only actions
 ========================================================= */
 
-.purchase-actions-header {
+.purchases-actions-header {
 
     text-align: center !important;
-
 }
 
 
-.purchase-table-actions {
+.purchases-table-actions {
 
     display: flex;
 
@@ -1703,17 +1962,27 @@
 
     justify-content: center;
 
-    gap: 4px;
+    gap: 9px;
 
-    white-space: nowrap;
-
+    min-width: 150px;
 }
 
 
-.purchase-view-button,
-.purchase-edit-button {
+.purchase-action-form {
 
-    height: 28px;
+    display: inline-flex;
+
+    margin: 0;
+
+    padding: 0;
+}
+
+
+.purchase-action {
+
+    width: 22px;
+
+    height: 22px;
 
     display: inline-flex;
 
@@ -1721,106 +1990,230 @@
 
     justify-content: center;
 
-    gap: 4px;
+    padding: 0;
 
-    padding: 0 7px;
+    margin: 0;
 
-    border: 1px solid #dfd0c3;
+    border: none;
 
-    border-radius: 7px;
+    border-radius: 5px;
 
-    text-decoration: none;
+    background: transparent;
 
     font-family: inherit;
-
-    font-size: 0.6875rem;
-
-    line-height: 1.2;
-
-    font-weight: 700;
-
-    cursor: pointer;
-
-    transition:
-        background-color 0.18s ease,
-        border-color 0.18s ease,
-        color 0.18s ease;
-
-}
-
-
-.purchase-view-button {
-
-    background: #faf7f3;
-
-    color: #79583f;
-
-}
-
-
-.purchase-view-button:hover {
-
-    background: #f5eee7;
-
-    border-color: #cdb49f;
-
-    color: #68482f;
-
-}
-
-
-.purchase-edit-button {
-
-    background: white;
-
-    color: #7d5b42;
-
-}
-
-
-.purchase-edit-button:hover {
-
-    background: #faf5ef;
-
-    border-color: #cdb49f;
-
-    color: #68482f;
-
-}
-
-
-.purchase-view-button span,
-.purchase-edit-button span {
 
     font-size: 0.75rem;
 
     line-height: 1;
 
+    font-weight: 700;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        color 0.15s ease,
+        background-color 0.15s ease,
+        transform 0.15s ease;
 }
+
+
+.purchase-action span {
+
+    display: block;
+
+    font-size: 0.75rem;
+
+    line-height: 1;
+}
+
+
+.purchase-action:hover {
+
+    transform: translateY(-1px);
+
+    text-decoration: none;
+}
+
+
+
+/* =========================================================
+   VIEW
+========================================================= */
+
+.purchase-action-view {
+
+    color: var(--green);
+}
+
+
+.purchase-action-view:hover {
+
+    color: #2e6c46;
+
+    background: #edf8f1;
+}
+
+
+
+/* =========================================================
+   EDIT
+========================================================= */
+
+.purchase-action-edit {
+
+    color: #806047;
+}
+
+
+.purchase-action-edit:hover {
+
+    color: #68482f;
+
+    background: #faf5ef;
+}
+
+
+
+/* =========================================================
+   SUBMIT
+========================================================= */
+
+.purchase-action-submit {
+
+    color: #926c2e;
+}
+
+
+.purchase-action-submit:hover {
+
+    color: #79551e;
+
+    background: #fff3dc;
+}
+
+
+
+/* =========================================================
+   APPROVE
+========================================================= */
+
+.purchase-action-approve {
+
+    color: #39704d;
+}
+
+
+.purchase-action-approve:hover {
+
+    color: #2e633f;
+
+    background: #e8f6ed;
+}
+
+
+
+/* =========================================================
+   REJECT
+========================================================= */
+
+.purchase-action-reject {
+
+    color: #9a4d43;
+}
+
+
+.purchase-action-reject:hover {
+
+    color: #843e36;
+
+    background: #fbeceb;
+}
+
+
+
+/* =========================================================
+   ORDER
+========================================================= */
+
+.purchase-action-order {
+
+    color: #536f8a;
+}
+
+
+.purchase-action-order:hover {
+
+    color: #405c75;
+
+    background: #eaf1f7;
+}
+
+
+
+/* =========================================================
+   RECEIVE
+========================================================= */
+
+.purchase-action-receive {
+
+    color: #8a7042;
+}
+
+
+.purchase-action-receive:hover {
+
+    color: #735b31;
+
+    background: #f5eedc;
+}
+
+
+
+/* =========================================================
+   CANCEL
+========================================================= */
+
+.purchase-action-cancel {
+
+    color: #817a75;
+}
+
+
+.purchase-action-cancel:hover {
+
+    color: #625b56;
+
+    background: #f3f0ed;
+}
+
 
 
 /* =========================================================
    EMPTY STATE
-
-   Same as Products
 ========================================================= */
 
-.purchase-empty-state {
+.purchases-empty-state {
 
-    padding: 65px 20px !important;
+    padding:
+        55px
+        20px !important;
 
     text-align: center !important;
-
 }
 
 
-.purchase-empty-icon {
+.purchases-empty-icon {
 
-    width: 52px;
+    width: 46px;
 
-    height: 52px;
+    height: 46px;
 
-    margin: 0 auto 13px;
+    margin:
+        0
+        auto
+        11px;
 
     display: flex;
 
@@ -1828,87 +2221,321 @@
 
     justify-content: center;
 
-    border-radius: 14px;
+    border-radius: 12px;
 
     background: var(--orange-light);
 
     color: var(--orange);
 
-    font-size: 1.1875rem;
-
+    font-size: 1.05rem;
 }
 
 
-.purchase-empty-title {
+.purchases-empty-title {
 
     color: var(--dark);
 
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
 
     font-weight: 700;
-
 }
 
 
-.purchase-empty-description {
+.purchases-empty-description {
 
-    margin-top: 5px;
+    margin-top: 4px;
 
     color: var(--muted);
 
-    font-size: 0.8125rem;
+    font-size: 0.6875rem;
 
     line-height: 1.4;
-
 }
+
 
 
 /* =========================================================
    PAGINATION
-
-   Same as Products
 ========================================================= */
 
-.purchase-pagination-wrapper {
+.purchases-pagination-wrapper {
 
-    padding: 15px 21px;
+    padding:
+        13px
+        18px;
 
-    border-top: 1px solid var(--border);
+    border-top:
+        1px solid var(--border);
 
+    background: white;
 }
 
 
-.purchase-pagination-wrapper nav {
+.purchases-pagination {
+
+    width: 100%;
 
     display: flex;
 
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+}
+
+
+.purchases-pagination-info {
+
+    color: var(--muted);
+
+    font-size: 0.6875rem;
+
+    line-height: 1.4;
+
+    white-space: nowrap;
+}
+
+
+.purchases-pagination-info strong {
+
+    color: var(--dark);
+
+    font-weight: 800;
+}
+
+
+.purchases-pagination-links {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    flex: 1;
+}
+
+
+.purchases-pagination-links nav {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    width: 100%;
+}
+
+
+.purchases-pagination-links nav > div {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 4px;
+
+    width: 100%;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Laravel pagination text/info section
+|--------------------------------------------------------------------------
+*/
+
+.purchases-pagination-links nav p {
+
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 0.6875rem;
+}
+
+
+.purchases-pagination-links nav p span {
+
+    color: var(--dark);
+
+    font-weight: 700;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Pagination links and buttons
+|--------------------------------------------------------------------------
+*/
+
+.purchases-pagination-links nav a,
+.purchases-pagination-links nav button,
+.purchases-pagination-links nav span[aria-current="page"],
+.purchases-pagination-links nav span[aria-disabled="true"] {
+
+    min-width: 30px;
+
+    height: 30px;
+
+    display: inline-flex;
+
+    align-items: center;
+
     justify-content: center;
 
+    padding:
+        0
+        8px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 7px;
+
+    background: white;
+
+    color: var(--muted);
+
+    font-family: inherit;
+
+    font-size: 0.6875rem;
+
+    line-height: 1;
+
+    font-weight: 700;
+
+    text-decoration: none;
+
+    box-sizing: border-box;
 }
 
 
-.purchase-pagination-wrapper svg {
+/*
+|--------------------------------------------------------------------------
+| Pagination links hover
+|--------------------------------------------------------------------------
+*/
 
-    width: 15px;
+.purchases-pagination-links nav a:hover {
 
-    height: 15px;
+    background: #faf5ef;
 
+    border-color: #d9b18d;
+
+    color: var(--orange);
+
+    text-decoration: none;
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| Current page
+|--------------------------------------------------------------------------
+*/
+
+.purchases-pagination-links nav span[aria-current="page"] {
+
+    background: var(--orange);
+
+    border-color: var(--orange);
+
+    color: white;
+
+    box-shadow:
+        0 2px 7px
+        rgba(168, 95, 40, 0.12);
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Current page inner span
+|--------------------------------------------------------------------------
+*/
+
+.purchases-pagination-links nav span[aria-current="page"] > span {
+
+    color: white;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Disabled previous / next
+|--------------------------------------------------------------------------
+*/
+
+.purchases-pagination-links nav span[aria-disabled="true"] {
+
+    background: #faf9f7;
+
+    color: #b4ada7;
+
+    border-color: #eee9e5;
+
+    cursor: not-allowed;
+
+    opacity: 0.75;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Pagination SVG arrows
+|--------------------------------------------------------------------------
+*/
+
+.purchases-pagination-links nav svg {
+
+    width: 13px;
+
+    height: 13px;
+
+    display: block;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Remove unnecessary default Tailwind spacing
+|--------------------------------------------------------------------------
+*/
+
+.purchases-pagination-links nav .relative {
+
+    position: relative;
+}
+
+
+.purchases-pagination-links nav .inline-flex {
+
+    display: inline-flex;
+}
+
+
+.purchases-pagination-links nav .items-center {
+
+    align-items: center;
+}
+
 
 
 /* =========================================================
    RESPONSIVE
-
-   Same as Products
 ========================================================= */
 
 @media (max-width: 1200px) {
 
-    .purchase-stats {
+    .purchases-stats {
 
         grid-template-columns:
             repeat(2, minmax(0, 1fr));
-
     }
 
 }
@@ -1916,10 +2543,41 @@
 
 @media (max-width: 700px) {
 
-    .purchase-stats {
+    .purchases-stats {
 
         grid-template-columns: 1fr;
+    }
 
+
+    .purchases-stat {
+
+        min-height: 115px;
+    }
+
+
+    .purchases-stat-left {
+
+        padding-top: 1px;
+    }
+
+
+    .purchases-stat-right {
+
+        min-width: 72px;
+
+        padding-top: 3px;
+    }
+
+
+    .purchases-stat-value {
+
+        font-size: 1.45rem;
+    }
+
+
+    .purchases-stat-note {
+
+        margin-top: 55px;
     }
 
 
@@ -1928,46 +2586,84 @@
         align-items: flex-start;
 
         flex-direction: column;
-
     }
 
 
-    .purchase-add-button {
+    .purchases-add-button {
 
         width: 100%;
-
     }
 
 
-    .purchase-filters {
+    .purchases-filters {
 
         align-items: stretch;
 
         flex-direction: column;
-
     }
 
 
-    .purchase-search-wrapper {
+    .purchases-search-wrapper {
 
         width: 100%;
-
     }
 
 
-    .purchase-filters select,
-    .purchase-filter-button,
-    .purchase-clear-button {
+    .purchases-filters select,
+    .purchases-filter-button,
+    .purchases-clear-button {
 
         width: 100%;
-
     }
 
 
-    .purchase-table-actions {
+    .purchases-table-actions {
 
         justify-content: flex-start;
 
+        gap: 8px;
+    }
+
+
+    .purchases-pagination {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .purchases-pagination-info {
+
+        width: 100%;
+
+        text-align: left;
+    }
+
+
+    .purchases-pagination-links {
+
+        width: 100%;
+
+        justify-content: flex-start;
+    }
+
+
+    .purchases-pagination-links nav {
+
+        justify-content: flex-start;
+
+        overflow-x: auto;
+
+        padding-bottom: 2px;
+    }
+
+
+    .purchases-pagination-links nav > div {
+
+        justify-content: flex-start;
+
+        width: auto;
     }
 
 }

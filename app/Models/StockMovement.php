@@ -28,6 +28,12 @@ class StockMovement extends Model
         'quantity_after' => 'decimal:2',
     ];
 
+    /*
+    |--------------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------------
+    */
+
     public function inventoryItem(): BelongsTo
     {
         return $this->belongsTo(InventoryItem::class);
@@ -36,5 +42,75 @@ class StockMovement extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Transaction Type Helpers
+    |--------------------------------------------------------------------------
+    */
+
+    public function isStockIn(): bool
+    {
+        return $this->type === 'stock_in';
+    }
+
+    public function isStockOut(): bool
+    {
+        return $this->type === 'stock_out';
+    }
+
+    public function isAdjustment(): bool
+    {
+        return $this->type === 'adjustment';
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reference Helpers
+    |--------------------------------------------------------------------------
+    |
+    | reference_type may contain:
+    |
+    | Purchase::class
+    | Sale::class
+    | initial_stock
+    | manual_stock_in
+    | manual_stock_out
+    | inventory_adjustment
+    |
+    | Because of this mixed reference structure, we intentionally do not
+    | use morphTo() here.
+    |
+    */
+
+    public function isPurchaseReference(): bool
+    {
+        return $this->reference_type === Purchase::class;
+    }
+
+    public function isSaleReference(): bool
+    {
+        return $this->reference_type === Sale::class;
+    }
+
+    public function isInitialStock(): bool
+    {
+        return $this->reference_type === 'initial_stock';
+    }
+
+    public function isManualStockIn(): bool
+    {
+        return $this->reference_type === 'manual_stock_in';
+    }
+
+    public function isManualStockOut(): bool
+    {
+        return $this->reference_type === 'manual_stock_out';
+    }
+
+    public function isInventoryAdjustment(): bool
+    {
+        return $this->reference_type === 'inventory_adjustment';
     }
 }

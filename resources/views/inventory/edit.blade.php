@@ -35,7 +35,9 @@
                     ◷
                 </span>
 
-                {{ now()->format('F d, Y') }}
+                <span>
+                    {{ now()->format('F d, Y') }}
+                </span>
 
             </div>
 
@@ -174,10 +176,6 @@
                                     required
                                 >
 
-                                <small>
-                                    Name used to identify this item.
-                                </small>
-
                             </div>
 
 
@@ -199,10 +197,6 @@
                                     maxlength="100"
                                     required
                                 >
-
-                                <small>
-                                    SKU must be unique.
-                                </small>
 
                             </div>
 
@@ -238,10 +232,6 @@
                                     @endforeach
 
                                 </select>
-
-                                <small>
-                                    Select the inventory category.
-                                </small>
 
                             </div>
 
@@ -279,10 +269,6 @@
 
                                 </select>
 
-                                <small>
-                                    Unit used for stock quantities.
-                                </small>
-
                             </div>
 
 
@@ -302,10 +288,6 @@
                                     placeholder="Example: Freezer 1"
                                     maxlength="255"
                                 >
-
-                                <small>
-                                    Where this item is physically stored.
-                                </small>
 
                             </div>
 
@@ -365,15 +347,10 @@
 
                                     {{ rtrim(rtrim(number_format((float) $inventoryItem->quantity, 2, '.', ''), '0'), '.') }}
 
-                                    <span id="current-stock-unit">
+                                    <span>
                                         {{ optional($inventoryItem->unit)->abbreviation ?? 'unit' }}
                                     </span>
 
-                                </div>
-
-                                <div class="current-stock-help">
-                                    Quantity can only be changed through Stock In,
-                                    Stock Out, or Stock Adjustment.
                                 </div>
 
                             </div>
@@ -405,18 +382,11 @@
                                         required
                                     >
 
-                                    <span
-                                        id="minimum-unit"
-                                        class="input-unit"
-                                    >
+                                    <span class="input-unit">
                                         {{ optional($inventoryItem->unit)->abbreviation ?? 'unit' }}
                                     </span>
 
                                 </div>
-
-                                <small>
-                                    Level that triggers low stock.
-                                </small>
 
                             </div>
 
@@ -440,18 +410,11 @@
                                         step="0.01"
                                     >
 
-                                    <span
-                                        id="maximum-unit"
-                                        class="input-unit"
-                                    >
+                                    <span class="input-unit">
                                         {{ optional($inventoryItem->unit)->abbreviation ?? 'unit' }}
                                     </span>
 
                                 </div>
-
-                                <small>
-                                    Optional maximum stock level.
-                                </small>
 
                             </div>
 
@@ -483,14 +446,10 @@
 
                                 </div>
 
-                                <small>
-                                    Current cost per inventory unit.
-                                </small>
-
                             </div>
 
 
-                            <!-- ACTIVE STATUS -->
+                            <!-- STATUS -->
 
                             <div class="form-group">
 
@@ -521,16 +480,12 @@
 
                                 </select>
 
-                                <small>
-                                    Inactive items remain in the records but are not active.
-                                </small>
-
                             </div>
 
                         </div>
 
 
-                        <!-- STOCK WARNING -->
+                        <!-- STOCK NOTE -->
 
                         <div class="stock-note">
 
@@ -581,6 +536,7 @@
 
                     </div>
 
+
                     <div class="form-panel-icon">
                         ≡
                     </div>
@@ -603,11 +559,6 @@
                             maxlength="2000"
                             placeholder="Enter additional information about this inventory item..."
                         >{{ old('description', $inventoryItem->description) }}</textarea>
-
-                        <small>
-                            Optional. Include specifications, usage notes,
-                            storage instructions, or other useful information.
-                        </small>
 
                     </div>
 
@@ -661,7 +612,14 @@
 ================================================================ */
 
 .inventory-edit-page {
+
     width: 100%;
+
+    max-width: 1120px;
+
+    margin: 0 auto;
+
+    padding-bottom: 30px;
 }
 
 
@@ -691,11 +649,13 @@
 
     color: #a9825b;
 
-    font-size: 11px;
+    font-size: 10px;
 
     font-weight: 700;
 
     letter-spacing: 0.12em;
+
+    line-height: 1.3;
 
     text-transform: uppercase;
 }
@@ -707,7 +667,7 @@
 
     color: var(--dark);
 
-    font-size: clamp(1.75rem, 2.2vw, 2rem);
+    font-size: 29px;
 
     font-weight: 700;
 
@@ -737,6 +697,8 @@
 
 .inventory-edit-page .date-box {
 
+    min-width: 145px;
+
     display: inline-flex;
 
     align-items: center;
@@ -747,9 +709,9 @@
 
     border: 1px solid var(--border);
 
-    border-radius: 9px;
+    border-radius: 10px;
 
-    background: white;
+    background: #ffffff;
 
     color: var(--muted);
 
@@ -762,6 +724,22 @@
 
 
 .inventory-edit-page .date-icon {
+
+    width: 30px;
+
+    height: 30px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 8px;
+
+    background: var(--orange-light);
 
     color: var(--orange);
 
@@ -799,8 +777,7 @@
 
     text-decoration: none;
 
-    transition:
-        color 0.18s ease;
+    transition: color 0.18s ease;
 }
 
 
@@ -836,9 +813,9 @@
 
     gap: 11px;
 
-    margin-bottom: 17px;
+    margin-bottom: 16px;
 
-    padding: 13px 15px;
+    padding: 11px 13px;
 
     border-radius: 10px;
 
@@ -913,7 +890,7 @@
 
 
 /* ================================================================
-   SIDE-BY-SIDE PANELS
+   INFORMATION GRID
 ================================================================ */
 
 .information-grid {
@@ -940,12 +917,11 @@
 
     overflow: hidden;
 
-    border:
-        1px solid var(--border);
+    border: 1px solid var(--border);
 
-    border-radius: 17px;
+    border-radius: 15px;
 
-    background: white;
+    background: #ffffff;
 
     box-shadow:
         0 5px 18px
@@ -965,7 +941,7 @@
 
 .form-panel-header {
 
-    min-height: 68px;
+    min-height: 65px;
 
     display: flex;
 
@@ -975,12 +951,11 @@
 
     gap: 15px;
 
-    padding: 15px 18px;
+    padding: 14px 19px;
 
-    border-bottom:
-        1px solid var(--border);
+    border-bottom: 1px solid var(--border);
 
-    background: white;
+    background: #ffffff;
 }
 
 
@@ -988,7 +963,7 @@
 
     color: var(--dark);
 
-    font-size: 19px;
+    font-size: 17px;
 
     font-weight: 700;
 
@@ -998,11 +973,11 @@
 
 .form-panel-subtitle {
 
-    margin-top: 4px;
+    margin-top: 3px;
 
     color: var(--muted);
 
-    font-size: 12px;
+    font-size: 11px;
 
     font-weight: 400;
 
@@ -1012,9 +987,9 @@
 
 .form-panel-icon {
 
-    width: 32px;
+    width: 30px;
 
-    height: 32px;
+    height: 30px;
 
     flex-shrink: 0;
 
@@ -1024,13 +999,13 @@
 
     justify-content: center;
 
-    border-radius: 9px;
+    border-radius: 8px;
 
     background: var(--orange-light);
 
     color: var(--orange);
 
-    font-size: 14px;
+    font-size: 13px;
 
     font-weight: 700;
 }
@@ -1041,6 +1016,7 @@
 ================================================================ */
 
 .form-content {
+
     padding: 18px;
 }
 
@@ -1061,6 +1037,7 @@
 
 
 .basic-location {
+
     grid-column: 1 / -1;
 }
 
@@ -1085,6 +1062,7 @@
 ================================================================ */
 
 .form-group {
+
     min-width: 0;
 }
 
@@ -1093,11 +1071,11 @@
 
     display: block;
 
-    margin-bottom: 7px;
+    margin-bottom: 6px;
 
     color: #4c3c31;
 
-    font-size: 13px;
+    font-size: 11px;
 
     font-weight: 600;
 
@@ -1123,18 +1101,17 @@
 
     width: 100%;
 
-    border:
-        1px solid #ded4cb;
+    border: 1px solid #ded4cb;
 
-    border-radius: 9px;
+    border-radius: 8px;
 
-    background: white;
+    background: #ffffff;
 
     color: var(--text);
 
     font-family: inherit;
 
-    font-size: 13px;
+    font-size: 12px;
 
     font-weight: 400;
 
@@ -1151,7 +1128,7 @@
 .form-group input,
 .form-group select {
 
-    height: 41px;
+    height: 39px;
 
     padding: 0 11px;
 }
@@ -1161,7 +1138,7 @@
 
     min-height: 105px;
 
-    padding: 11px;
+    padding: 10px 11px;
 
     resize: vertical;
 
@@ -1191,26 +1168,6 @@
 
 
 /* ================================================================
-   HELPER TEXT
-================================================================ */
-
-.form-group small {
-
-    display: block;
-
-    margin-top: 5px;
-
-    color: #9d958f;
-
-    font-size: 12px;
-
-    font-weight: 400;
-
-    line-height: 1.45;
-}
-
-
-/* ================================================================
    CURRENT STOCK
 ================================================================ */
 
@@ -1222,12 +1179,11 @@
 
     gap: 11px;
 
-    margin-bottom: 18px;
+    margin-bottom: 17px;
 
-    padding: 13px;
+    padding: 12px;
 
-    border:
-        1px solid #e9dfd5;
+    border: 1px solid #e9dfd5;
 
     border-radius: 10px;
 
@@ -1237,9 +1193,9 @@
 
 .current-stock-icon {
 
-    width: 35px;
+    width: 32px;
 
-    height: 35px;
+    height: 32px;
 
     flex-shrink: 0;
 
@@ -1249,19 +1205,20 @@
 
     justify-content: center;
 
-    border-radius: 9px;
+    border-radius: 8px;
 
     background: #eadbc9;
 
     color: #855b38;
 
-    font-size: 13px;
+    font-size: 12px;
 
     font-weight: 700;
 }
 
 
 .current-stock-content {
+
     min-width: 0;
 }
 
@@ -1272,7 +1229,7 @@
 
     color: #95867b;
 
-    font-size: 11px;
+    font-size: 10px;
 
     font-weight: 600;
 
@@ -1286,7 +1243,7 @@
 
     color: #594536;
 
-    font-size: 19px;
+    font-size: 18px;
 
     font-weight: 700;
 
@@ -1298,23 +1255,9 @@
 
     color: #95867b;
 
-    font-size: 12px;
+    font-size: 11px;
 
     font-weight: 600;
-}
-
-
-.current-stock-help {
-
-    margin-top: 3px;
-
-    color: #9d958f;
-
-    font-size: 12px;
-
-    font-weight: 400;
-
-    line-height: 1.4;
 }
 
 
@@ -1340,11 +1283,13 @@
 ================================================================ */
 
 .input-with-unit {
+
     position: relative;
 }
 
 
 .input-with-unit input {
+
     padding-right: 55px;
 }
 
@@ -1357,12 +1302,11 @@
 
     right: 11px;
 
-    transform:
-        translateY(-50%);
+    transform: translateY(-50%);
 
     color: #9b8d82;
 
-    font-size: 12px;
+    font-size: 11px;
 
     font-weight: 600;
 
@@ -1375,6 +1319,7 @@
 ================================================================ */
 
 .currency-input {
+
     position: relative;
 }
 
@@ -1387,12 +1332,11 @@
 
     left: 11px;
 
-    transform:
-        translateY(-50%);
+    transform: translateY(-50%);
 
     color: #8c684b;
 
-    font-size: 13px;
+    font-size: 12px;
 
     font-weight: 600;
 
@@ -1401,6 +1345,7 @@
 
 
 .currency-input input {
+
     padding-left: 27px;
 }
 
@@ -1417,12 +1362,11 @@
 
     gap: 10px;
 
-    margin-top: 18px;
+    margin-top: 17px;
 
     padding: 11px 12px;
 
-    border:
-        1px solid #e9dfd5;
+    border: 1px solid #e9dfd5;
 
     border-radius: 9px;
 
@@ -1464,7 +1408,7 @@
 
     color: #594536;
 
-    font-size: 12px;
+    font-size: 11px;
 
     font-weight: 700;
 }
@@ -1476,7 +1420,7 @@
 
     color: #95867b;
 
-    font-size: 12px;
+    font-size: 11px;
 
     font-weight: 400;
 
@@ -1498,7 +1442,7 @@
 
     gap: 9px;
 
-    padding-top: 1px;
+    padding-top: 0;
 
     padding-bottom: 4px;
 }
@@ -1507,7 +1451,7 @@
 .cancel-button,
 .save-button {
 
-    min-height: 41px;
+    min-height: 37px;
 
     display: inline-flex;
 
@@ -1517,13 +1461,13 @@
 
     gap: 7px;
 
-    padding: 0 17px;
+    padding: 0 14px;
 
-    border-radius: 9px;
+    border-radius: 8px;
 
     font-family: inherit;
 
-    font-size: 13px;
+    font-size: 11px;
 
     font-weight: 700;
 
@@ -1539,10 +1483,9 @@
 
 .cancel-button {
 
-    border:
-        1px solid var(--border);
+    border: 1px solid var(--border);
 
-    background: white;
+    background: #ffffff;
 
     color: var(--muted);
 
@@ -1578,7 +1521,7 @@
             var(--orange-dark)
         );
 
-    color: white;
+    color: #ffffff;
 
     box-shadow:
         0 4px 10px
@@ -1607,7 +1550,7 @@
 
 .save-button span {
 
-    font-size: 12px;
+    font-size: 11px;
 
     font-weight: 400;
 }
@@ -1633,6 +1576,12 @@
 
 @media (max-width: 700px) {
 
+    .inventory-edit-page {
+
+        padding-bottom: 25px;
+    }
+
+
     .inventory-edit-page .topbar {
 
         flex-direction: column;
@@ -1655,16 +1604,19 @@
 
 
     .basic-location {
+
         grid-column: auto;
     }
 
 
     .form-content {
+
         padding: 15px;
     }
 
 
     .form-panel-header {
+
         padding: 14px 15px;
     }
 
@@ -1700,7 +1652,7 @@
 
     .form-panel-title {
 
-        font-size: 18px;
+        font-size: 17px;
 
         font-weight: 700;
     }
@@ -1710,7 +1662,7 @@
 
         max-width: 220px;
 
-        font-size: 12px;
+        font-size: 11px;
 
         font-weight: 400;
     }

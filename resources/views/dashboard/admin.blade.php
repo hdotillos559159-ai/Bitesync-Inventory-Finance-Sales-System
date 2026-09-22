@@ -1,3156 +1,2167 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
 
-<head>
+@section('title', 'Dashboard')
 
-    <meta charset="UTF-8">
+@section('content')
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
+@php
+    $userName = $user->name ?? 'Administrator';
+
+    $salesPurchaseTrendJson = json_encode($salesPurchaseTrend ?? []);
+    $expenseBreakdownJson = json_encode($expenseBreakdown ?? []);
+    $purchaseStatusesJson = json_encode($purchaseStatuses ?? []);
+@endphp
+
+
+<style>
+
+/* ============================================================
+   BITE SYNC DASHBOARD
+   ============================================================ */
+
+.dashboard-page {
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto;
+    padding-bottom: 30px;
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.dashboard-page .topbar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 25px;
+    margin-bottom: 17px;
+}
+
+.dashboard-page .page-title small {
+    display: block;
+    margin-bottom: 5px;
+    color: #a9825b;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.dashboard-page .page-title h1 {
+    margin: 0;
+    color: #241a14;
+    font-size: 29px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -.045rem;
+}
+
+.dashboard-page .page-title p {
+    margin: 6px 0 0;
+    color: #8b8179;
+    font-size: 12px;
+    line-height: 1.5;
+    font-weight: 400;
+}
+
+.dashboard-page .date-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 145px;
+    padding: 9px 12px;
+    border: 1px solid #e4dcd4;
+    border-radius: 10px;
+    background: white;
+    color: #8b8179;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: 0 3px 12px rgba(43,31,23,.025);
+}
+
+.dashboard-page .date-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: #f4e4d4;
+    color: #c47a3a;
+    font-size: 17px;
+}
+
+
+/* ============================================================
+   KPI CARDS
+   ============================================================ */
+
+.dashboard-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 17px;
+    margin-bottom: 17px;
+}
+
+.dashboard-kpi {
+    min-height: 125px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+
+    padding: 16px 17px 15px;
+
+    border: 1px solid #e4dcd4;
+    border-radius: 15px;
+    background: white;
+
+    box-shadow: 0 5px 18px rgba(43,31,23,.045);
+
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-kpi::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 3px;
+
+    background: linear-gradient(
+        180deg,
+        #c47a3a,
+        #e2a16c
+    );
+}
+
+
+/* ============================================================
+   KPI LEFT SIDE
+   ============================================================ */
+
+.dashboard-kpi-left {
+    min-width: 0;
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+
+    padding-left: 1px;
+    padding-top: 2px;
+}
+
+.dashboard-kpi-label {
+    color: #8b8179;
+    font-size: .6875rem;
+    line-height: 1.3;
+    font-weight: 800;
+    letter-spacing: .045rem;
+    white-space: nowrap;
+    text-transform: uppercase;
+}
+
+.dashboard-kpi-note {
+    margin-top: auto;
+    padding-top: 10px;
+
+    color: #9d958f;
+    font-size: .6875rem;
+    line-height: 1.4;
+
+    max-width: 155px;
+}
+
+
+/* ============================================================
+   KPI RIGHT SIDE
+   ============================================================ */
+
+.dashboard-kpi-right {
+    min-width: 88px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-start;
+
+    padding-top: 3px;
+
+    flex-shrink: 0;
+}
+
+
+/* ============================================================
+   KPI ICON
+   ============================================================ */
+
+.dashboard-kpi-icon {
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 9px;
+
+    background: linear-gradient(
+        135deg,
+        #fbf1e7,
+        #f4e3d4
+    );
+
+    color: #c47a3a;
+
+    font-size: .72rem;
+    font-weight: 800;
+}
+
+.dashboard-kpi-icon.green {
+    background: #edf6ef;
+    color: #5d8b67;
+}
+
+.dashboard-kpi-icon.blue {
+    background: #edf2f7;
+    color: #637f9f;
+}
+
+.dashboard-kpi-icon.red {
+    background: #fbeeed;
+    color: #b95d56;
+}
+
+
+/* ============================================================
+   KPI VALUE
+   ============================================================ */
+
+.dashboard-kpi-value {
+    margin-top: 13px;
+
+    color: #241a14;
+
+    font-size: clamp(
+        1.45rem,
+        1.8vw,
+        1.75rem
+    );
+
+    line-height: 1;
+
+    font-weight: 800;
+
+    text-align: right;
+
+    white-space: nowrap;
+}
+
+.dashboard-kpi-value.money {
+    font-size: clamp(
+        1rem,
+        1.3vw,
+        1.25rem
+    );
+
+    letter-spacing: -.02rem;
+}
+
+
+/* ============================================================
+   MAIN ANALYTICS
+   ============================================================ */
+
+.dashboard-main-grid {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.7fr)
+        minmax(310px, .85fr);
+
+    gap: 17px;
+
+    margin-bottom: 17px;
+}
+
+
+/* ============================================================
+   PANELS
+   ============================================================ */
+
+.dashboard-panel {
+    background: white;
+
+    border: 1px solid #e4dcd4;
+    border-radius: 15px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 4px 16px rgba(43,31,23,.035);
+}
+
+.dashboard-panel-header {
+    min-height: 65px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 14px 18px;
+
+    border-bottom: 1px solid #e4dcd4;
+}
+
+.dashboard-panel-heading h2 {
+    margin: 0;
+
+    color: #241a14;
+
+    font-size: .875rem;
+    line-height: 1.3;
+
+    font-weight: 700;
+}
+
+.dashboard-panel-heading p {
+    margin: 3px 0 0;
+
+    color: #8b8179;
+
+    font-size: .6875rem;
+    line-height: 1.4;
+
+    font-weight: 400;
+}
+
+.dashboard-panel-body {
+    padding: 18px;
+}
+
+
+/* ============================================================
+   CHARTS
+   ============================================================ */
+
+.dashboard-chart {
+    width: 100%;
+    min-height: 310px;
+    position: relative;
+}
+
+.dashboard-chart-small {
+    min-height: 300px;
+}
+
+
+/* ============================================================
+   FINANCIAL SUMMARY
+   ============================================================ */
+
+.financial-summary {
+    display: grid;
+    gap: 13px;
+}
+
+.financial-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding-bottom: 12px;
+
+    border-bottom: 1px solid #f0ebe6;
+}
+
+.financial-row:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.financial-label {
+    color: #8b8179;
+    font-size: .72rem;
+}
+
+.financial-value {
+    color: #241a14;
+    font-size: .82rem;
+    font-weight: 800;
+
+    text-align: right;
+}
+
+.financial-value.positive {
+    color: #5d8b67;
+}
+
+.financial-value.negative {
+    color: #b95d56;
+}
+
+.financial-divider {
+    height: 1px;
+    background: #e4dcd4;
+
+    margin: 3px 0;
+}
+
+.financial-highlight {
+    padding: 14px;
+
+    border-radius: 11px;
+
+    background: #fcfaf7;
+
+    border: 1px solid #eee6de;
+}
+
+.financial-highlight-label {
+    color: #8b8179;
+
+    font-size: .65rem;
+
+    font-weight: 800;
+
+    letter-spacing: .04rem;
+
+    text-transform: uppercase;
+}
+
+.financial-highlight-value {
+    margin-top: 6px;
+
+    color: #241a14;
+
+    font-size: 1.35rem;
+
+    font-weight: 800;
+}
+
+
+/* ============================================================
+   OPERATIONAL GRID
+   ============================================================ */
+
+.dashboard-operational-grid {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+
+    gap: 17px;
+
+    margin-bottom: 17px;
+}
+
+
+/* ============================================================
+   INVENTORY HEALTH
+   ============================================================ */
+
+.stock-summary {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 10px;
+}
+
+.stock-card {
+    min-height: 90px;
+
+    padding: 13px;
+
+    border: 1px solid #e8e0d8;
+
+    border-radius: 11px;
+
+    background: #fcfaf7;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.stock-card-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.stock-card-label {
+    color: #8b8179;
+
+    font-size: .625rem;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+
+    letter-spacing: .035rem;
+}
+
+.stock-card-value {
+    color: #241a14;
+
+    font-size: 1.3rem;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+
+    text-align: right;
+
+    flex-shrink: 0;
+}
+
+.stock-card-note {
+    margin-top: 3px;
+
+    color: #9d958f;
+
+    font-size: .625rem;
+}
+
+.stock-card.normal {
+    border-left: 3px solid #5d8b67;
+}
+
+.stock-card.low {
+    border-left: 3px solid #b9823e;
+}
+
+.stock-card.out {
+    border-left: 3px solid #b95d56;
+}
+
+
+/* ============================================================
+   ACTIVITY
+   ============================================================ */
+
+.dashboard-activity-grid {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.35fr)
+        minmax(0, 1fr);
+
+    gap: 17px;
+}
+
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+
+.dashboard-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.dashboard-table {
+    width: 100%;
+
+    min-width: 560px;
+
+    border-collapse: collapse;
+}
+
+.dashboard-table th {
+    padding: 10px 12px;
+
+    background: #fbf9f6;
+
+    color: #8b8179;
+
+    border-bottom: 1px solid #e4dcd4;
+
+    text-align: left;
+
+    font-size: .625rem;
+    line-height: 1.3;
+
+    font-weight: 800;
+
+    letter-spacing: .04rem;
+
+    text-transform: uppercase;
+
+    white-space: nowrap;
+}
+
+.dashboard-table td {
+    padding: 11px 12px;
+
+    color: #625951;
+
+    border-bottom: 1px solid #f0ebe6;
+
+    font-size: .72rem;
+
+    line-height: 1.4;
+
+    vertical-align: middle;
+}
+
+.dashboard-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.dashboard-number {
+    color: #a85f28;
+    font-weight: 700;
+}
+
+.dashboard-amount {
+    color: #241a14;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   STATUS
+   ============================================================ */
+
+.dashboard-status {
+    display: inline-flex;
+
+    align-items: center;
+
+    min-height: 23px;
+
+    padding: 0 7px;
+
+    border-radius: 7px;
+
+    font-size: .6rem;
+
+    line-height: 1.2;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+}
+
+.dashboard-status.completed,
+.dashboard-status.received {
+    background: #edf6ef;
+    color: #5d8b67;
+}
+
+.dashboard-status.pending,
+.dashboard-status.ordered,
+.dashboard-status.partially {
+    background: #fbf1e3;
+    color: #b9823e;
+}
+
+.dashboard-status.draft {
+    background: #edf2f7;
+    color: #637f9f;
+}
+
+.dashboard-status.cancelled,
+.dashboard-status.rejected {
+    background: #fbeeed;
+    color: #b95d56;
+}
+
+.dashboard-status.approved {
+    background: #f4e4d4;
+    color: #a85f28;
+}
+
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+
+.dashboard-empty {
+    padding: 42px 18px;
+
+    text-align: center;
+}
+
+.dashboard-empty-icon {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 10px;
+
+    border-radius: 11px;
+
+    background: #f4e4d4;
+
+    color: #c47a3a;
+
+    font-size: 15px;
+}
+
+.dashboard-empty-title {
+    color: #625951;
+
+    font-size: .8rem;
+
+    font-weight: 700;
+}
+
+.dashboard-empty-text {
+    margin-top: 4px;
+
+    color: #9d958f;
+
+    font-size: .68rem;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1200px) {
+
+    .dashboard-kpis {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .dashboard-main-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 850px) {
+
+    .dashboard-operational-grid,
+    .dashboard-activity-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .dashboard-page .topbar {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .dashboard-page .date-box {
+        align-self: flex-start;
+    }
+
+    .dashboard-kpis {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-kpi {
+        min-height: 115px;
+    }
+
+    .dashboard-kpi-right {
+        min-width: 80px;
+    }
+
+    .dashboard-kpi-value {
+        font-size: 1.45rem;
+    }
+
+    .dashboard-kpi-value.money {
+        font-size: 1.05rem;
+    }
+
+    .stock-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-panel-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .dashboard-panel-body {
+        padding: 15px;
+    }
+
+}
+
+
+@media (max-width: 480px) {
+
+    .dashboard-page .page-title h1 {
+        font-size: 23px;
+    }
+
+    .dashboard-kpi {
+        min-height: 115px;
+    }
+
+    .dashboard-kpi-note {
+        max-width: 145px;
+    }
+
+    .stock-card {
+        min-height: 82px;
+    }
+
+}
+
+</style>
+
+
+<div class="dashboard-page">
+
+
+    {{-- ============================================================
+         HEADER
+         ============================================================ --}}
+
+    <div class="topbar">
+
+        <div class="page-title">
+
+            <small>
+                Business Overview
+            </small>
+
+            <h1>
+                Dashboard
+            </h1>
+
+            <p>
+                Monitor BiteSync sales, purchasing, expenses, and inventory performance.
+            </p>
+
+        </div>
+
+
+        <div class="date-box">
+
+            <span class="date-icon">
+                ◷
+            </span>
+
+            {{ now()->format('F d, Y') }}
+
+        </div>
+
+    </div>
+
+
+
+    {{-- ============================================================
+         KPI CARDS
+         ============================================================ --}}
+
+    <div class="dashboard-kpis">
+
+
+        {{-- ========================================================
+             TOTAL SALES
+             ======================================================== --}}
+
+        <div class="dashboard-kpi">
+
+            <div class="dashboard-kpi-left">
+
+                <div class="dashboard-kpi-label">
+                    Total Sales
+                </div>
+
+                <div class="dashboard-kpi-note">
+                    {{ number_format($salesCount) }}
+                    completed transactions
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-kpi-right">
+
+                <div class="dashboard-kpi-icon">
+                    ₱
+                </div>
+
+                <div class="dashboard-kpi-value money">
+                    ₱{{ number_format($totalSales, 2) }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        {{-- ========================================================
+             TOTAL PURCHASES
+             ======================================================== --}}
+
+        <div class="dashboard-kpi">
+
+            <div class="dashboard-kpi-left">
+
+                <div class="dashboard-kpi-label">
+                    Purchases
+                </div>
+
+                <div class="dashboard-kpi-note">
+                    {{ number_format($purchaseCount) }}
+                    non-cancelled purchases
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-kpi-right">
+
+                <div class="dashboard-kpi-icon blue">
+                    PO
+                </div>
+
+                <div class="dashboard-kpi-value money">
+                    ₱{{ number_format($totalPurchases, 2) }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        {{-- ========================================================
+             EXPENSES
+             ======================================================== --}}
+
+        <div class="dashboard-kpi">
+
+            <div class="dashboard-kpi-left">
+
+                <div class="dashboard-kpi-label">
+                    Expenses
+                </div>
+
+                <div class="dashboard-kpi-note">
+                    {{ number_format($expenseCount) }}
+                    recorded expenses
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-kpi-right">
+
+                <div class="dashboard-kpi-icon red">
+                    −
+                </div>
+
+                <div class="dashboard-kpi-value money">
+                    ₱{{ number_format($totalExpenses, 2) }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        {{-- ========================================================
+             INVENTORY VALUE
+             ======================================================== --}}
+
+        <div class="dashboard-kpi">
+
+            <div class="dashboard-kpi-left">
+
+                <div class="dashboard-kpi-label">
+                    Inventory Value
+                </div>
+
+                <div class="dashboard-kpi-note">
+                    {{ number_format($inventoryCount) }}
+                    inventory items
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-kpi-right">
+
+                <div class="dashboard-kpi-icon green">
+                    BOX
+                </div>
+
+                <div class="dashboard-kpi-value money">
+                    ₱{{ number_format($inventoryValue, 2) }}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    {{-- ============================================================
+         MAIN ANALYTICS
+         ============================================================ --}}
+
+    <div class="dashboard-main-grid">
+
+
+        {{-- ========================================================
+             SALES VS PURCHASES
+             ======================================================== --}}
+
+        <div class="dashboard-panel">
+
+            <div class="dashboard-panel-header">
+
+                <div class="dashboard-panel-heading">
+
+                    <h2>
+                        Sales vs Purchases
+                    </h2>
+
+                    <p>
+                        Daily activity for the last 30 days.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-panel-body">
+
+                <div class="dashboard-chart">
+
+                    <canvas id="salesPurchaseChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        {{-- ========================================================
+             FINANCIAL SUMMARY
+             ======================================================== --}}
+
+        <div class="dashboard-panel">
+
+            <div class="dashboard-panel-header">
+
+                <div class="dashboard-panel-heading">
+
+                    <h2>
+                        Financial Summary
+                    </h2>
+
+                    <p>
+                        Current overall business position.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-panel-body">
+
+                <div class="financial-summary">
+
+
+                    <div class="financial-row">
+
+                        <span class="financial-label">
+                            Total Sales
+                        </span>
+
+                        <span class="financial-value positive">
+                            ₱{{ number_format($totalSales, 2) }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="financial-row">
+
+                        <span class="financial-label">
+                            Total Purchases
+                        </span>
+
+                        <span class="financial-value">
+                            ₱{{ number_format($totalPurchases, 2) }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="financial-row">
+
+                        <span class="financial-label">
+                            Total Expenses
+                        </span>
+
+                        <span class="financial-value">
+                            ₱{{ number_format($totalExpenses, 2) }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="financial-divider"></div>
+
+
+                    <div class="financial-highlight">
+
+                        <div class="financial-highlight-label">
+                            Net Position
+                        </div>
+
+                        <div class="financial-highlight-value
+                            {{ $netPosition >= 0 ? 'positive' : 'negative' }}">
+
+                            ₱{{ number_format($netPosition, 2) }}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="financial-row">
+
+                        <span class="financial-label">
+                            This Month Sales
+                        </span>
+
+                        <span class="financial-value">
+                            ₱{{ number_format($monthlySales, 2) }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="financial-row">
+
+                        <span class="financial-label">
+                            This Month Purchases
+                        </span>
+
+                        <span class="financial-value">
+                            ₱{{ number_format($monthlyPurchases, 2) }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="financial-row">
+
+                        <span class="financial-label">
+                            This Month Expenses
+                        </span>
+
+                        <span class="financial-value">
+                            ₱{{ number_format($monthlyExpenses, 2) }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    {{-- ============================================================
+         GRAPH ROW
+         ============================================================ --}}
+
+    <div class="dashboard-operational-grid">
+
+
+        {{-- ========================================================
+             EXPENSE BREAKDOWN
+             ======================================================== --}}
+
+        <div class="dashboard-panel">
+
+            <div class="dashboard-panel-header">
+
+                <div class="dashboard-panel-heading">
+
+                    <h2>
+                        Expense Breakdown
+                    </h2>
+
+                    <p>
+                        Recorded operating expenses by category.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-panel-body">
+
+                <div class="dashboard-chart dashboard-chart-small">
+
+                    <canvas id="expenseChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        {{-- ========================================================
+             PURCHASE STATUS
+             ======================================================== --}}
+
+        <div class="dashboard-panel">
+
+            <div class="dashboard-panel-header">
+
+                <div class="dashboard-panel-heading">
+
+                    <h2>
+                        Purchase Status
+                    </h2>
+
+                    <p>
+                        Current purchasing workflow.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-panel-body">
+
+                <div class="dashboard-chart dashboard-chart-small">
+
+                    <canvas id="purchaseStatusChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    {{-- ============================================================
+         INVENTORY HEALTH
+         ============================================================ --}}
+
+    <div
+        class="dashboard-panel"
+        style="margin-bottom:17px;"
     >
 
-    <title>BiteSync | Admin Dashboard</title>
+        <div class="dashboard-panel-header">
 
-    <style>
+            <div class="dashboard-panel-heading">
 
-        /* =========================================================
-           RESET
-        ========================================================== */
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-
-        /* =========================================================
-           ROOT
-        ========================================================== */
-
-        :root {
-
-            --bg: #f5f1eb;
-
-            --card: #ffffff;
-
-            --card-soft: #fcfaf7;
-
-
-            --dark: #241a14;
-
-            --dark-soft: #34251d;
-
-
-            --brown: #76563d;
-
-
-            --orange: #c47a3a;
-
-            --orange-dark: #a85f28;
-
-            --orange-light: #f4e4d4;
-
-
-            --text: #2c241f;
-
-            --muted: #8b8179;
-
-
-            --border: #e4dcd4;
-
-
-            --green: #5d8b67;
-
-            --green-light: #edf6ef;
-
-
-            --red: #b95d56;
-
-            --red-light: #fbeeed;
-
-
-            --yellow: #b9823e;
-
-            --yellow-light: #fbf1e3;
-
-
-            --blue: #637f9f;
-
-            --blue-light: #edf2f7;
-        }
-
-
-        /* =========================================================
-           HTML
-        ========================================================== */
-
-        html {
-            min-height: 100%;
-            font-size: 16px;
-        }
-
-
-        /* =========================================================
-           BODY
-        ========================================================== */
-
-        body {
-
-            min-height: 100vh;
-
-            font-family:
-                "Segoe UI",
-                Arial,
-                Helvetica,
-                sans-serif;
-
-            font-size: 1rem;
-
-            line-height: 1.5;
-
-            background: var(--bg);
-
-            color: var(--text);
-
-            overflow-x: hidden;
-        }
-
-
-        /* =========================================================
-           APP
-        ========================================================== */
-
-        .app {
-            min-height: 100vh;
-        }
-
-
-        /* =========================================================
-           SIDEBAR
-        ========================================================== */
-
-        .sidebar {
-
-            width: 255px;
-
-            height: 100vh;
-
-            position: fixed;
-
-            top: 0;
-            left: 0;
-
-            display: flex;
-
-            flex-direction: column;
-
-            padding:
-                clamp(12px, 2.2vh, 24px)
-                14px
-                clamp(10px, 1.8vh, 18px);
-
-            background:
-                linear-gradient(
-                    160deg,
-                    #241a14 0%,
-                    #302118 55%,
-                    #422b1c 100%
-                );
-
-            color: white;
-
-            z-index: 100;
-
-            overflow: hidden;
-
-            box-shadow:
-                5px 0 22px
-                rgba(28, 19, 13, 0.08);
-        }
-
-
-        /* =========================================================
-           LOGO
-        ========================================================== */
-
-        .logo {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 11px;
-
-            padding:
-                3px
-                9px;
-
-            margin-bottom:
-                clamp(15px, 2.8vh, 30px);
-
-            flex-shrink: 0;
-        }
-
-
-        .logo-icon {
-
-            width:
-                clamp(38px, 5vh, 45px);
-
-            height:
-                clamp(38px, 5vh, 45px);
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            border-radius: 13px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #d79555,
-                    #a85f28
-                );
-
-            color: white;
-
-            font-size: 1.1875rem;
-
-            font-weight: 800;
-
-            box-shadow:
-                0 8px 20px
-                rgba(0, 0, 0, 0.22);
-
-            flex-shrink: 0;
-        }
-
-
-        .logo-name {
-
-            font-size: 1.25rem;
-
-            font-weight: 800;
-
-            letter-spacing: -0.025rem;
-        }
-
-
-        .logo-subtitle {
-
-            margin-top: 2px;
-
-            font-size: 0.75rem;
-
-            color:
-                rgba(255, 255, 255, 0.55);
-
-            text-transform: uppercase;
-
-            letter-spacing: 0.055rem;
-        }
-
-
-        /* =========================================================
-           NAVIGATION TITLE
-        ========================================================== */
-
-        .nav-title {
-
-            padding: 0 11px;
-
-            margin-bottom:
-                clamp(5px, 1vh, 9px);
-
-            font-size: 0.75rem;
-
-            color:
-                rgba(255, 255, 255, 0.48);
-
-            text-transform: uppercase;
-
-            letter-spacing: 0.075rem;
-
-            font-weight: 800;
-
-            flex-shrink: 0;
-        }
-
-
-        /* =========================================================
-           NAVIGATION
-        ========================================================== */
-
-        .nav {
-
-            display: flex;
-
-            flex-direction: column;
-
-            gap:
-                clamp(2px, 0.5vh, 5px);
-
-            flex-shrink: 0;
-        }
-
-
-        .nav-item {
-
-            width: 100%;
-
-            min-height:
-                clamp(36px, 5vh, 45px);
-
-            display: flex;
-
-            align-items: center;
-
-            gap:
-                clamp(8px, 1.3vh, 12px);
-
-            padding:
-                clamp(6px, 0.9vh, 9px)
-                11px;
-
-            border-radius: 10px;
-
-            border: none;
-
-            background: transparent;
-
-            color:
-                rgba(255, 255, 255, 0.72);
-
-            text-decoration: none;
-
-            font-size: 0.875rem;
-
-            line-height: 1.3;
-
-            cursor: pointer;
-
-            white-space: nowrap;
-
-            transition:
-                background 0.2s ease,
-                color 0.2s ease;
-        }
-
-
-        /* =========================================================
-           NAV HOVER
-        ========================================================== */
-
-        .nav-item:hover {
-
-            background:
-                rgba(255, 255, 255, 0.07);
-
-            color: white;
-        }
-
-
-        /* =========================================================
-           ACTIVE NAVIGATION
-        ========================================================== */
-
-        .nav-item.active {
-
-            background:
-                linear-gradient(
-                    135deg,
-                    rgba(196, 122, 58, 0.98),
-                    rgba(168, 95, 40, 0.98)
-                );
-
-            color: white;
-
-            box-shadow:
-                0 6px 16px
-                rgba(0, 0, 0, 0.16);
-        }
-
-
-        .nav-item.active:hover {
-
-            background:
-                linear-gradient(
-                    135deg,
-                    rgba(196, 122, 58, 0.98),
-                    rgba(168, 95, 40, 0.98)
-                );
-
-            color: white;
-        }
-
-
-        /* =========================================================
-           NAV ICON
-        ========================================================== */
-
-        .nav-icon {
-
-            width:
-                clamp(26px, 3.4vh, 30px);
-
-            height:
-                clamp(26px, 3.4vh, 30px);
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            border-radius: 8px;
-
-            background:
-                rgba(255, 255, 255, 0.055);
-
-            color:
-                rgba(255, 255, 255, 0.82);
-
-            font-size: 0.8125rem;
-
-            flex-shrink: 0;
-        }
-
-
-        .nav-item.active .nav-icon {
-
-            background:
-                rgba(255, 255, 255, 0.15);
-
-            color: white;
-        }
-
-
-        /* =========================================================
-           ADMINISTRATION
-        ========================================================== */
-
-        .admin-section {
-
-            margin-top:
-                clamp(12px, 2vh, 23px);
-        }
-
-
-        /* =========================================================
-           SIDEBAR BOTTOM
-        ========================================================== */
-
-        .sidebar-bottom {
-
-            margin-top: auto;
-
-            padding-top:
-                clamp(8px, 1.4vh, 15px);
-
-            flex-shrink: 0;
-        }
-
-
-        /* =========================================================
-           MINI USER
-        ========================================================== */
-
-        .user-mini {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 9px;
-
-            padding:
-                clamp(8px, 1.2vh, 11px);
-
-            margin-bottom: 6px;
-
-            border-radius: 11px;
-
-            background:
-                rgba(255, 255, 255, 0.055);
-
-            border:
-                1px solid
-                rgba(255, 255, 255, 0.045);
-        }
-
-
-        .avatar {
-
-            width:
-                clamp(34px, 4.5vh, 39px);
-
-            height:
-                clamp(34px, 4.5vh, 39px);
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            border-radius: 10px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #e0a164,
-                    #c47a3a
-                );
-
-            color: #382519;
-
-            font-size: 0.8125rem;
-
-            font-weight: 800;
-
-            flex-shrink: 0;
-        }
-
-
-        .user-info {
-
-            min-width: 0;
-        }
-
-
-        .user-name {
-
-            font-size: 0.8125rem;
-
-            font-weight: 700;
-
-            line-height: 1.3;
-
-            white-space: nowrap;
-
-            overflow: hidden;
-
-            text-overflow: ellipsis;
-
-            color: white;
-        }
-
-
-        .user-role {
-
-            margin-top: 2px;
-
-            font-size: 0.75rem;
-
-            line-height: 1.3;
-
-            color:
-                rgba(255, 255, 255, 0.58);
-        }
-
-
-        /* =========================================================
-           LOGOUT
-        ========================================================== */
-
-        .logout-form {
-            width: 100%;
-        }
-
-
-        .logout-button {
-
-            width: 100%;
-
-            min-height:
-                clamp(36px, 4.5vh, 42px);
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 10px;
-
-            padding:
-                6px 11px;
-
-            border:
-                1px solid
-                rgba(255, 255, 255, 0.06);
-
-            border-radius: 9px;
-
-            background:
-                rgba(255, 255, 255, 0.025);
-
-            color:
-                rgba(255, 255, 255, 0.68);
-
-            font-family: inherit;
-
-            font-size: 0.875rem;
-
-            cursor: pointer;
-
-            transition:
-                background 0.2s ease,
-                color 0.2s ease,
-                border-color 0.2s ease;
-        }
-
-
-        .logout-button:hover {
-
-            background:
-                rgba(255, 255, 255, 0.08);
-
-            border-color:
-                rgba(255, 255, 255, 0.11);
-
-            color: white;
-        }
-
-
-        /* =========================================================
-           MAIN
-        ========================================================== */
-
-        .main {
-
-            width:
-                calc(100% - 255px);
-
-            min-height: 100vh;
-
-            margin-left: 255px;
-
-            padding:
-                clamp(20px, 3vw, 34px)
-                clamp(20px, 3vw, 34px)
-                40px;
-        }
-
-
-        /* =========================================================
-           TOPBAR
-        ========================================================== */
-
-        .topbar {
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            gap: 20px;
-
-            margin-bottom:
-                clamp(20px, 3vh, 28px);
-        }
-
-
-        .page-title small {
-
-            display: block;
-
-            margin-bottom: 5px;
-
-            color: var(--orange);
-
-            font-size: 0.8125rem;
-
-            font-weight: 800;
-
-            text-transform: uppercase;
-
-            letter-spacing: 0.075rem;
-        }
-
-
-        .page-title h1 {
-
-            font-size:
-                clamp(1.75rem, 2.4vw, 2.125rem);
-
-            line-height: 1.15;
-
-            letter-spacing: -0.055rem;
-
-            color: var(--dark);
-        }
-
-
-        .page-title p {
-
-            margin-top: 7px;
-
-            color: var(--muted);
-
-            font-size: 0.9375rem;
-
-            line-height: 1.5;
-        }
-
-
-        .date-box {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 8px;
-
-            padding: 11px 15px;
-
-            border:
-                1px solid var(--border);
-
-            border-radius: 12px;
-
-            background: white;
-
-            color: #756b63;
-
-            font-size: 0.875rem;
-
-            box-shadow:
-                0 3px 12px
-                rgba(43, 31, 23, 0.03);
-        }
-
-
-        .date-icon {
-
-            color: var(--orange);
-
-            font-size: 1rem;
-        }
-
-
-        /* =========================================================
-           STATS
-        ========================================================== */
-
-        .stats {
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(4, minmax(0, 1fr));
-
-            gap: 17px;
-
-            margin-bottom: 22px;
-        }
-
-
-        .stat-card {
-
-            min-height:
-                clamp(145px, 18vh, 165px);
-
-            position: relative;
-
-            overflow: hidden;
-
-            padding: 20px 20px 18px;
-
-            border:
-                1px solid var(--border);
-
-            border-radius: 17px;
-
-            background: var(--card);
-
-            box-shadow:
-                0 7px 22px
-                rgba(43, 31, 23, 0.055);
-
-            transition:
-                box-shadow 0.2s ease;
-        }
-
-
-        .stat-card:hover {
-
-            box-shadow:
-                0 11px 27px
-                rgba(43, 31, 23, 0.075);
-        }
-
-
-        .stat-card::before {
-
-            content: "";
-
-            position: absolute;
-
-            left: 0;
-            top: 0;
-            bottom: 0;
-
-            width: 4px;
-
-            background:
-                linear-gradient(
-                    180deg,
-                    var(--orange),
-                    #e2a16c
-                );
-        }
-
-
-        .stat-card::after {
-
-            content: "";
-
-            position: absolute;
-
-            width: 115px;
-            height: 115px;
-
-            right: -48px;
-            bottom: -56px;
-
-            border-radius: 50%;
-
-            background:
-                rgba(196, 122, 58, 0.075);
-        }
-
-
-        .stat-top {
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            position: relative;
-
-            z-index: 2;
-        }
-
-
-        .stat-label {
-
-            color: var(--muted);
-
-            font-size: 0.8125rem;
-
-            font-weight: 800;
-
-            text-transform: uppercase;
-
-            letter-spacing: 0.05rem;
-        }
-
-
-        .stat-icon {
-
-            width: 42px;
-            height: 42px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            border-radius: 11px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #fbf1e7,
-                    #f4e3d4
-                );
-
-            color: var(--orange);
-
-            font-size: 1rem;
-
-            box-shadow:
-                inset 0 0 0 1px
-                rgba(196, 122, 58, 0.08);
-        }
-
-
-        .stat-value {
-
-            position: relative;
-
-            z-index: 2;
-
-            margin-top: 21px;
-
-            font-size:
-                clamp(1.75rem, 2.1vw, 2rem);
-
-            line-height: 1;
-
-            font-weight: 800;
-
-            color: var(--dark);
-
-            letter-spacing: -0.05rem;
-        }
-
-
-        .stat-note {
-
-            position: relative;
-
-            z-index: 2;
-
-            margin-top: 10px;
-
-            color: #9d958f;
-
-            font-size: 0.8125rem;
-
-            line-height: 1.45;
-        }
-
-
-        /* =========================================================
-           ANALYTICS
-        ========================================================== */
-
-        .analytics-grid {
-
-            display: grid;
-
-            grid-template-columns:
-                minmax(0, 1.55fr)
-                minmax(280px, 0.85fr);
-
-            gap: 20px;
-
-            margin-bottom: 20px;
-        }
-
-
-        .panel {
-
-            border:
-                1px solid var(--border);
-
-            border-radius: 17px;
-
-            background: white;
-
-            overflow: hidden;
-
-            box-shadow:
-                0 5px 18px
-                rgba(43, 31, 23, 0.035);
-        }
-
-
-        .panel-header {
-
-            min-height: 76px;
-
-            padding: 17px 21px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            gap: 15px;
-
-            border-bottom:
-                1px solid var(--border);
-        }
-
-
-        .panel-title {
-
-            font-size: 1rem;
-
-            font-weight: 800;
-
-            color: var(--dark);
-
-            line-height: 1.35;
-        }
-
-
-        .panel-subtitle {
-
-            margin-top: 4px;
-
-            color: var(--muted);
-
-            font-size: 0.8125rem;
-
-            line-height: 1.4;
-        }
-
-
-        .panel-badge {
-
-            padding: 6px 10px;
-
-            border-radius: 7px;
-
-            background: var(--orange-light);
-
-            color: var(--orange-dark);
-
-            font-size: 0.75rem;
-
-            font-weight: 800;
-
-            white-space: nowrap;
-        }
-
-
-        /* =========================================================
-           GRAPH
-        ========================================================== */
-
-        .chart-container {
-
-            min-height: 280px;
-
-            padding:
-                15px 20px 18px;
-        }
-
-
-        .chart-area {
-
-            width: 100%;
-
-            height: 220px;
-
-            position: relative;
-        }
-
-
-        .chart-svg {
-
-            width: 100%;
-
-            height: 100%;
-
-            display: block;
-        }
-
-
-        .chart-grid-line {
-
-            stroke: #eee8e2;
-
-            stroke-width: 1;
-        }
-
-
-        .chart-axis {
-
-            stroke: #dcd3ca;
-
-            stroke-width: 1;
-        }
-
-
-        .chart-bar-empty {
-
-            fill: #eee8e2;
-
-            rx: 5;
-        }
-
-
-        .chart-line {
-
-            fill: none;
-
-            stroke: var(--orange);
-
-            stroke-width: 3;
-
-            stroke-linecap: round;
-
-            stroke-linejoin: round;
-        }
-
-
-        .chart-point {
-
-            fill: white;
-
-            stroke: var(--orange);
-
-            stroke-width: 3;
-        }
-
-
-        .chart-label {
-
-            fill: #81776f;
-
-            font-size: 0.75rem;
-
-            font-family:
-                "Segoe UI",
-                Arial,
-                sans-serif;
-        }
-
-
-        .chart-legend {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 18px;
-
-            margin-top: 2px;
-
-            color: var(--muted);
-
-            font-size: 0.8125rem;
-
-            line-height: 1.4;
-        }
-
-
-        .legend-item {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 7px;
-        }
-
-
-        .legend-dot {
-
-            width: 9px;
-            height: 9px;
-
-            border-radius: 3px;
-
-            background: #e6b58a;
-
-            flex-shrink: 0;
-        }
-
-
-        .legend-dot.orange {
-
-            background: var(--orange);
-        }
-
-
-        /* =========================================================
-           QUICK ACTIONS
-        ========================================================== */
-
-        .quick-actions {
-
-            padding: 17px;
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(4, minmax(0, 1fr));
-
-            gap: 11px;
-        }
-
-
-        .action {
-
-            min-height: 100px;
-
-            position: relative;
-
-            padding: 13px;
-
-            border:
-                1px solid var(--border);
-
-            border-radius: 12px;
-
-            background: var(--card-soft);
-
-            text-decoration: none;
-
-            transition:
-                border-color 0.2s ease,
-                background 0.2s ease,
-                box-shadow 0.2s ease;
-        }
-
-
-        .action:hover {
-
-            border-color: #d8b28f;
-
-            background: #fffaf5;
-
-            box-shadow:
-                0 5px 13px
-                rgba(43, 31, 23, 0.04);
-        }
-
-
-        .action-icon {
-
-            width: 32px;
-            height: 32px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            border-radius: 9px;
-
-            background: #f4e7db;
-
-            color: var(--orange);
-
-            font-size: 0.875rem;
-
-            margin-bottom: 9px;
-        }
-
-
-        .action-title {
-
-            color: var(--dark);
-
-            font-size: 0.875rem;
-
-            font-weight: 800;
-
-            line-height: 1.35;
-        }
-
-
-        .action-description {
-
-            margin-top: 4px;
-
-            color: var(--muted);
-
-            font-size: 0.8125rem;
-
-            line-height: 1.45;
-        }
-
-
-        /* =========================================================
-           LOWER CONTENT
-        ========================================================== */
-
-        .content-grid {
-
-            display: grid;
-
-            grid-template-columns:
-                minmax(0, 1.55fr)
-                minmax(280px, 0.85fr);
-
-            gap: 20px;
-        }
-
-
-        /* =========================================================
-           INVENTORY STATUS
-        ========================================================== */
-
-        .inventory-list {
-
-            padding:
-                5px 21px 14px;
-        }
-
-
-        .inventory-row {
-
-            min-height: 64px;
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 12px;
-
-            padding: 10px 0;
-
-            border-bottom:
-                1px solid #f0ebe6;
-        }
-
-
-        .inventory-row:last-child {
-
-            border-bottom: none;
-        }
-
-
-        .inventory-item-icon {
-
-            width: 37px;
-            height: 37px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            border-radius: 10px;
-
-            background: #f7eee7;
-
-            color: var(--orange);
-
-            font-size: 0.875rem;
-
-            flex-shrink: 0;
-        }
-
-
-        .inventory-info {
-
-            flex: 1;
-
-            min-width: 0;
-        }
-
-
-        .inventory-name {
-
-            color: var(--dark);
-
-            font-size: 0.875rem;
-
-            font-weight: 700;
-
-            line-height: 1.35;
-        }
-
-
-        .inventory-detail {
-
-            margin-top: 3px;
-
-            color: var(--muted);
-
-            font-size: 0.8125rem;
-
-            line-height: 1.4;
-        }
-
-
-        .stock-status {
-
-            padding: 6px 9px;
-
-            border-radius: 7px;
-
-            font-size: 0.75rem;
-
-            font-weight: 800;
-
-            letter-spacing: 0.025rem;
-
-            white-space: nowrap;
-        }
-
-
-        .status-out {
-
-            color: var(--red);
-
-            background: var(--red-light);
-        }
-
-
-        .status-low {
-
-            color: var(--yellow);
-
-            background: var(--yellow-light);
-        }
-
-
-        .status-normal {
-
-            color: var(--green);
-
-            background: var(--green-light);
-        }
-
-
-        /* =========================================================
-           ACTIVITY
-        ========================================================== */
-
-        .activity-list {
-
-            padding:
-                7px 21px 15px;
-        }
-
-
-        .activity {
-
-            display: flex;
-
-            gap: 12px;
-
-            padding: 12px 0;
-
-            border-bottom:
-                1px solid #f0ebe6;
-        }
-
-
-        .activity:last-child {
-
-            border-bottom: none;
-        }
-
-
-        .activity-dot {
-
-            width: 9px;
-            height: 9px;
-
-            margin-top: 7px;
-
-            border-radius: 50%;
-
-            background: var(--orange);
-
-            flex-shrink: 0;
-
-            box-shadow:
-                0 0 0 4px
-                rgba(196, 122, 58, 0.09);
-        }
-
-
-        .activity-text {
-
-            color: #625951;
-
-            font-size: 0.875rem;
-
-            line-height: 1.55;
-        }
-
-
-        .activity-text strong {
-
-            color: var(--dark);
-        }
-
-
-        .activity-time {
-
-            margin-top: 4px;
-
-            color: #938a83;
-
-            font-size: 0.75rem;
-
-            line-height: 1.4;
-        }
-
-
-        /* =========================================================
-           VIEW LINK
-        ========================================================== */
-
-        .view-link {
-
-            color: var(--orange);
-
-            font-size: 0.8125rem;
-
-            font-weight: 800;
-
-            text-decoration: none;
-
-            transition:
-                color 0.2s ease;
-        }
-
-
-        .view-link:hover {
-
-            color: var(--orange-dark);
-        }
-
-
-        /* =========================================================
-           RESPONSIVE — 1250px
-        ========================================================== */
-
-        @media (max-width: 1250px) {
-
-            .stats {
-
-                grid-template-columns:
-                    repeat(2, minmax(0, 1fr));
-            }
-
-
-            .analytics-grid,
-            .content-grid {
-
-                grid-template-columns: 1fr;
-            }
-
-
-            .quick-actions {
-
-                grid-template-columns:
-                    repeat(2, minmax(0, 1fr));
-            }
-
-        }
-
-
-        /* =========================================================
-           RESPONSIVE — 850px
-        ========================================================== */
-
-        @media (max-width: 850px) {
-
-            .sidebar {
-
-                width: 72px;
-
-                padding:
-                    15px 8px;
-            }
-
-
-            .logo {
-
-                justify-content: center;
-
-                padding: 0;
-
-                margin-bottom: 20px;
-            }
-
-
-            .logo > div:not(.logo-icon) {
-
-                display: none;
-            }
-
-
-            .nav-title {
-
-                display: none;
-            }
-
-
-            .nav-item {
-
-                justify-content: center;
-
-                padding:
-                    6px 3px;
-            }
-
-
-            .nav-item span:not(.nav-icon) {
-
-                display: none;
-            }
-
-
-            .nav-icon {
-
-                width: 36px;
-
-                height: 36px;
-            }
-
-
-            .admin-section {
-
-                margin-top: 15px;
-            }
-
-
-            .user-mini {
-
-                justify-content: center;
-
-                padding: 6px 3px;
-            }
-
-
-            .user-info {
-
-                display: none;
-            }
-
-
-            .logout-button {
-
-                justify-content: center;
-
-                padding: 5px 3px;
-            }
-
-
-            .logout-button span:not(.nav-icon) {
-
-                display: none;
-            }
-
-
-            .main {
-
-                width:
-                    calc(100% - 72px);
-
-                margin-left: 72px;
-
-                padding:
-                    24px 18px 35px;
-            }
-
-        }
-
-
-        /* =========================================================
-           RESPONSIVE — 600px
-        ========================================================== */
-
-        @media (max-width: 600px) {
-
-            .stats {
-
-                grid-template-columns: 1fr;
-            }
-
-
-            .quick-actions {
-
-                grid-template-columns: 1fr;
-            }
-
-
-            .topbar {
-
-                align-items: flex-start;
-
-                flex-direction: column;
-            }
-
-
-            .date-box {
-
-                display: none;
-            }
-
-
-            .main {
-
-                padding:
-                    20px 14px 30px;
-            }
-
-
-            .chart-container {
-
-                padding:
-                    12px;
-            }
-
-
-            .page-title h1 {
-
-                font-size: 1.75rem;
-            }
-
-
-            .page-title p {
-
-                font-size: 0.875rem;
-            }
-
-
-            .panel-header {
-
-                padding:
-                    15px;
-            }
-
-
-            .inventory-list,
-            .activity-list {
-
-                padding-left: 15px;
-
-                padding-right: 15px;
-            }
-
-        }
-
-
-        /* =========================================================
-           RESPONSIVE — 420px
-        ========================================================== */
-
-        @media (max-width: 420px) {
-
-            .main {
-
-                padding:
-                    18px 11px 25px;
-            }
-
-
-            .stat-card {
-
-                padding:
-                    18px 16px;
-            }
-
-
-            .quick-actions {
-
-                padding:
-                    14px;
-            }
-
-
-            .action {
-
-                min-height: 96px;
-            }
-
-
-            .stock-status {
-
-                padding:
-                    5px 7px;
-
-                font-size: 0.6875rem;
-            }
-
-        }
-
-    </style>
-
-</head>
-
-
-<body>
-
-<div class="app">
-
-
-    <!-- =========================================================
-         SIDEBAR
-    ========================================================== -->
-
-    <aside class="sidebar">
-
-
-        <!-- =====================================================
-             LOGO
-        ====================================================== -->
-
-        <div class="logo">
-
-            <div class="logo-icon">
-                B
-            </div>
-
-            <div>
-
-                <div class="logo-name">
-                    BiteSync
-                </div>
-
-                <div class="logo-subtitle">
-                    Management System
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- =====================================================
-             MAIN MENU
-        ====================================================== -->
-
-        <div class="nav-title">
-            Main Menu
-        </div>
-
-
-        <nav class="nav">
-
-
-            <!-- =================================================
-                 DASHBOARD
-            ================================================== -->
-
-            <a
-                href="{{ route('admin.dashboard') }}"
-                class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
-            >
-
-                <span class="nav-icon">
-                    ⌂
-                </span>
-
-                <span>
-                    Dashboard
-                </span>
-
-            </a>
-
-
-            <!-- =================================================
-                 INVENTORY
-            ================================================== -->
-
-            <a
-                href="{{ route('inventory.index') }}"
-                class="nav-item {{ request()->routeIs('inventory.*') ? 'active' : '' }}"
-            >
-
-                <span class="nav-icon">
-                    ▦
-                </span>
-
-                <span>
-                    Inventory
-                </span>
-
-            </a>
-
-
-            <!-- =================================================
-                 PRODUCTS
-            ================================================== -->
-
-            <a
-                href="{{ route('products.index') }}"
-                class="nav-item {{ request()->routeIs('products.*') || request()->routeIs('recipes.*') ? 'active' : '' }}"
-            >
-
-                <span class="nav-icon">
-                    ◈
-                </span>
-
-                <span>
-                    Products
-                </span>
-
-            </a>
-
-
-            <!-- =================================================
-                 SUPPLIERS
-            ================================================== -->
-
-            <a
-                href="{{ route('suppliers.index') }}"
-                class="nav-item {{ request()->routeIs('suppliers.*') ? 'active' : '' }}"
-            >
-
-                <span class="nav-icon">
-                    ♧
-                </span>
-
-                <span>
-                    Suppliers
-                </span>
-
-            </a>
-
-
-            <!-- =================================================
-                 PURCHASES
-            ================================================== -->
-
-            <a
-                href="#"
-                class="nav-item"
-            >
-
-                <span class="nav-icon">
-                    ▤
-                </span>
-
-                <span>
-                    Purchases
-                </span>
-
-            </a>
-
-
-            <!-- =================================================
-                 SALES
-            ================================================== -->
-
-            <a
-                href="#"
-                class="nav-item"
-            >
-
-                <span class="nav-icon">
-                    ₱
-                </span>
-
-                <span>
-                    Sales
-                </span>
-
-            </a>
-
-
-            <!-- =================================================
-                 EXPENSES
-            ================================================== -->
-
-            <a
-                href="#"
-                class="nav-item"
-            >
-
-                <span class="nav-icon">
-                    ▣
-                </span>
-
-                <span>
-                    Expenses
-                </span>
-
-            </a>
-
-
-            <!-- =================================================
-                 REPORTS
-            ================================================== -->
-
-            <a
-                href="#"
-                class="nav-item"
-            >
-
-                <span class="nav-icon">
-                    ▥
-                </span>
-
-                <span>
-                    Reports
-                </span>
-
-            </a>
-
-        </nav>
-
-
-        <!-- =====================================================
-             ADMINISTRATION
-        ====================================================== -->
-
-        <div class="admin-section">
-
-            <div class="nav-title">
-                Administration
-            </div>
-
-
-            <nav class="nav">
-
-
-                <!-- USER MANAGEMENT -->
-
-                <a
-                    href="#"
-                    class="nav-item"
-                >
-
-                    <span class="nav-icon">
-                        ♙
-                    </span>
-
-                    <span>
-                        User Management
-                    </span>
-
-                </a>
-
-
-                <!-- SYSTEM SETTINGS -->
-
-                <a
-                    href="#"
-                    class="nav-item"
-                >
-
-                    <span class="nav-icon">
-                        ⚙
-                    </span>
-
-                    <span>
-                        System Settings
-                    </span>
-
-                </a>
-
-
-                <!-- AUDIT LOGS -->
-
-                <a
-                    href="#"
-                    class="nav-item"
-                >
-
-                    <span class="nav-icon">
-                        ◷
-                    </span>
-
-                    <span>
-                        Audit Logs
-                    </span>
-
-                </a>
-
-            </nav>
-
-        </div>
-
-
-        <!-- =====================================================
-             USER / LOGOUT
-        ====================================================== -->
-
-        <div class="sidebar-bottom">
-
-
-            <!-- USER -->
-
-            <div class="user-mini">
-
-                <div class="avatar">
-
-                    {{ strtoupper(substr($user->name, 0, 1)) }}
-
-                </div>
-
-
-                <div class="user-info">
-
-                    <div class="user-name">
-                        {{ $user->name }}
-                    </div>
-
-                    <div class="user-role">
-                        {{ $user->role }}
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- LOGOUT -->
-
-            <form
-                method="POST"
-                action="{{ route('logout') }}"
-                class="logout-form"
-            >
-
-                @csrf
-
-                <button
-                    type="submit"
-                    class="logout-button"
-                >
-
-                    <span class="nav-icon">
-                        ↪
-                    </span>
-
-                    <span>
-                        Sign Out
-                    </span>
-
-                </button>
-
-            </form>
-
-        </div>
-
-    </aside>
-
-
-    <!-- =========================================================
-         MAIN CONTENT
-    ========================================================== -->
-
-    <main class="main">
-
-
-        <!-- =====================================================
-             TOPBAR
-        ====================================================== -->
-
-        <div class="topbar">
-
-            <div class="page-title">
-
-                <small>
-                    CEO / Administration
-                </small>
-
-                <h1>
-                    Dashboard
-                </h1>
+                <h2>
+                    Inventory Health
+                </h2>
 
                 <p>
-                    Welcome back, {{ $user->name }}.
-                    Here's your BiteSync overview.
+                    Current stock condition across inventory items.
                 </p>
 
             </div>
 
+        </div>
 
-            <div class="date-box">
 
-                <span class="date-icon">
-                    ◷
-                </span>
+        <div class="dashboard-panel-body">
 
-                {{ now()->format('F d, Y') }}
+            <div class="stock-summary">
+
+
+                <div class="stock-card normal">
+
+                    <div class="stock-card-info">
+
+                        <div class="stock-card-label">
+                            Normal Stock
+                        </div>
+
+                        <div class="stock-card-note">
+                            Items above minimum level
+                        </div>
+
+                    </div>
+
+
+                    <div class="stock-card-value">
+                        {{ number_format($normalStockCount) }}
+                    </div>
+
+                </div>
+
+
+                <div class="stock-card low">
+
+                    <div class="stock-card-info">
+
+                        <div class="stock-card-label">
+                            Low Stock
+                        </div>
+
+                        <div class="stock-card-note">
+                            Items needing attention
+                        </div>
+
+                    </div>
+
+
+                    <div class="stock-card-value">
+                        {{ number_format($lowStockCount) }}
+                    </div>
+
+                </div>
+
+
+                <div class="stock-card out">
+
+                    <div class="stock-card-info">
+
+                        <div class="stock-card-label">
+                            Out of Stock
+                        </div>
+
+                        <div class="stock-card-note">
+                            Items with zero quantity
+                        </div>
+
+                    </div>
+
+
+                    <div class="stock-card-value">
+                        {{ number_format($outOfStockCount) }}
+                    </div>
+
+                </div>
 
             </div>
 
         </div>
 
-
-        <!-- =====================================================
-             SUMMARY CARDS
-        ====================================================== -->
-
-        <section class="stats">
+    </div>
 
 
-            <!-- INVENTORY -->
 
-            <div class="stat-card">
+    {{-- ============================================================
+         RECENT ACTIVITY
+         ============================================================ --}}
 
-                <div class="stat-top">
-
-                    <div class="stat-label">
-                        Inventory Items
-                    </div>
-
-                    <div class="stat-icon">
-                        ▦
-                    </div>
-
-                </div>
+    <div class="dashboard-activity-grid">
 
 
-                <div class="stat-value">
-                    0
-                </div>
+        {{-- ========================================================
+             RECENT SALES
+             ======================================================== --}}
 
+        <div class="dashboard-panel">
 
-                <div class="stat-note">
-                    Total active inventory items
+            <div class="dashboard-panel-header">
+
+                <div class="dashboard-panel-heading">
+
+                    <h2>
+                        Recent Sales
+                    </h2>
+
+                    <p>
+                        Latest completed customer transactions.
+                    </p>
+
                 </div>
 
             </div>
 
 
-            <!-- LOW STOCK -->
+            @if ($recentSales->count())
 
-            <div class="stat-card">
+                <div class="dashboard-table-wrapper">
 
-                <div class="stat-top">
+                    <table class="dashboard-table">
 
-                    <div class="stat-label">
-                        Low Stock
-                    </div>
+                        <thead>
 
-                    <div class="stat-icon">
-                        !
-                    </div>
+                            <tr>
+
+                                <th>
+                                    Sale
+                                </th>
+
+                                <th>
+                                    Date
+                                </th>
+
+                                <th>
+                                    Payment
+                                </th>
+
+                                <th>
+                                    Total
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            @foreach ($recentSales as $sale)
+
+                                <tr>
+
+                                    <td>
+
+                                        <span class="dashboard-number">
+                                            {{ $sale->sale_number }}
+                                        </span>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {{ $sale->sale_date
+                                            ? $sale->sale_date->format('M d, Y')
+                                            : '—'
+                                        }}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {{ $sale->payment_method ?? '—' }}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <span class="dashboard-amount">
+                                            ₱{{ number_format((float) $sale->total, 2) }}
+                                        </span>
+
+                                    </td>
+
+                                </tr>
+
+                            @endforeach
+
+                        </tbody>
+
+                    </table>
 
                 </div>
 
+            @else
 
-                <div class="stat-value">
-                    0
-                </div>
+                <div class="dashboard-empty">
 
-
-                <div class="stat-note">
-                    Items requiring attention
-                </div>
-
-            </div>
-
-
-            <!-- PURCHASES -->
-
-            <div class="stat-card">
-
-                <div class="stat-top">
-
-                    <div class="stat-label">
-                        Purchases
-                    </div>
-
-                    <div class="stat-icon">
-                        ▤
-                    </div>
-
-                </div>
-
-
-                <div class="stat-value">
-                    ₱0.00
-                </div>
-
-
-                <div class="stat-note">
-                    No purchase records yet
-                </div>
-
-            </div>
-
-
-            <!-- EXPENSES -->
-
-            <div class="stat-card">
-
-                <div class="stat-top">
-
-                    <div class="stat-label">
-                        Expenses
-                    </div>
-
-                    <div class="stat-icon">
+                    <div class="dashboard-empty-icon">
                         ₱
                     </div>
 
-                </div>
-
-
-                <div class="stat-value">
-                    ₱0.00
-                </div>
-
-
-                <div class="stat-note">
-                    No expense records yet
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =====================================================
-             ANALYTICS
-        ====================================================== -->
-
-        <section class="analytics-grid">
-
-
-            <!-- =================================================
-                 INVENTORY OVERVIEW
-            ================================================== -->
-
-            <div class="panel">
-
-
-                <div class="panel-header">
-
-                    <div>
-
-                        <div class="panel-title">
-                            Inventory Overview
-                        </div>
-
-                        <div class="panel-subtitle">
-                            Current stock status by category
-                        </div>
-
+                    <div class="dashboard-empty-title">
+                        No sales recorded yet
                     </div>
 
-
-                    <div class="panel-badge">
-                        Inventory
+                    <div class="dashboard-empty-text">
+                        Completed sales will appear here.
                     </div>
 
                 </div>
 
-
-                <div class="chart-container">
-
-                    <div class="chart-area">
-
-                        <svg
-                            class="chart-svg"
-                            viewBox="0 0 700 220"
-                            preserveAspectRatio="none"
-                        >
-
-                            <line
-                                class="chart-grid-line"
-                                x1="55"
-                                y1="25"
-                                x2="680"
-                                y2="25"
-                            />
-
-                            <line
-                                class="chart-grid-line"
-                                x1="55"
-                                y1="70"
-                                x2="680"
-                                y2="70"
-                            />
-
-                            <line
-                                class="chart-grid-line"
-                                x1="55"
-                                y1="115"
-                                x2="680"
-                                y2="115"
-                            />
-
-                            <line
-                                class="chart-grid-line"
-                                x1="55"
-                                y1="160"
-                                x2="680"
-                                y2="160"
-                            />
-
-                            <line
-                                class="chart-axis"
-                                x1="55"
-                                y1="195"
-                                x2="680"
-                                y2="195"
-                            />
-
-
-                            <text
-                                class="chart-label"
-                                x="20"
-                                y="29"
-                            >
-                                20
-                            </text>
-
-                            <text
-                                class="chart-label"
-                                x="25"
-                                y="74"
-                            >
-                                15
-                            </text>
-
-                            <text
-                                class="chart-label"
-                                x="25"
-                                y="119"
-                            >
-                                10
-                            </text>
-
-                            <text
-                                class="chart-label"
-                                x="30"
-                                y="164"
-                            >
-                                5
-                            </text>
-
-                            <text
-                                class="chart-label"
-                                x="30"
-                                y="199"
-                            >
-                                0
-                            </text>
-
-
-                            <rect
-                                class="chart-bar-empty"
-                                x="90"
-                                y="193"
-                                width="55"
-                                height="2"
-                            />
-
-                            <rect
-                                class="chart-bar-empty"
-                                x="190"
-                                y="193"
-                                width="55"
-                                height="2"
-                            />
-
-                            <rect
-                                class="chart-bar-empty"
-                                x="290"
-                                y="193"
-                                width="55"
-                                height="2"
-                            />
-
-                            <rect
-                                class="chart-bar-empty"
-                                x="390"
-                                y="193"
-                                width="55"
-                                height="2"
-                            />
-
-                            <rect
-                                class="chart-bar-empty"
-                                x="490"
-                                y="193"
-                                width="55"
-                                height="2"
-                            />
-
-                            <rect
-                                class="chart-bar-empty"
-                                x="590"
-                                y="193"
-                                width="55"
-                                height="2"
-                            />
-
-
-                            <text
-                                class="chart-label"
-                                x="94"
-                                y="213"
-                            >
-                                Meat
-                            </text>
-
-                            <text
-                                class="chart-label"
-                                x="185"
-                                y="213"
-                            >
-                                Vegetables
-                            </text>
-
-                            <text
-                                class="chart-label"
-                                x="300"
-                                y="213"
-                            >
-                                Dairy
-                            </text>
-
-                            <text
-                                class="chart-label"
-                                x="395"
-                                y="213"
-                            >
-                                Beverages
-                            </text>
-
-                            <text
-                                class="chart-label"
-                                x="500"
-                                y="213"
-                            >
-                                Dry Goods
-                            </text>
-
-                            <text
-                                class="chart-label"
-                                x="605"
-                                y="213"
-                            >
-                                Other
-                            </text>
-
-                        </svg>
-
-                    </div>
-
-
-                    <div class="chart-legend">
-
-                        <div class="legend-item">
-
-                            <span class="legend-dot"></span>
-
-                            <span>
-                                No inventory records yet
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 BUSINESS ACTIVITY
-            ================================================== -->
-
-            <div class="panel">
-
-
-                <div class="panel-header">
-
-                    <div>
-
-                        <div class="panel-title">
-                            Business Activity
-                        </div>
-
-                        <div class="panel-subtitle">
-                            Recent financial activity
-                        </div>
-
-                    </div>
-
-
-                    <div class="panel-badge">
-                        Overview
-                    </div>
-
-                </div>
-
-
-                <div class="chart-container">
-
-                    <div class="chart-area">
-
-                        <svg
-                            class="chart-svg"
-                            viewBox="0 0 500 220"
-                            preserveAspectRatio="none"
-                        >
-
-                            <line
-                                class="chart-grid-line"
-                                x1="45"
-                                y1="30"
-                                x2="475"
-                                y2="30"
-                            />
-
-                            <line
-                                class="chart-grid-line"
-                                x1="45"
-                                y1="75"
-                                x2="475"
-                                y2="75"
-                            />
-
-                            <line
-                                class="chart-grid-line"
-                                x1="45"
-                                y1="120"
-                                x2="475"
-                                y2="120"
-                            />
-
-                            <line
-                                class="chart-grid-line"
-                                x1="45"
-                                y1="165"
-                                x2="475"
-                                y2="165"
-                            />
-
-                            <line
-                                class="chart-axis"
-                                x1="45"
-                                y1="195"
-                                x2="475"
-                                y2="195"
-                            />
-
-
-                            <line
-                                class="chart-line"
-                                x1="55"
-                                y1="194"
-                                x2="465"
-                                y2="194"
-                                style="opacity: 0.25;"
-                            />
-
-
-                            <circle
-                                class="chart-point"
-                                cx="65"
-                                cy="194"
-                                r="4"
-                                style="opacity: 0.55;"
-                            />
-
-                            <circle
-                                class="chart-point"
-                                cx="135"
-                                cy="194"
-                                r="4"
-                                style="opacity: 0.55;"
-                            />
-
-                            <circle
-                                class="chart-point"
-                                cx="205"
-                                cy="194"
-                                r="4"
-                                style="opacity: 0.55;"
-                            />
-
-                            <circle
-                                class="chart-point"
-                                cx="275"
-                                cy="194"
-                                r="4"
-                                style="opacity: 0.55;"
-                            />
-
-                            <circle
-                                class="chart-point"
-                                cx="345"
-                                cy="194"
-                                r="4"
-                                style="opacity: 0.55;"
-                            />
-
-                            <circle
-                                class="chart-point"
-                                cx="415"
-                                cy="194"
-                                r="4"
-                                style="opacity: 0.55;"
-                            />
-
-                            <circle
-                                class="chart-point"
-                                cx="465"
-                                cy="194"
-                                r="4"
-                                style="opacity: 0.55;"
-                            />
-
-
-                            <text
-                                class="chart-label"
-                                x="52"
-                                y="213"
-                            >
-                                Jan
-                            </text>
-
-                            <text
-                                class="chart-label"
-                                x="122"
-                                y="213"
-                            >
-                                Feb
-                            </text>
-
-                            <text
-                                class="chart-label"
-                                x="192"
-                                y="213"
-                            >
-                                Mar
-                            </text>
-
-                            <text
-                                class="chart-label"
-                                x="262"
-                                y="213"
-                            >
-                                Apr
-                            </text>
-
-                            <text
-                                class="chart-label"
-                                x="332"
-                                y="213"
-                            >
-                                May
-                            </text>
-
-                            <text
-                                class="chart-label"
-                                x="402"
-                                y="213"
-                            >
-                                Jun
-                            </text>
-
-                            <text
-                                class="chart-label"
-                                x="450"
-                                y="213"
-                            >
-                                Jul
-                            </text>
-
-                        </svg>
-
-                    </div>
-
-
-                    <div class="chart-legend">
-
-                        <div class="legend-item">
-
-                            <span class="legend-dot orange"></span>
-
-                            <span>
-                                No financial records yet
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =====================================================
-             QUICK ACTIONS
-        ====================================================== -->
-
-        <div
-            class="panel"
-            style="margin-bottom: 20px;"
-        >
-
-            <div class="panel-header">
-
-                <div>
-
-                    <div class="panel-title">
-                        Quick Actions
-                    </div>
-
-                    <div class="panel-subtitle">
-                        Frequently used management functions
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="quick-actions">
-
-
-                <!-- =================================================
-                     ADD INVENTORY
-                ================================================== -->
-
-                <a
-                    href="{{ route('inventory.create') }}"
-                    class="action"
-                >
-
-                    <div class="action-icon">
-                        +
-                    </div>
-
-                    <div class="action-title">
-                        Add Inventory
-                    </div>
-
-                    <div class="action-description">
-                        Register a new stock item
-                    </div>
-
-                </a>
-
-
-                <!-- =================================================
-                     PRODUCTS
-                ================================================== -->
-
-                <a
-                    href="{{ route('products.index') }}"
-                    class="action"
-                >
-
-                    <div class="action-icon">
-                        ◈
-                    </div>
-
-                    <div class="action-title">
-                        Products
-                    </div>
-
-                    <div class="action-description">
-                        Manage café menu products
-                    </div>
-
-                </a>
-
-
-                <!-- =================================================
-                     NEW PURCHASE
-                ================================================== -->
-
-                <a
-                    href="#"
-                    class="action"
-                >
-
-                    <div class="action-icon">
-                        ▤
-                    </div>
-
-                    <div class="action-title">
-                        New Purchase
-                    </div>
-
-                    <div class="action-description">
-                        Create a purchase record
-                    </div>
-
-                </a>
-
-
-                <!-- =================================================
-                     REPORTS
-                ================================================== -->
-
-                <a
-                    href="#"
-                    class="action"
-                >
-
-                    <div class="action-icon">
-                        ▥
-                    </div>
-
-                    <div class="action-title">
-                        View Reports
-                    </div>
-
-                    <div class="action-description">
-                        Review system reports
-                    </div>
-
-                </a>
-
-            </div>
+            @endif
 
         </div>
 
 
-        <!-- =====================================================
-             LOWER CONTENT
-        ====================================================== -->
 
-        <section class="content-grid">
+        {{-- ========================================================
+             RECENT EXPENSES
+             ======================================================== --}}
 
+        <div class="dashboard-panel">
 
-            <!-- =================================================
-                 INVENTORY STATUS
-            ================================================== -->
+            <div class="dashboard-panel-header">
 
-            <div class="panel">
+                <div class="dashboard-panel-heading">
 
-                <div class="panel-header">
+                    <h2>
+                        Recent Expenses
+                    </h2>
 
-                    <div>
-
-                        <div class="panel-title">
-                            Inventory Status
-                        </div>
-
-                        <div class="panel-subtitle">
-                            Items that require monitoring
-                        </div>
-
-                    </div>
-
-
-                    <a
-                        href="{{ route('inventory.index') }}"
-                        class="view-link"
-                    >
-                        View Inventory
-                    </a>
-
-                </div>
-
-
-                <div class="inventory-list">
-
-
-                    <!-- BURGER PATTY -->
-
-                    <div class="inventory-row">
-
-                        <div class="inventory-item-icon">
-                            ◈
-                        </div>
-
-
-                        <div class="inventory-info">
-
-                            <div class="inventory-name">
-                                Burger Patty
-                            </div>
-
-                            <div class="inventory-detail">
-                                No stock recorded
-                            </div>
-
-                        </div>
-
-
-                        <span class="stock-status status-out">
-                            NO STOCK
-                        </span>
-
-                    </div>
-
-
-                    <!-- CHICKEN -->
-
-                    <div class="inventory-row">
-
-                        <div class="inventory-item-icon">
-                            ◈
-                        </div>
-
-
-                        <div class="inventory-info">
-
-                            <div class="inventory-name">
-                                Chicken
-                            </div>
-
-                            <div class="inventory-detail">
-                                No stock recorded
-                            </div>
-
-                        </div>
-
-
-                        <span class="stock-status status-out">
-                            NO STOCK
-                        </span>
-
-                    </div>
-
-
-                    <!-- COFFEE BEANS -->
-
-                    <div class="inventory-row">
-
-                        <div class="inventory-item-icon">
-                            ◈
-                        </div>
-
-
-                        <div class="inventory-info">
-
-                            <div class="inventory-name">
-                                Coffee Beans
-                            </div>
-
-                            <div class="inventory-detail">
-                                No stock recorded
-                            </div>
-
-                        </div>
-
-
-                        <span class="stock-status status-out">
-                            NO STOCK
-                        </span>
-
-                    </div>
+                    <p>
+                        Latest recorded operating expenses.
+                    </p>
 
                 </div>
 
             </div>
 
 
-            <!-- =================================================
-                 RECENT ACTIVITY
-            ================================================== -->
+            @if ($recentExpenses->count())
 
-            <div class="panel">
+                <div class="dashboard-table-wrapper">
 
-                <div class="panel-header">
+                    <table class="dashboard-table">
 
-                    <div>
+                        <thead>
 
-                        <div class="panel-title">
-                            Recent Activity
-                        </div>
+                            <tr>
 
-                        <div class="panel-subtitle">
-                            Latest system actions
-                        </div>
+                                <th>
+                                    Category
+                                </th>
 
+                                <th>
+                                    Date
+                                </th>
+
+                                <th>
+                                    Amount
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            @foreach ($recentExpenses as $expense)
+
+                                <tr>
+
+                                    <td>
+                                        {{ $expense->category }}
+                                    </td>
+
+
+                                    <td>
+
+                                        {{ $expense->expense_date
+                                            ? $expense->expense_date->format('M d, Y')
+                                            : '—'
+                                        }}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <span class="dashboard-amount">
+                                            ₱{{ number_format((float) $expense->amount, 2) }}
+                                        </span>
+
+                                    </td>
+
+                                </tr>
+
+                            @endforeach
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            @else
+
+                <div class="dashboard-empty">
+
+                    <div class="dashboard-empty-icon">
+                        −
+                    </div>
+
+                    <div class="dashboard-empty-title">
+                        No expenses recorded yet
+                    </div>
+
+                    <div class="dashboard-empty-text">
+                        Recorded expenses will appear here.
                     </div>
 
                 </div>
 
+            @endif
 
-                <div class="activity-list">
+        </div>
 
-
-                    <!-- LOGIN -->
-
-                    <div class="activity">
-
-                        <div class="activity-dot"></div>
-
-                        <div>
-
-                            <div class="activity-text">
-
-                                <strong>
-                                    {{ $user->name }}
-                                </strong>
-
-                                signed in to BiteSync.
-
-                            </div>
-
-                            <div class="activity-time">
-                                Just now
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- INVENTORY -->
-
-                    <div class="activity">
-
-                        <div class="activity-dot"></div>
-
-                        <div>
-
-                            <div class="activity-text">
-                                Inventory monitoring is ready
-                                for use.
-                            </div>
-
-                            <div class="activity-time">
-                                System
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- PRODUCTS -->
-
-                    <div class="activity">
-
-                        <div class="activity-dot"></div>
-
-                        <div>
-
-                            <div class="activity-text">
-                                Product and recipe management
-                                are ready to be configured.
-                            </div>
-
-                            <div class="activity-time">
-                                System
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- PROCUREMENT -->
-
-                    <div class="activity">
-
-                        <div class="activity-dot"></div>
-
-                        <div>
-
-                            <div class="activity-text">
-                                Procurement and financial
-                                records can be managed from
-                                BiteSync.
-                            </div>
-
-                            <div class="activity-time">
-                                System
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-    </main>
+    </div>
 
 </div>
 
-</body>
 
-</html>
+
+{{-- ================================================================
+     CHART.JS
+     ================================================================ --}}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script>
+
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+
+        /* ==========================================================
+           REAL DATABASE DATA
+           ========================================================== */
+
+        const salesPurchaseTrend =
+            {!! $salesPurchaseTrendJson !!};
+
+        const expenseBreakdown =
+            {!! $expenseBreakdownJson !!};
+
+        const purchaseStatuses =
+            {!! $purchaseStatusesJson !!};
+
+
+
+        /* ==========================================================
+           CHART DEFAULTS
+           ========================================================== */
+
+        Chart.defaults.font.family =
+            "'Segoe UI', Arial, sans-serif";
+
+        Chart.defaults.font.size = 10;
+
+        Chart.defaults.color =
+            '#8b8179';
+
+
+
+        /* ==========================================================
+           SALES VS PURCHASES
+           ========================================================== */
+
+        const salesPurchaseCanvas =
+            document.getElementById(
+                'salesPurchaseChart'
+            );
+
+
+        if (salesPurchaseCanvas) {
+
+            new Chart(
+                salesPurchaseCanvas,
+                {
+
+                    type: 'line',
+
+                    data: {
+
+                        labels:
+                            salesPurchaseTrend.map(
+                                item => item.date
+                            ),
+
+                        datasets: [
+
+                            {
+                                label: 'Sales',
+
+                                data:
+                                    salesPurchaseTrend.map(
+                                        item => item.sales
+                                    ),
+
+                                borderColor:
+                                    '#c47a3a',
+
+                                backgroundColor:
+                                    'rgba(196,122,58,.10)',
+
+                                borderWidth: 2,
+
+                                fill: true,
+
+                                tension: .35,
+
+                                pointRadius: 2,
+
+                                pointHoverRadius: 4
+                            },
+
+
+                            {
+                                label: 'Purchases',
+
+                                data:
+                                    salesPurchaseTrend.map(
+                                        item => item.purchases
+                                    ),
+
+                                borderColor:
+                                    '#637f9f',
+
+                                backgroundColor:
+                                    'rgba(99,127,159,.06)',
+
+                                borderWidth: 2,
+
+                                fill: true,
+
+                                tension: .35,
+
+                                pointRadius: 2,
+
+                                pointHoverRadius: 4
+                            }
+
+                        ]
+
+                    },
+
+
+                    options: {
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        },
+
+                        plugins: {
+
+                            legend: {
+
+                                position: 'top',
+
+                                align: 'end',
+
+                                labels: {
+
+                                    usePointStyle: true,
+
+                                    boxWidth: 7,
+
+                                    padding: 15,
+
+                                    font: {
+
+                                        size: 10,
+
+                                        weight: '600'
+                                    }
+
+                                }
+
+                            },
+
+                            tooltip: {
+
+                                callbacks: {
+
+                                    label:
+                                        function(context) {
+
+                                            return (
+                                                ' ' +
+                                                context.dataset.label +
+                                                ': ₱' +
+                                                Number(
+                                                    context.parsed.y
+                                                ).toLocaleString(
+                                                    'en-PH',
+                                                    {
+                                                        minimumFractionDigits: 2
+                                                    }
+                                                )
+                                            );
+
+                                        }
+
+                                }
+
+                            }
+
+                        },
+
+
+                        scales: {
+
+                            x: {
+
+                                grid: {
+                                    display: false
+                                },
+
+                                ticks: {
+
+                                    maxTicksLimit: 8,
+
+                                    font: {
+                                        size: 9
+                                    }
+
+                                }
+
+                            },
+
+
+                            y: {
+
+                                beginAtZero: true,
+
+                                grid: {
+
+                                    color:
+                                        '#eee8e2'
+                                },
+
+                                ticks: {
+
+                                    font: {
+                                        size: 9
+                                    },
+
+                                    callback:
+                                        function(value) {
+
+                                            return '₱' +
+                                                Number(value)
+                                                    .toLocaleString(
+                                                        'en-PH',
+                                                        {
+                                                            notation:
+                                                                'compact'
+                                                        }
+                                                    );
+
+                                        }
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+            );
+
+        }
+
+
+
+        /* ==========================================================
+           EXPENSE BREAKDOWN
+           ========================================================== */
+
+        const expenseCanvas =
+            document.getElementById(
+                'expenseChart'
+            );
+
+
+        if (expenseCanvas) {
+
+            new Chart(
+                expenseCanvas,
+                {
+
+                    type: 'doughnut',
+
+                    data: {
+
+                        labels:
+                            expenseBreakdown.map(
+                                item => item.category
+                            ),
+
+                        datasets: [
+
+                            {
+
+                                data:
+                                    expenseBreakdown.map(
+                                        item => item.total
+                                    ),
+
+                                backgroundColor: [
+
+                                    '#c47a3a',
+                                    '#76563d',
+                                    '#637f9f',
+                                    '#5d8b67',
+                                    '#b9823e',
+                                    '#a85f28',
+                                    '#b95d56',
+                                    '#8b8179',
+                                    '#d6a15c',
+                                    '#9c7b5b'
+
+                                ],
+
+                                borderWidth: 2,
+
+                                borderColor: '#ffffff'
+
+                            }
+
+                        ]
+
+                    },
+
+
+                    options: {
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+                        cutout: '62%',
+
+                        plugins: {
+
+                            legend: {
+
+                                position: 'right',
+
+                                labels: {
+
+                                    usePointStyle: true,
+
+                                    pointStyle: 'circle',
+
+                                    padding: 10,
+
+                                    boxWidth: 7,
+
+                                    font: {
+                                        size: 9
+                                    }
+
+                                }
+
+                            },
+
+                            tooltip: {
+
+                                callbacks: {
+
+                                    label:
+                                        function(context) {
+
+                                            return (
+                                                ' ₱' +
+                                                Number(
+                                                    context.parsed
+                                                ).toLocaleString(
+                                                    'en-PH',
+                                                    {
+                                                        minimumFractionDigits: 2
+                                                    }
+                                                )
+                                            );
+
+                                        }
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+            );
+
+        }
+
+
+
+        /* ==========================================================
+           PURCHASE STATUS
+           ========================================================== */
+
+        const purchaseStatusCanvas =
+            document.getElementById(
+                'purchaseStatusChart'
+            );
+
+
+        if (purchaseStatusCanvas) {
+
+            new Chart(
+                purchaseStatusCanvas,
+                {
+
+                    type: 'bar',
+
+                    data: {
+
+                        labels:
+                            purchaseStatuses.map(
+                                item => item.status
+                            ),
+
+                        datasets: [
+
+                            {
+
+                                label: 'Purchases',
+
+                                data:
+                                    purchaseStatuses.map(
+                                        item => item.count
+                                    ),
+
+                                backgroundColor:
+                                    '#c47a3a',
+
+                                borderRadius: 6,
+
+                                borderSkipped: false,
+
+                                maxBarThickness: 28
+
+                            }
+
+                        ]
+
+                    },
+
+
+                    options: {
+
+                        indexAxis: 'y',
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+                        plugins: {
+
+                            legend: {
+                                display: false
+                            }
+
+                        },
+
+
+                        scales: {
+
+                            x: {
+
+                                beginAtZero: true,
+
+                                ticks: {
+
+                                    precision: 0,
+
+                                    font: {
+                                        size: 9
+                                    }
+
+                                },
+
+                                grid: {
+
+                                    color:
+                                        '#eee8e2'
+                                }
+
+                            },
+
+
+                            y: {
+
+                                grid: {
+                                    display: false
+                                },
+
+                                ticks: {
+
+                                    font: {
+                                        size: 9
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+            );
+
+        }
+
+    }
+
+);
+
+</script>
+
+@endsection
