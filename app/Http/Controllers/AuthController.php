@@ -9,99 +9,32 @@ use Illuminate\View\View;
 
 class AuthController extends Controller
 {
-    /**
-     * Show the login page.
-     */
-    public function showLogin(): View
+    public function create(): View
     {
         return view('auth.login');
     }
 
-    /**
-     * Process the login request.
-     */
-    public function login(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
         $credentials = $request->validate([
-            'email' => [
-                'required',
-                'email',
-            ],
-            'password' => [
-                'required',
-            ],
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
         ]);
 
-        $remember = $request->boolean('remember');
-
-        if (!Auth::attempt($credentials, $remember)) {
+        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()
-                ->withErrors([
-                    'email' => 'The email or password is incorrect.',
-                ])
+                ->withErrors(['email' => 'Those credentials do not match our records.'])
                 ->onlyInput('email');
         }
 
-        // Regenerate the session after successful login.
         $request->session()->regenerate();
 
-        $user = Auth::user();
-
-        /*
-        |--------------------------------------------------------------------------
-        | CEO/Admin
-        |--------------------------------------------------------------------------
-        */
-
-        if ($user->role === 'CEO/Admin') {
-            return redirect()->route('admin.dashboard');
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Finance
-        |--------------------------------------------------------------------------
-        */
-
-        if ($user->role === 'Finance') {
-            return redirect()->route('finance.dashboard');
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Procurement
-        |--------------------------------------------------------------------------
-        */
-
-        if ($user->role === 'Procurement') {
-            return redirect()->route('procurement.dashboard');
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Invalid Role
-        |--------------------------------------------------------------------------
-        */
-
-        Auth::logout();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect()
-            ->route('login')
-            ->withErrors([
-                'email' => 'Your account does not have a valid BiteSync role.',
-            ]);
+        return redirect()->route('finance.index');
     }
 
-    /**
-     * Log the user out.
-     */
-    public function logout(Request $request): RedirectResponse
+    public function destroy(Request $request): RedirectResponse
     {
         Auth::logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

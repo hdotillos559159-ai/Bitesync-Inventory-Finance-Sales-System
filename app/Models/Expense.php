@@ -10,33 +10,27 @@ class Expense extends Model
 {
     use HasFactory;
 
-    /**
-     * Fields that can be mass assigned.
-     */
     protected $fillable = [
-        'user_id',
+        'expense_no',
         'category',
-        'amount',
         'expense_date',
-        'description',
-        'reference_no',
-        'status',
+        'recorded_by',
+        'purchase_id',
+        'amount',
     ];
 
-    /**
-     * Automatically convert database values
-     * into the appropriate PHP types.
-     */
     protected $casts = [
-        'amount' => 'decimal:2',
         'expense_date' => 'date',
+        'amount' => 'decimal:2',
     ];
 
-    /**
-     * The user who recorded this expense.
-     */
-    public function user(): BelongsTo
+    public function purchase(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Purchase::class);
+    }
+
+    public function scopeFromPurchase($query)
+    {
+        return $query->whereNotNull('purchase_id');
     }
 }
